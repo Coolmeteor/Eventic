@@ -1,15 +1,16 @@
 import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperclip } from '@fortawesome/free-solid-svg-icons'
+import { faP, faPaperclip, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
-export default function BuisnessCard({
-	theme = "black",
-	title,
-	children,
-	icons = faPaperclip
-}) {
+type Props = {
+	theme?: string,
+	title: string,
+	children: React.ReactNode,
+	icons?: IconDefinition
+}
 
+export default function BuisnessCard({theme = "black", title, children, icons = faPaperclip}: Props) {
 	let fontColor;
 
 	// handle theme, variants from props

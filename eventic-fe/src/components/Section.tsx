@@ -1,5 +1,14 @@
 import React from 'react'
 
+
+type Props = {
+	fullWidth?: boolean,
+	usePadding?: boolean,
+	marginTop?: string,
+	marginBottom?: string,
+	children: React.ReactNode
+}
+
 /**
  * Section
  * 
@@ -18,7 +27,7 @@ import React from 'react'
  * @param {String} props.marginBottom - The bottom margin of the section
  * @param {React.ReactNode} props.children - The jsx content of the section
  */
-export default function Section({ fullWidth = false, usePadding = true, marginTop = "0px", marginBottom = "0px", children }) {
+export default function Section({ fullWidth = false, usePadding = true, marginTop = "0px", marginBottom = "0px", children }: Props) {
 	return (
 		<>
 			<section className="outer-container">

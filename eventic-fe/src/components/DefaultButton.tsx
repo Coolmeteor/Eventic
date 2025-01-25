@@ -1,5 +1,15 @@
 import React from "react";
 
+type Props = {
+	bgColor?: string;
+	textColor?: string;
+	fontSize?: string;
+	padding?: string;
+	className?: string;
+	onClick?: () => void;
+	children: React.ReactNode;
+};
+
 /**
  * Defaults:
  * text colour = white
@@ -10,7 +20,6 @@ import React from "react";
  * @param {*} param0
  * @returns
  */
-
 export default function DefaultButton({
 	bgColor = "var(--color-primary-green)",
 	textColor = "#FFFFFF",
@@ -19,7 +28,7 @@ export default function DefaultButton({
 	className = "",
 	onClick,
 	children,
-}) {
+}: Props) {
 
 	return (
 		<>
