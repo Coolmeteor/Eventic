@@ -8,7 +8,7 @@ import DefaultButton from "@/components/DefaultButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function Homepage() {
+export default function Example() {
 	const [testData, setTestData] = useState<string[]>([]); // state
 	const [images, setImages] = useState<string[]>([]); // images
 
