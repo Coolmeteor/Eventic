@@ -39,6 +39,7 @@ export default function Section({ fullWidth = false, usePadding = true, marginTo
 			<style jsx>
 				{`
 				.outer-container {
+				
 					display: flex;
 					justify-content: center;
 					padding: 0px ${usePadding ? 'var(--section-padding)' : '0px'};
@@ -47,6 +48,7 @@ export default function Section({ fullWidth = false, usePadding = true, marginTo
 				}
 
 				.inner-container {
+				
 					width: 100%;
 					max-width: ${fullWidth ? '100%' : 'var(--section-max-width)'};
 				}

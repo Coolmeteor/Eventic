@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 
 // import css here
+import '../styles/homepage.css'
 import '../styles/gallery.css'
 import '../styles/interaction.css'
 import '../styles/test.css'
@@ -15,6 +16,8 @@ config.autoAddCss = false;
 
 // Fonts
 import { Roboto_Condensed } from "next/font/google"
+import { TopNavbar } from "@/components/Navigation/TopNav";
+import { BottomNavbar } from "@/components/Navigation/BottomNav";
 const roboto_condensed = Roboto_Condensed({
 	subsets: ['latin'],
 	weight: ['300', '400', '700']
@@ -51,11 +54,13 @@ export default function App({
 	return (
 		<>
 			<div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+				<TopNavbar />
 				<div>
 					{/* <SessionProvider session={session}> */}
 						<Component {...pageProps} />
 					{/* </SessionProvider> */}
 				</div>
+				<BottomNavbar></BottomNavbar>
 			</div>
 
 			{/* css reset */}
@@ -67,6 +72,13 @@ export default function App({
 			<style jsx global>{`
 				:root {
 					/* Colors */
+					--color-primary:rgb(222, 245, 71);
+					--color-secondary:rgb(227, 255, 175);
+					--color-teritary:rgb(149, 250, 255);
+
+
+					--color-onPrimary:rgb(57, 62, 20);
+
 					--color-primary-green:rgb(89, 206, 16);
 					--color-background: #FCFCFC;
 					--color-font-primary: #000000;
