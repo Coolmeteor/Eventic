@@ -77,10 +77,16 @@ export default function App({
 					--color-teritary:rgb(149, 250, 255);
 
 
+					--color-primary-dark:rgb(201, 222, 63);
+
 					--color-onPrimary:rgb(57, 62, 20);
 
+					--color-background-light: #FCFCFC;
+					--color-background-mid:rgb(247, 249, 246);
+					--color-background-dark:rgb(90, 90, 90);
+
 					--color-primary-green:rgb(89, 206, 16);
-					--color-background: #FCFCFC;
+					
 					--color-font-primary: #000000;
 					--color-font-secondary: #5C5C5C;
 
