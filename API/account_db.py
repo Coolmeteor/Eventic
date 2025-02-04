@@ -1,11 +1,7 @@
 
-import sqlite3
 from utils import hash_pass
 from utils import get_db_connect
 
-conn = sqlite3.connect('app.db')
-
-c = conn.cursor()
 
 def clear_user(info):
     if 'password' in info:

@@ -1,9 +1,9 @@
 from flask import Flask
-import auth
-
+import bp_auth
+import bp_event
 
 app = Flask(__name__)
-if __name__ == '__main__':
-    app.run(debug=True)
 app.secret_key = b'dev'
-app.register_blueprint(auth.bp)
+app.register_blueprint(bp_auth.bp)
+app.register_blueprint(bp_event.bp)
+
