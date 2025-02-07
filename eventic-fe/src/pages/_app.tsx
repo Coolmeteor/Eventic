@@ -2,6 +2,7 @@ import "../styles/globals.css";
 
 // import css here
 import '../styles/homepage.css'
+import '../styles/profile.css'
 import '../styles/gallery.css'
 import '../styles/interaction.css'
 import '../styles/test.css'
@@ -89,6 +90,8 @@ export default function App({
 					
 					--color-font-primary: #000000;
 					--color-font-secondary: #5C5C5C;
+
+					--color-icon-gray: rgba(219, 221, 210, 70%);
 
 					/* Fonts */
 					--font-calps: ${calps.style.fontFamily};
