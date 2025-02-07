@@ -1,12 +1,14 @@
 .greeting {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin: 40px 20px 20px 20px;
 
-    width: 1000px;
+    width: 90%;
     text-align: center;
 }
+
 .dashboard {
-    width: 350px;
+    width: 90%;
+    height: auto;
     min-height: 100px;
     margin: 20px 20px 20px 20px;
 
@@ -14,27 +16,43 @@
     border-radius: 15px;
 }
 
+.box{
+    margin: 10px;
+    background: var(--color-background-light)
+}
+
+.listLabel{
+    display:block;
+    text-align: left;
+    margin: 20px;
+    font-size: 2rem;
+}
+
 
 .iconList{
     text-align: center;
-    width: 1000px;
-    margin: 20px;
+    width: 90%;
+    min-height: 500px;
+    margin: 10px;
 }
 
 .textLink {
     margin: .1em;
     font-size: var(--font-size-body-M);
+    font-family: var(--font-roboto);
     color: var(--color-font-primary);
-    transition: .2s;
-}
-
-.textLink::marker {
-    font-size: 1em;
+    --webkit-transfrom: scale(1);
+    transform: scale(1);
 }
 
 .textLink:hover {
     color: var(--color-font-primary);
     text-decoration: underline;
+    transform: scale(1.01);
+}
+
+/* .textLink::marker {
+    font-size: 1em;
 }
 
 .textLink::before{
@@ -46,4 +64,10 @@
 
 .textLink:hover::before{
     margin-right: 5px;
+} */
+
+.errorMessage{
+    text-align: left;
+    color: red;
+    font-size: 1.1rem;
 }

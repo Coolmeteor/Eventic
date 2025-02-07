@@ -7,11 +7,12 @@ import styles from "./DefaultIconButton.module.css"
 type Props = {
     title: string,
     icons?: IconDefinition,
+    iconSize?: string,
     onClick?: () => void,
     className?: string;
 }
 
-export default function DefaultIconButton({title, icons=faPaperclip, onClick, className}: Props){
+export default function DefaultIconButton({title, icons=faPaperclip, iconSize="35px", onClick, className}: Props){
     return (
         <>
             <button className={`defaultStyle ${className}`} onClick={onClick}>
@@ -19,7 +20,7 @@ export default function DefaultIconButton({title, icons=faPaperclip, onClick, cl
                     <h1>{title}</h1>
                 </span>
                 <div className='icon'>
-                    <FontAwesomeIcon icon={icons} />
+                    <FontAwesomeIcon icon={icons}/>
                 </div>
             </button>
             <style jsx>{`
@@ -43,6 +44,12 @@ export default function DefaultIconButton({title, icons=faPaperclip, onClick, cl
 
             .defaultStyle:hover{
                 background: var(--color-icon-gray);
+            }
+            
+            .icon{
+                display: inline;
+                align-item: center;
+                font-size: ${iconSize};
             }
 
             .title{
