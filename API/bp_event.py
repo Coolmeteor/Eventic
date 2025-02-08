@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from request_utils import resp_json
 from request_utils import check_form
 from event_db import save_event, publish_event, search_event
@@ -7,6 +8,7 @@ from event_db import save_event, publish_event, search_event
 bp = Blueprint('event', __name__, url_prefix='/event')
 
 @bp.post('create')
+@jwt_required()
 def create():
     params = check_form(['name', 'description', 'start_date', 'end_date', 'location', 'organizer'], request)
     if params['code'] == 1:
@@ -17,6 +19,7 @@ def create():
     return resp_json(0, saved)
 
 @bp.put('publish/<int:id>')
+@jwt_required()
 def publich(id):
     publish_event(id)
     return resp_json(0, f"Event with id {id} published.")
