@@ -32,3 +32,12 @@ def search_event(name):
     for row in rows:
         events.append(dict(row))
     return events
+
+def get_event_info(id):
+    with get_db_connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * from events where id = ?", [id])
+        row = cursor.fetchone()
+        if row is None:
+            return None
+    return dict(row)
