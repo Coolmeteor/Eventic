@@ -1,7 +1,5 @@
-
 from utils import hash_pass
 from utils import get_db_connect
-
 
 def clear_user(info):
     if 'password' in info:
