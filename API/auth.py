@@ -5,7 +5,6 @@ from request_utils import resp_json
 from request_utils import check_form
 from account_db import find_account_by_name, find_account_by_email, save_account, check_account
 
-
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/test', methods=('GET', 'POST'))
