@@ -85,15 +85,15 @@ export default function Event() {
                 // const data: EventData = (await response.json())[0]
 
                 // make loading status show for now
-                setTimeout(() => {
-                    // console.log(data);
+                // setTimeout(() => {
+                    // console.log(data );
                     // setEventData(data)
 
                     setEventData(
                         mockEvents.filter((event) => event.id === parseInt(id))[0]
                     )
                     setLoading(false)
-                }, 500);
+                // }, 2000);
 
             } catch (err) {
                 setError((err as Error).message)
