@@ -1,0 +1,246 @@
+openapi: 3.0.0
+info:
+  title: System API
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: user register
+      tags: 
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: user name
+                  example: bob
+                email:
+                  type: string
+                  format: email
+                  example: aa@aa.com
+                password:
+                  type: string
+                  example: a
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /auth/login:
+    post:
+      summary: user login
+      tags: 
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: aa@aa.com
+                password:
+                  type: string
+                  example: a
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+        '401':
+          description: error parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  msg:
+                    type: string
+  /event/create:
+    post:
+      summary: create event
+      tags: 
+        - event
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: book sell
+                description:
+                  type: string
+                start_date:
+                  type: string
+                end_date:
+                  type: string
+                location:
+                  type: string
+                organizer:
+                  type: string
+              required:
+                - name
+                - description
+                - start_date
+                - end_date
+                - location
+                - organizer
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /event/publish/{id}:
+    put:
+      summary: publish event
+      tags: 
+        - event
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /event/search:
+    get:
+      summary: search event filtering
+      tags: 
+        - event
+      parameters:
+        - in: query
+          name: name
+          required: true
+          schema:
+            type: string
+          description: event name or part of name
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /ticket/create:
+    post:
+      summary: create ticket for event
+      tags: 
+        - ticket
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                event_id:
+                  type: integer
+                  example: 1
+                price:
+                  type: real
+                  example: 123.5
+                quantity:
+                  type: integer
+                  example: 120
+              required:
+                - event_id
+                - price
+                - quantity
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /ticket/register:
+    post:
+      summary: user order a ticket
+      tags: 
+        - ticket
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                ticket_id:
+                  type: integer
+                  example: 1
+              required:
+                - ticket_id
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /payment/charge:
+    put:
+      summary: Users pay for tickets
+      tags: 
+        - payment
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+  /payment/check_in/<int:id>:
+    put:
+      summary: user check in a paid ticket
+      tags: 
+        - payment
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          "$ref": "#/components/responses/Normal"
+tags:
+  - name: auth
+    description: User authority
+  - name: event
+    description: Event create and management
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Normal:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              data:
+                type: object
