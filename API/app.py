@@ -11,16 +11,13 @@ import sqlite3
 from app_base import app
 
 def init_db():
-    conn = sqlite3.connect('app.db')  # 连接数据库
+    conn = sqlite3.connect('app.db') 
     with open('schema.sql', 'r', encoding='utf-8') as f:
         sql_script = f.read()
     conn.executescript(sql_script)
     conn.commit()
     conn.close()
     print("Database initialized.")
-
-# 运行数据库初始化（只在 app.py 运行时执行一次）
-init_db()
 
 # Config Swagger UI
 SWAGGER_URL = '/api/docs'
@@ -40,6 +37,7 @@ def index():
     
     return render_template('yaml.html', yaml_content=yaml_content)
 
+init_db()
 
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
