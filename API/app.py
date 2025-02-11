@@ -1,3 +1,4 @@
+#Main entry point for the Flask application
 from flask import render_template
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -5,8 +6,21 @@ import bp_auth
 import bp_event
 import bp_ticket
 import bp_payment
+import sqlite3
 
 from app_base import app
+
+def init_db():
+    conn = sqlite3.connect('app.db')  # 连接数据库
+    with open('schema.sql', 'r', encoding='utf-8') as f:
+        sql_script = f.read()
+    conn.executescript(sql_script)
+    conn.commit()
+    conn.close()
+    print("Database initialized.")
+
+# 运行数据库初始化（只在 app.py 运行时执行一次）
+init_db()
 
 # Config Swagger UI
 SWAGGER_URL = '/api/docs'
