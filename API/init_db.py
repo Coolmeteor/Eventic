@@ -13,7 +13,7 @@ account_statements = [
     '''CREATE TABLE account (
         id INTEGER PRIMARY KEY  AUTOINCREMENT,
         name TEXT NOT NULL,
-        email TET NOT NULL,
+        email TEXT NOT NULL,
         password TEXT NOT NULL
     );''',
     f"INSERT INTO account (name, email, password) VALUES ('a', 'a', '{hash_pass('a', 'a')}' );"
