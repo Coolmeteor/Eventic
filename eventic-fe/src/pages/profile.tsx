@@ -30,10 +30,9 @@ export default function Profile(){
 
     // For both account
     const profileList = [
-        {text: "Username and passward", url: '', onClick:()=>setDisplay(DISPLAY.personalInfo)},
+        {text: "Edit personal information", url: '', onClick:()=>setDisplay(DISPLAY.personalInfo)},
         {text: "Saved payment option", url: "", onClick:notDefined},
         {text: "Setup your preference", url: "", onClick:notDefined},
-        {text: "Mail address / phone number", url: "", onClick: notDefined},
         {text: "Notification settings", url: "", onClick: notDefined}
     ]
 

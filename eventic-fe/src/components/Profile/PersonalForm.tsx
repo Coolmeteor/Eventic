@@ -12,11 +12,17 @@ export default function PersonalForm({username, toHome}: Props){
 
     const [nameErrorText, setNameErrorText] = useState<string>("");
     const [passErrorText, setPassErrorText] = useState<string>("");
-    
+
+
+    function resetErrorText(){
+        setNameErrorText("");
+        setPassErrorText("");
+    }
+
+
     function changeUsername(_newUsername: string){
-        if(passErrorText != ""){
-            setPassErrorText("");
-        }
+        resetErrorText();
+
         // Check the validity
         if(_newUsername == undefined || _newUsername == ""){
             setNameErrorText("New username is not entered");
@@ -35,9 +41,8 @@ export default function PersonalForm({username, toHome}: Props){
     }
 
     function changePassword(_currentPassword: string, _newPassword: string){
-        if(nameErrorText != ""){
-            setNameErrorText("");
-        }
+        resetErrorText();
+
         // Check the validity first
         if(_currentPassword == undefined || _currentPassword == ""){
             setPassErrorText("Current password is not entered");
@@ -80,6 +85,7 @@ export default function PersonalForm({username, toHome}: Props){
                     </form>
                     
                 </div>
+
                 <div className="formBox">
                     <h1>Password</h1>
                     <form onSubmit={(e) => {
