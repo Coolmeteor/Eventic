@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import Section from "@/components/Section";
 import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
+import { API } from "../_app";
 
-const API = "http://localhost:25753/apitest";
 // event id 100, 101, 102 are avalible currently.
 type EventData = {
     id: number;

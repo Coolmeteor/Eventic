@@ -4,9 +4,11 @@ from flask import Blueprint, jsonify, request, make_response
 from request_utils import resp_json
 from request_utils import check_form
 from account_db import find_account_by_name, find_account_by_email, save_account, check_account
-
+from flask_cors import CORS
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+CORS(bp) 
 
 @bp.route('/test', methods=('GET', 'POST'))
 def test():

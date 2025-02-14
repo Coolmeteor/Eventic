@@ -1,6 +1,8 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
 import { useState, useEffect } from "react";
+import { API } from "./_app";
+import { data } from "autoprefixer";
 
 export default function Login() {
 
@@ -14,8 +16,8 @@ export default function Login() {
 
     const [errorText, setErrorText] = useState<string>("");
 
-    function login(username: string, password: string) {
-        if (username == undefined || username == "") {
+    async function login(email: string, password: string) {
+        if (email == undefined || email == "") {
             setErrorText("Please enter your username");
             return
         }
@@ -24,12 +26,45 @@ export default function Login() {
             return
         }
         setErrorText("");
-        setUsername(username);
+        setEmail(email);
         setPassword(password);
-        window.alert("Login (no backend yet) + username: " + username + " password: " + password);
+
+
+
+        const data = {
+        
+            password: password,
+            email: email,
+        }
+
+
+        try {
+            const response = await fetch(`${API}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+                 mode: "no-cors"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to upload data to server: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            setErrorText((error as Error).message);
+            console.error("Error posting event:", error);
+            
+            return null;
+        }
+
+
+       
     }
 
-    function register(email: string, username: string, password: string, confirmPassword: string) {
+    async function register(email: string, username: string, password: string, confirmPassword: string) {
 
         if (username == undefined || username == "") {
             setErrorText("Please enter your username");
@@ -57,7 +92,36 @@ export default function Login() {
         setConfirmPassword(confirmPassword);
         setEmail(email);
 
-        window.alert("Register (no backend yet) + username: " + username + " password: " + password + " email: " + email);
+
+        const data = {
+            name: username,
+            email: email,
+            password: password,
+        }
+
+        console.log(data);
+        try {
+            const response = await fetch(`${API}/auth/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+                 mode: "no-cors"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to upload data to server: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            setErrorText((error as Error).message);
+            console.error("Error posting event:", error);
+            
+            return null;
+        }
+
     }
 
     // useEffect(() => {
@@ -77,8 +141,8 @@ export default function Login() {
                                     e.preventDefault();
                                     login(e.target[0].value, e.target[1].value);
                                 }}>
-                                    <input id="username" type="text" placeholder="Username" required={true}/>
-                                    <input id="password" type="password" placeholder="Password" required={true}/>
+                                    <input id="email" type="email" placeholder="Email address" required={true}/>
+                                    <input id="password" type="password" placeholder="Password" required={true} />
                                     {errorText && <p className="errortext">{errorText}</p>}
                                     <button type="submit">Login</button>
                                 </form>
@@ -92,13 +156,13 @@ export default function Login() {
                                 <h1>Create an account</h1>
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
-                                    register( e.target[3].value,e.target[0].value, e.target[1].value, e.target[2].value);
+                                    register(e.target[3].value, e.target[0].value, e.target[1].value, e.target[2].value);
                                 }
                                 }>
-                                    <input id="username" type="text" placeholder="Username" required={true}/>
-                                    <input id="password" type="password" placeholder="Password" required={true}/>
-                                    <input id="passwordconf" type="password" placeholder="Confirm Password" required={true}/>
-                                    <input id="email" type="email" placeholder="Email address (Optional)" />
+                                    <input id="email" type="email" placeholder="Email address" required={true}/>
+                                    <input id="username" type="text" placeholder="Username" required={true} />
+                                    <input id="password" type="password" placeholder="Password" required={true} />
+                                    <input id="passwordconf" type="password" placeholder="Confirm Password" required={true} />
 
                                     {errorText && <p className="errortext">{errorText}</p>}
                                     <button type="submit">Register</button>
