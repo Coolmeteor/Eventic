@@ -3,11 +3,33 @@ import Section from "@/components/Section";
 import React from "react";
 
 
+const mockIcons = [
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+]
 
 
 export default function Homepage() {
     return (
-        <Section fullWidth = {true}>
+        <Section fullWidth={true}>
             <div className="hero-container">
                 <img
                     src="hero.jpg"
@@ -21,7 +43,15 @@ export default function Homepage() {
 
 
             </div>
-            <HorizontalScroll />
+            <HorizontalScroll textWithIcons={
+                [
+                    { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Artist" },
+                    { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Movie" },
+                    { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Show" },
+                    { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Chill" },
+                    { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Trip" },
+            ]
+            } />
         </Section>
     );
 }
