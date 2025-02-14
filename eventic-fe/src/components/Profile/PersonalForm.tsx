@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import DefaultLinkButton from '../DefaultLinkButton';
+import DefaultInputForm from '../DefaultInputForm';
 
 type Props = {
     username: string,
@@ -77,7 +78,7 @@ export default function PersonalForm({username, toHome}: Props){
                         changeUsername(e.target[0].value);
                     }}>
                         <p>&bull; Your current username: <span>{username}</span></p>
-                        <input id="username" type="text" placeholder="New username"/>
+                        <DefaultInputForm id="username" type="text" placeholder="New username"/>
                         <p style={{color: "red"}}>{nameErrorText}</p>
                         <p>
                             <button type="submit">Change username</button>
@@ -93,9 +94,9 @@ export default function PersonalForm({username, toHome}: Props){
                         changePassword(e.target[0].value, e.target[1].value);
                     }}>
                         <p>&bull; Enter your current password</p>
-                        <input id="currentPassword" type="password" placeholder="Current Password"/>
+                        <DefaultInputForm id="currentPassword" type="password" placeholder="Current Password"/>
                         <p>&bull; Enter new password</p>
-                        <input id="newPassword" type="password" placeholder="New Password"/>
+                        <DefaultInputForm id="newPassword" type="password" placeholder="New Password"/>
                         <p style={{color: "red"}}>{passErrorText}</p>
                         <p>
                             <button type="submit">Change password</button>
