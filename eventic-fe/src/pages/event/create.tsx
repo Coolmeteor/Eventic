@@ -4,6 +4,9 @@ import Section from "@/components/Section";
 import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
 import { API } from "../_app";
+import DefaultInputForm from "@/components/DefaultInputForm";
+import InputMultiLine from "@/components/InputMultiLine";
+import TagEditor from "@/components/TagEditor";
 
 // event id 100, 101, 102 are avalible currently.
 type EventData = {
@@ -111,7 +114,7 @@ export default function CreateEvent() {
  * Upload form to server
  */
     async function submitForm() {
-        console.log("submitting form")
+        console.log("submitting form", eventData, images);
 
         try {
             const response = await fetch(`${API}/blah blah`, {
@@ -145,34 +148,22 @@ export default function CreateEvent() {
                 {eventData != undefined && eventData != null &&
                     <div>
 
-                        <h1>{eventData?.name}</h1>
-
-    
+                        <h1>Create new event</h1>
 
                         <div className="event-content">
 
                             <div className="event-detail">
-
-
-                            <h2>Title</h2>
-                                <textarea  className="event-detail-input"
-                
-                                    onChange={(e) => {
-                                        setEventData({ ...eventData, name: e.target.value })
-                                    }}>{eventData.name}</textarea>
-
+                                <h2>Title</h2>
+                                <InputMultiLine initialValue={eventData.name} onChange={(e) => {
+                                    setEventData({ ...eventData, name: e.target.value })
+                                }} />
                                 <div className="spacer"></div>
 
 
-
                                 <h2>Description</h2>
-                                <textarea className="event-detail-input"
-                                    
-                                    rows={10}
-                                    onChange={(e) => {
-                                        setEventData({ ...eventData, description: e.target.value })
-                                    }}>{eventData.description}</textarea>
-
+                                <InputMultiLine initialValue={eventData.description} onChange={(e) => {
+                                    setEventData({ ...eventData, description: e.target.value })
+                                }} />
                                 <div className="spacer"></div>
 
 
@@ -184,6 +175,11 @@ export default function CreateEvent() {
 
                                 <div className="category-tags">
                                     <h2>Tags</h2>
+
+                                    <TagEditor tags={eventData.tags} setTags={(tags) => {
+                                        setEventData({ ...eventData, tags: tags })
+                                    }
+                                    } />
                                 </div>
 
 
@@ -194,9 +190,9 @@ export default function CreateEvent() {
 
 
                                 <div className="action-buttons">
+                                    {/* no edit event support yet. */}
                                     <DefaultButton onClick={submitForm}>Save</DefaultButton>
                                     <DefaultButton onClick={submitForm}>Publish</DefaultButton>
-
                                 </div>
 
                                 {error && <p className="errortext">{error}</p>}
@@ -255,25 +251,6 @@ export default function CreateEvent() {
                  width: 100%;
                 // background-color: coral;
             }
-
-
-
-            .event-detail-input {
-                padding-left: 1em;
-                padding-right: 2em;
-                font-size: var(--font-size-body-L);
-
-                border: 3px solid #d1d5db;
-                border-radius: 8px;
-                padding: 8px; 
-                outline: none; 
-                transition: box-shadow 0.2s ease-in-out;
-                }
-
-                .event-detail-input:focus {
-                    border-color: #3b82f6; 
-                    box-shadow: 0 0 4px #3b82f6; 
-                }
 
 
 
