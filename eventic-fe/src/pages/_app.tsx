@@ -54,10 +54,11 @@ export default function App({
 	return (
 		<>
 			<div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-				<TopNavbar />
+				<TopNavbar showProfile={!Component.hideTopNav} />
+
 				<div>
 					{/* <SessionProvider session={session}> */}
-						<Component {...pageProps} />
+					<Component {...pageProps} />
 					{/* </SessionProvider> */}
 				</div>
 				<BottomNavbar></BottomNavbar>
@@ -132,4 +133,4 @@ export default function App({
 	);
 }
 
-export const API ="http://127.0.0.1:5000"
+export const API = "http://127.0.0.1:5000"

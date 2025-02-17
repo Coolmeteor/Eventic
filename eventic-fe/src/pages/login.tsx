@@ -1,8 +1,7 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
 import { useState, useEffect } from "react";
-import {API} from "./_app";
-import { data } from "autoprefixer";
+import { API } from "./_app";
 
 
 export default function Login() {
@@ -27,29 +26,30 @@ export default function Login() {
             return;
         }
         setErrorText("");
-    
+
         const data = { email, password };
-    
+
         try {
             const response = await fetch(`${API}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Login failed: ${response.statusText}`);
             }
-    
+
             const result = await response.json();
             console.log("Login Success:", result);
             if (response.ok) {
-                alert("Login successful!");
-                setIsLogin(true);
+                // setErrorText("Login successful!");
+                localStorage.setItem("authtoken", `${email};${password}`); // later make this session token
+                window.location.href = "/";
             } else {
                 setErrorText(result.msg || "Invalid credentials");
             }
-    
+
         } catch (error) {
             setErrorText("Login error: " + (error as Error).message);
             console.error("Login error:", error);
@@ -73,42 +73,44 @@ export default function Login() {
             return;
         }
         setErrorText("");
-    
+
         const data = {
             user_name: username,  // ✅ 确保参数匹配后端
             email,
             password,
-            
+
         };
-    
+
         try {
             const response = await fetch(`${API}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Registration Failed: ${response.statusText}`);
             }
-    
+
             const result = await response.json();
             console.log("Registration Success:", result);
             if (response.ok) {
-                alert("Registration successful! Please log in.");
-                setIsLogin(true);
+                // setErrorText("Registration successful!")
+                localStorage.setItem("authtoken", `${email};${password}`) // later make this session token
+                window.location.href = "/";
+
             } else {
                 setErrorText(result.msg || "Registration failed");
             }
-    
+
         } catch (error) {
             setErrorText("Registration error: " + (error as Error).message);
             console.error("Registration error:", error);
         }
     }
-    
-    
-   
+
+
+
 
     return (
         <Section>
@@ -191,3 +193,5 @@ export default function Login() {
         </Section>
     );
 }
+
+Login.hideTopNav = true;
