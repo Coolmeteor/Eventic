@@ -3,12 +3,10 @@ import { useRouter } from "next/router";
 import Section from "@/components/Section";
 import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
-import { API } from "../_app";
-import DefaultInputForm from "@/components/DefaultInputForm";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
+import { API } from "@/constants";
 
-// event id 100, 101, 102 are avalible currently.
 type EventData = {
     id: number;
     name: string;
@@ -117,7 +115,7 @@ export default function CreateEvent() {
         console.log("submitting form", eventData, images);
 
         try {
-            const response = await fetch(`${API}/blah blah`, {
+            const response = await fetch(`${API}/event/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

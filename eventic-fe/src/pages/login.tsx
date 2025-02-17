@@ -1,7 +1,7 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
+import { API } from "@/constants";
 import { useState, useEffect } from "react";
-import { API } from "./_app";
 
 
 export default function Login() {

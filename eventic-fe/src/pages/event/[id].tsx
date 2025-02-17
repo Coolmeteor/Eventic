@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll, TextWithIcon } from "@/components/ScrollerLists/HorizontalScroll";
 
-// const API = "http://localhost:25753/apitest";
 // event id 100, 101, 102 are avalible currently.
 type EventData = {
     id: number;
