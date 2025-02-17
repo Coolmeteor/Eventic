@@ -4,7 +4,11 @@ from flask import request, jsonify
 def resp_data(code, data):
     return {'code':code, 'data':data}
 def resp_json(code, data):
-    return jsonify({'code':code, 'data':data})
+    if code == 0:
+        return jsonify({'code':code, 'data':data})
+    else:
+        return jsonify({'code':code, 'msg':data})
+
 
 
 def check_json(param_list, req, method='POST'):
