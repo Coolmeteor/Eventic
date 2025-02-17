@@ -3,9 +3,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from request_utils import resp_json
 from request_utils import check_form
 from event_db import save_event, publish_event, search_event
-
+from flask_cors import CORS
 
 bp = Blueprint('event', __name__, url_prefix='/event')
+CORS(bp) 
 
 @bp.post('create')
 @jwt_required()
