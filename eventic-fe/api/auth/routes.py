@@ -4,7 +4,7 @@ from flask_jwt_extended import create_access_token
 import psycopg2.extras
 from db.db_connect import get_db_connection
 
-# 初始化蓝图 & Bcrypt
+
 auth_bp = Blueprint("auth", __name__)
 bcrypt = Bcrypt()
 @auth_bp.route("/test", methods=["GET"])
@@ -27,7 +27,7 @@ def test():
         return f"<h3>database wrong: {str(e)}</h3>"
 
 
-# 📌 用户注册 API
+
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -38,7 +38,7 @@ def register():
     sex = data.get("sex", None)  # 默认为 None
     password = data.get("password")
 
-    # 校验字段是否为空
+    
     if not user_name or not email or not password:
         return jsonify({"error": "所有字段都必须填写"}), 400
 
@@ -47,13 +47,13 @@ def register():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-          # 🔹 先检查数据库是否已有相同的用户名或邮箱
+          
         cursor.execute("SELECT * FROM users WHERE user_name = %s OR email = %s", (user_name, email))
         existing_user = cursor.fetchone()
         if existing_user:
             return jsonify({"error": "用户名或邮箱已存在，请换一个"}), 409
 
-        # 🔹 如果没有重复数据，插入用户
+        
         cursor.execute(
             """
             INSERT INTO users (user_name, email, passwd_hash, phone, date_of_birth, sex) 
@@ -68,7 +68,7 @@ def register():
     finally:
         conn.close()
 
-# 📌 用户登录 API
+
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()

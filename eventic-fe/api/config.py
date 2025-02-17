@@ -6,4 +6,4 @@ DB_CONFIG = {
     "port": "5432"
 }
 
-SECRET_KEY = "super-secret-key"  # JWT 秘钥，建议存入 .env 文件
+SECRET_KEY = "super-secret-key"  
