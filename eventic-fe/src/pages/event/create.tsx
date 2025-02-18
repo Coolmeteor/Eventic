@@ -121,6 +121,7 @@ export default function CreateEvent() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(eventData),
+                mode: "no-cors"
             });
 
             if (!response.ok) {

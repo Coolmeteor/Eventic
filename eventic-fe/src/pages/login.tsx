@@ -47,7 +47,11 @@ export default function Login() {
                 localStorage.setItem("authtoken", `${email};${password}`); // later make this session token
                 window.location.href = "/";
             } else {
-                setErrorText(result.msg || "Invalid credentials");
+                if (response.status === 401) {
+                    setErrorText("Wrong email or password")
+                } else {
+                    setErrorText(result.msg || "Invalid credentials")
+                }
             }
 
         } catch (error) {
@@ -100,7 +104,17 @@ export default function Login() {
                 window.location.href = "/";
 
             } else {
-                setErrorText(result.msg || "Registration failed");
+                // I have no idea what you guys wrote in chinese in the api, This is my guess based on error codes
+                if (response.status === 500) {
+                    setErrorText("Internal server error")
+                } else if (response.status === 400) {
+                    setErrorText("Invalid registration data")
+
+                } else if (response.status === 409) {
+                    setErrorText("Email already in use")
+                } else {
+                    setErrorText(result.msg || "Registration failed");
+                }
             }
 
         } catch (error) {
