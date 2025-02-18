@@ -91,8 +91,6 @@ export default function App({
 					--color-font-primary: #000000;
 					--color-font-secondary: #5C5C5C;
 
-					--color-icon-gray: rgba(219, 221, 210, 70%);
-
 					/* Fonts */
 					--font-calps: ${calps.style.fontFamily};
 					--font-roboto: ${roboto_condensed.style.fontFamily};

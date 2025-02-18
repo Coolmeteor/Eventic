@@ -1,14 +1,16 @@
-import { useState } from "react";
-import Split from "react-split"
+import { useState, useEffect } from "react";
+import Split from "react-split";
 import { 
     faChartLine, faUserAlt, faShieldAlt, 
     faPlusCircle, faRunning, faCalendarAlt, faTicket,
     faIdCard
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/free-solid-svg-icons';
 
 import DashboardList from "@/components/Profile/DashboardList";
 import PersonalForm from "@/components/Profile/PersonalForm";
 import DefaultIconButton from "@/components/DefaultIconButton";
+
+const API = 'http://127.0.0.1:5000'
 
 const enum DISPLAY{
     home,
@@ -16,17 +18,109 @@ const enum DISPLAY{
 }
 
 export default function Profile(){
-    const [username, setUsername] = useState<string>("defaultName");
     const [display, setDisplay] = useState<DISPLAY>(DISPLAY.home);
     
     const [isUser, setIsUser] = useState<boolean>(true); // Should be set with data from DB
 
     const [errorText, setErrorText] = useState<string>("");
+    ///////////////////////////////////////////////////////////
+    /** 
+     * For debug until profile-page branch merged into main.
+    */
+    // const user_name = "profileTester";
+    const email = "profile_test@example.com";
+    const password = "abcd1234";
+
+    const data = {email, password};
+
+    const createUserToken = async () => {
+        try{
+            const response = await fetch(`${API}/profile/testUser`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify(data),
+            });
+    
+            const received = await response.json();
+            
+            if(response.ok){
+                console.log(received);
+                localStorage.setItem("access_token", received.access_token);
+                localStorage.setItem("user", JSON.stringify(received.user));
+                fetchProfile();
+            } else {
+                console.log(received.message);
+                setErrorText("Failed");
+            }
+        }
+        catch(error){
+            console.error('Error', error);
+            window.alert("Failed to fetch");
+            setErrorText("Failed");
+        }
+    }
+    ////////////////////////////////////////////////////////////
+
+    /*
+    Fetch user information using token stored in localStorage
+    If there is no access_token in localStorage, go back to login page
+     */
+    const [user, setUser] = useState(null);
+
+    const fetchProfile = async () => {
+        const token = localStorage.getItem("access_token");
+        if(!token){
+            window.alert("token error");
+            window.location.href = "/login";
+            return;
+        }
+
+        const response = await fetch(`${API}/profile/authorization`, {
+            headers: {Authorization: `Bearer ${token}`},
+        });
+
+        const _data = await response.json();
+
+
+        if(response.ok){
+            setUser(_data.user);
+            localStorage.setItem("user", JSON.stringify(_data.user));
+        } else {
+            const text = response.text();
+            console.log(text);
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+        }
+    };
+
+    useEffect(() => {
+        if(!localStorage.getItem("access_token") || !localStorage.getItem("user"))
+            createUserToken();
+        else
+        fetchProfile();
+    }, []); // For debugging
+
+    // This is the actual code for release
+    // Load profile
+    // useEffect(() => {
+    //     fetchProfile();
+    // })
+
+
+    if (!user)
+        return <h1 style={{fontSize: "4rem", display: "block", textAlign: "center"}}>Loading...</h1>
+
+    
+    
 
     const notDefined = () => {
         setErrorText("The link/action event is not defined");
         setTimeout(()=>{setErrorText("")}, 2000);
     } // Just for debugging
+
+    
 
     // For both account
     const profileList = [
@@ -103,7 +197,7 @@ export default function Profile(){
                         </div>
                         
                     )
-                } 
+                }
                 
 
                 {/* Right Component*/}
@@ -116,7 +210,7 @@ export default function Profile(){
                                 : (<div><button style={{border: "2px solid black", width: "10rem", background: "yellow"}} onClick={()=>setIsUser(true)}>To user profile</button></div>)
                             }
                             <div className="errorMessage">{errorText}</div>
-                            <h1 className="greeting">Hello {username}!</h1>
+                            <h1 className="greeting">Hello {user["user_name"]}!</h1>
                             {
                                 isUser ? (
                                     <div>
@@ -145,7 +239,7 @@ export default function Profile(){
                             }
                         </div>
                     ) : display==DISPLAY.personalInfo ? (
-                        <PersonalForm username={username} toHome={()=>setDisplay(DISPLAY.home)}/>
+                        <PersonalForm username={user["user_name"]} toHome={()=>setDisplay(DISPLAY.home)}/>
                     ) : (
                         <h2> Error </h2>
                     )
