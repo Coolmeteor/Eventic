@@ -5,6 +5,7 @@ import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll, TextWithIcon } from "@/components/ScrollerLists/HorizontalScroll";
+import { API } from "@/constants";
 
 // event id 100, 101, 102 are avalible currently.
 type EventData = {
@@ -78,8 +79,9 @@ export default function Event() {
             try {
                 setLoading(true);
 
-                // console.log(`fetching event ${API}/event/${id}`)
-                // const response = await fetch(`${API}/event/${id}`)
+                console.log(`fetching event ${API}/events/${id}`)
+                const response = await fetch(`${API}/events/${id}`)
+                console.log(response)
                 // if (!response.ok) throw new Error("Failed to fetch event")
                 // const data: EventData = (await response.json())[0]
 
@@ -88,9 +90,9 @@ export default function Event() {
                     // console.log(data );
                     // setEventData(data)
 
-                    setEventData(
-                        mockEvents.filter((event) => event.id === parseInt(id))[0]
-                    )
+                    // setEventData(
+                    //     mockEvents.filter((event) => event.id === parseInt(id))[0]
+                    // )
                     setLoading(false)
                 // }, 2000);
 
