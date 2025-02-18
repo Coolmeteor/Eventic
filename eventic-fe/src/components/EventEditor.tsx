@@ -4,7 +4,7 @@ import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
-import { API, EventData, mockEvents } from "@/constants";
+import { API, eventCategories, EventData, mockEvents } from "@/constants";
 
 
 export default function EventEditor({ eventId = undefined }: { eventId?: string }) {
@@ -152,6 +152,24 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 <div className="category-tags">
                                     <h2>Category</h2>
 
+                                    <div className="category-selector">
+                                        {eventCategories.map((category) => (
+                                            <label key={category} className="radio-label">
+                                                <input
+                                                    type="radio"
+                                                    name="category"
+                                                    value={category}
+                                                    checked={eventData.category === category}
+                                                    onChange={(e) => {
+                                                        setEventData({ ...eventData, category: e.target.value })
+                                                    }
+                                                    }
+                                                    className="radio-input"
+                                                />
+                                                {category}
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="spacer"></div>
@@ -215,6 +233,23 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 flex-direction: row;
                 width: 100%;
             }
+
+            .category-selector {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                }
+
+                .radio-label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                }
+
+                .radio-input {
+                accent-color: #3b82f6; /* Tailwind blue-500 */
+                }
 
             .rsb {
                 min-width: 400px;
