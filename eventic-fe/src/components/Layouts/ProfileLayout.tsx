@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import Split from "react-split";
 import { useRouter } from "next/router";
 import DashboardList from "@/components/Profile/DashboardList";
