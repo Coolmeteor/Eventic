@@ -90,6 +90,9 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
  * Upload form to server
  */
     async function submitForm(visibility: string = "private") {
+        window.location.href = "/";
+        return
+
         console.log("submitting form", eventData, images);
 
         try {

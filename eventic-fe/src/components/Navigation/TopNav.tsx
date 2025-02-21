@@ -36,7 +36,9 @@ export function TopNavbar({ showProfile }: Props) {
                     </nav>
 
                     {showProfile && !isLogin &&
-                        <DefaultButton onClick={() => window.location.href = "/login"}>
+                        <DefaultButton
+                            bgColor='000000'
+                            onClick={() => window.location.href = "/login"}>
                             <p>Login</p>
                         </DefaultButton>
                     }
