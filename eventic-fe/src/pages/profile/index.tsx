@@ -10,53 +10,13 @@ import ProfileLayout from "@/components/Layouts/ProfileLayout";
 import DefaultIconButton from "@/components/DefaultIconButton";
 import { fetchProfile, User } from "@/utils/profile-api";
 import { logout } from "@/utils/auth-api";
+import { useRouter } from "next/router";
 
 
 export default function ProfileMain(){    
     const [isUser, setIsUser] = useState<boolean>(true); // Should be set with data from DB
 
     const [errorText, setErrorText] = useState<string>("");
-    // ///////////////////////////////////////////////////////////
-    // /** 
-    //  * For debug until profile-page branch merged into main.
-    // */
-    // // const user_name = "profileTester";
-
-    // const createUserToken = async () => {
-    //     try{
-    //         const response = await fetch(`${API}/profile/testUser`, {
-    //             method: "POST",
-    //             credentials: "include",
-    //             mode: "cors",
-    //             headers: { "Content-Type": "application/json"},
-    //             body: JSON.stringify({
-    //                 email: "profile-test@example.com",
-    //                 password: "abcd1234"
-    //             }),
-    //         });
-    
-    //         const received = await response.json();
-            
-    //         if(response.ok){
-    //             console.log(received);
-    //             fetchProfile()
-    //             .then((userData) => {
-    //                 if(userData && "user" in userData){
-    //                     setUser(userData.user as User);
-    //                 }
-    //             });
-    //         } else {
-    //             console.log(received.message);
-    //             setErrorText("Failed");
-    //         }
-    //     }
-    //     catch(error){
-    //         console.error('Error', error);
-    //         window.alert("Failed to fetch");
-    //         setErrorText("Failed");
-    //     }
-    // }
-    // ////////////////////////////////////////////////////////////
 
     /*
     Fetch user information
@@ -78,12 +38,25 @@ export default function ProfileMain(){
     //     fetchProfile();
     // })
 
+    // Page transition variables and functions
+    const router = useRouter();
+
+    const goToEdit = () => {
+        router.push("/profile/edit");
+    }
+
+    const goToSecurityEdit = () => {
+        router.push("/profile/edit-security");
+    }
+
 
     if (!user)
         return <h1 style={{fontSize: "4rem", display: "block", textAlign: "center"}}>Loading...</h1>
 
     // User
     const userAccountIcons = [
+        {label: "Edit Profile", onClick:goToEdit, icon: faUserAlt},
+        {label: "Security Information", onClick:goToSecurityEdit, icon: faShieldAlt},
         {label: "Ordered Tickets", onClick:undefined, icon: faTicket},
         {label: "Upcoming Events", onClick:undefined, icon: faCalendarAlt},
         {label: "Payment Method", onClick:undefined, icon: faIdCard}
@@ -99,8 +72,8 @@ export default function ProfileMain(){
     ]
     
         const orgAccountIcons = [
-        {label: "Edit Profile", onClick:undefined, icon: faUserAlt},
-        {label: "Security Information", onClick:undefined, icon: faShieldAlt}
+        {label: "Edit Profile", onClick:goToEdit, icon: faUserAlt},
+        {label: "Security Information", onClick:goToSecurityEdit, icon: faShieldAlt}
     ]
 
     return(
