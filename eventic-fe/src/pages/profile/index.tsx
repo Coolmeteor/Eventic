@@ -25,9 +25,9 @@ export default function ProfileMain(){
 
     useEffect(() => {
         fetchProfile()
-        .then((user) => {
-            if(user && "user" in user){
-                setUser(user.user);
+        .then((userData) => {
+            if(userData && "user" in userData){
+                setUser(userData.user);
             }
         });
     }, []); // For debugging

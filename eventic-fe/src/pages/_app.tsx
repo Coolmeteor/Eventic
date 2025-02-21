@@ -75,8 +75,7 @@ export default function App({
 
 				<div>
 					{/* <SessionProvider session={session}> */}
-						{getLayout(<Component {...pageProps} />)}
-					<Component {...pageProps} />
+					{getLayout(<Component {...pageProps} />)}
 					{/* </SessionProvider> */}
 				</div>
 				<BottomNavbar></BottomNavbar>

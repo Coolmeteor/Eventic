@@ -31,11 +31,12 @@ export async function fetchProfile(): Promise<{user: User} | void> {
         credentials: "include",
     });
 
+    // const text = await response.text();
+    // console.log(text);
+    // return;
     const userData = await response.json();
 
-    if(response.ok){
-        localStorage.setItem("user", JSON.stringify(userData.user));
-    } else {
+    if(!response.ok){
         window.alert(userData["error"]);
         window.location.href = "/cookie-login";
     }
