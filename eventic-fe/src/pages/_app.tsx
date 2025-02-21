@@ -54,10 +54,11 @@ export default function App({
 	return (
 		<>
 			<div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-				<TopNavbar />
+				<TopNavbar showProfile={!Component.hideTopNav} />
+
 				<div>
 					{/* <SessionProvider session={session}> */}
-						<Component {...pageProps} />
+					<Component {...pageProps} />
 					{/* </SessionProvider> */}
 				</div>
 				<BottomNavbar></BottomNavbar>

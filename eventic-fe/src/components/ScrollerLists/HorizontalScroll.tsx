@@ -1,28 +1,20 @@
-import { MiniCard } from "./MiniCard";
+import { MicroCard, MiniCard } from "./MiniCard";
 
 
-const imgs = [
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-]
+export type TextWithIcon = {
+    icon: any;
+    text: string;
+}
 
-export function HorizontalScroll() {
+export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
     return (
         <>
             <div className="scroll-list-container">
                 <ul className="scroll-list">
 
-                    {imgs?.map((image, index) => (
+                    {textWithIcons?.map((item, index) => (
                         <li key={index} className="smallCardli">
-                            <MiniCard icon={image} text={`Genre ${index}`} />
+                            <MiniCard icon={"../"+item.icon} text={item.text} />
                         </li>
                     ))}
 
@@ -47,6 +39,52 @@ export function HorizontalScroll() {
 
             .scroll-list li {
                 margin-right: 5px;
+                display: inline-block;
+            }
+
+        `}</style>
+
+
+        </>
+    );
+}
+
+
+
+
+
+export function MiniHorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
+    return (
+        <>
+            <div className="scroll-list-container">
+                <ul className="scroll-list">
+
+                {textWithIcons?.map((item, index) => (
+                        <li key={index} className="smallCardli">
+                            <MicroCard icon={"../"+item.icon} text={item.text} />
+                        </li>
+                    ))}
+
+                </ul>
+
+            </div>
+
+            <style jsx>{`
+
+            .scroll-list-container {
+                display: flex;
+                justify-content: left;
+                margin-top: 1rem;
+            }
+
+
+
+            .scroll-list {
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .scroll-list li {
                 display: inline-block;
             }
 

@@ -13,7 +13,7 @@ export default function Gallery({children}) {
 					display: flex;
 					flex-direction: row;
 					flex-wrap: wrap;
-					gap: 32px;
+					gap: 4px;
 					width: 100%;
 				}
 			`}</style>

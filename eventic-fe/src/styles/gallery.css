@@ -4,6 +4,6 @@
     align-items: center;
     width: 100px;
     height: 100px;
-    border: 8px solid white;
+    border: 2px solid white;
     box-shadow: var(--shadow-large);
 }
