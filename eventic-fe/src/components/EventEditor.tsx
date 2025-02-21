@@ -39,7 +39,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     locationLong: 0,
                     locationLat: 0,
 
-                    visibility: "public",
+                    visibility: "private",
                     maxParticipants: 0,
                     currentParticipants: 0,
                     pricing: 0,
