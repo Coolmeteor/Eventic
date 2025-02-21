@@ -4,10 +4,10 @@ from flask_jwt_extended import create_access_token, jwt_required, decode_token
 import psycopg2.extras
 from db.db_connect import get_db_connection
 
-auth_bp = Blueprint("auth", __name__)
+auth_t_bp = Blueprint("auth_t", __name__)
 bcrypt = Bcrypt()
 
-@auth_bp.route("/login", methods=["POST"])
+@auth_t_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -41,7 +41,7 @@ def login():
         return jsonify({"error": f'Error: {str(e)}'}), 500
     
 
-@auth_bp.route("/logout", methods=["POST"])
+@auth_t_bp.route("/logout", methods=["POST"])
 def logout():
     response = make_response(jsonify({"message": "Logged out seccessfully"}), 200)
     

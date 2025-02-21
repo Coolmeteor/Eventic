@@ -20,7 +20,7 @@ export default function Login() {
     const router = useRouter();
 
     async function login(email: string, password: string) {
-        const response = await fetch(`${API}/auth/login`, {
+        const response = await fetch(`${API}/auth_t/login`, {
             method: "POST",
             credentials: "include",
             headers: {
