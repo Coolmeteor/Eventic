@@ -47,7 +47,7 @@ def register():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-          
+        
         cursor.execute("SELECT * FROM users WHERE user_name = %s OR email = %s", (user_name, email))
         existing_user = cursor.fetchone()
         if existing_user:

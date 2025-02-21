@@ -6,4 +6,4 @@ DB_CONFIG = {
     "port": "5432"
 }
 
-SECRET_KEY = "super-secret-key"  
+SECRET_KEY = "super-secret-key"

@@ -1,7 +1,8 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
-import { API } from "@/constants";
 import { useState, useEffect } from "react";
+import {API} from "./_app";
+import { data } from "autoprefixer";
 
 
 export default function Login() {
@@ -26,34 +27,29 @@ export default function Login() {
             return;
         }
         setErrorText("");
-
+    
         const data = { email, password };
-
+    
         try {
             const response = await fetch(`${API}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`Login failed: ${response.statusText}`);
             }
-
+    
             const result = await response.json();
             console.log("Login Success:", result);
             if (response.ok) {
-                // setErrorText("Login successful!");
-                localStorage.setItem("authtoken", `${email};${password}`); // later make this session token
-                window.location.href = "/";
+                alert("Login successful!");
+                setIsLogin(true);
             } else {
-                if (response.status === 401) {
-                    setErrorText("Wrong email or password")
-                } else {
-                    setErrorText(result.msg || "Invalid credentials")
-                }
+                setErrorText(result.msg || "Invalid credentials");
             }
-
+    
         } catch (error) {
             setErrorText("Login error: " + (error as Error).message);
             console.error("Login error:", error);
@@ -77,54 +73,42 @@ export default function Login() {
             return;
         }
         setErrorText("");
-
+    
         const data = {
             user_name: username,  // ✅ 确保参数匹配后端
             email,
             password,
-
+            
         };
-
+    
         try {
             const response = await fetch(`${API}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`Registration Failed: ${response.statusText}`);
             }
-
+    
             const result = await response.json();
             console.log("Registration Success:", result);
             if (response.ok) {
-                // setErrorText("Registration successful!")
-                localStorage.setItem("authtoken", `${email};${password}`) // later make this session token
-                window.location.href = "/";
-
+                alert("Registration successful! Please log in.");
+                setIsLogin(true);
             } else {
-                // I have no idea what you guys wrote in chinese in the api, This is my guess based on error codes
-                if (response.status === 500) {
-                    setErrorText("Internal server error")
-                } else if (response.status === 400) {
-                    setErrorText("Invalid registration data")
-
-                } else if (response.status === 409) {
-                    setErrorText("Email already in use")
-                } else {
-                    setErrorText(result.msg || "Registration failed");
-                }
+                setErrorText(result.msg || "Registration failed");
             }
-
+    
         } catch (error) {
             setErrorText("Registration error: " + (error as Error).message);
             console.error("Registration error:", error);
         }
     }
-
-
-
+    
+    
+   
 
     return (
         <Section>
@@ -207,5 +191,3 @@ export default function Login() {
         </Section>
     );
 }
-
-Login.hideTopNav = true;
