@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, decode_token
 import psycopg2.extras
 from db.db_connect import get_test_connection
 
@@ -8,7 +8,7 @@ profile_bp = Blueprint("profile", __name__)
 bcrypt = Bcrypt()
     
 # This is just to create a localStorage for debugging
-# Not necessarry for 
+# Not necessarry for the actual server API
 @profile_bp.route("/testUser", methods=["POST"])
 def get_test_user():
     data = request.get_json()
@@ -29,37 +29,47 @@ def get_test_user():
     
     if user and bcrypt.check_password_hash(user["passwd_hash"], password):
         access_token = create_access_token(identity=email)
-        return jsonify({
-            "message": "Succesfully logged in",
-            "access_token": access_token,
-            "user": user
-        }), 200
+        response = make_response(
+            jsonify({
+                "message": "Successfully logged in",
+                "user": user
+            }), 200
+        )
+        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        
+        return response
+        
     else:
-        return jsonify({"error": "email or pasw wrong"}), 401
-
+        return jsonify({"error": "email or password is wrong"}), 401
 
 # Load the corresponding user when the profile page read
 @profile_bp.route("/authorization", methods=["GET"])
-@jwt_required()
-def profile():
-    identity = get_jwt_identity()
+def authorization():
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        print("Token Error")
+        return jsonify({"error": "Missing access token"}), 401
+    
     try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
         with get_test_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
                 user = cursor.fetchone()
+
     except Exception as e:
-        return jsonify({"error": f"Error: {str(e)}"}), 500
+        return jsonify({"error": f'JWT Error: {str(e)}'}), 401
     
     if user:
         return jsonify({"user": user}), 200
     else:
         return jsonify({"error": "User not found"}), 404
 
-
 # Change the user_name
-@profile_bp.route("/chUsername", methods=["PATCH"])
-@jwt_required()
+@profile_bp.route("/change-username", methods=["PATCH"])
 def change_name():
     data = request.get_json()
     new_name = data.get("user_name")
@@ -67,9 +77,16 @@ def change_name():
     if not new_name:
         return jsonify({"error": "New username is needed"}), 400
     
-    identity = get_jwt_identity()
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
     
     try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
+        
         with get_test_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 
@@ -88,25 +105,20 @@ def change_name():
                 conn.commit()
                 
                 # Re-fetch altered user
-                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
                 user = cursor.fetchone()
                 
                 
-                
-        access_token = create_access_token(identity=user["email"])
         return jsonify({
             "message": "Username is updated",
-            "access_token": access_token,
             "user": user
         }), 200
     
     except Exception as e:
         return jsonify({"error": f"Username update error: {str(e)}"}), 500
-    
 
 # Change the password
-@profile_bp.route("/chPass", methods=["PATCH"])
-@jwt_required()
+@profile_bp.route("/change-password", methods=["PATCH"])
 def change_password():
     data = request.get_json()
     current_pass = data.get("current_password")
@@ -115,46 +127,174 @@ def change_password():
     if not new_pass or not current_pass:
         return jsonify({"error": "New password and current password are needed"}), 400
     
-    identity = get_jwt_identity()
+    # Get the access_token from the sent cookie
+    access_token = request.cookies.get("access_token")
     
     # Authorize the current userpassword first and then update 
     try:
+        
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+    
         with get_test_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
                 user = cursor.fetchone()
                 
-                if user:
-                    if bcrypt.check_password_hash(user["passwd_hash"], new_pass):
-                        return jsonify({"error": "Current password and new password is identical"}), 400
-                    elif bcrypt.check_password_hash(user["passwd_hash"], current_pass):
-                        hashed_pass = bcrypt.generate_password_hash(new_pass).decode("utf-8")
-                        # Change password
-                        with get_test_connection() as conn:
-                            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                                update_query = """
-                                    UPDATE users
-                                    SET passwd_hash = %s
-                                    WHERE email = %s
-                                """
-                                cursor.execute(update_query, (hashed_pass, identity))
-                                conn.commit()
-                                
-                                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
-                                user = cursor.fetchone()
-                                
-                        # Return new JWT token and user
-                        access_token = create_access_token(identity=user["email"])
-                        return jsonify({
-                            "message": "Password is updated",
-                            "access_token": access_token,
-                            "user": user
-                        }), 200
-                    else:
-                        return jsonify({"error": "Password is not correct"}), 500
-                else:
-                    return jsonify({"error": f"User not found"}), 500
-    
+                if not user:
+                    return jsonify({"error": f"User not found"}), 404
+
+                if not bcrypt.check_password_hash(user["passwd_hash"], current_pass):
+                    return jsonify({"error": "Password is not correct"}), 400
+                
+                if new_pass == current_pass:
+                    return jsonify({"error": "Current password and new password are identical"}), 400
+                
+                hashed_pass = bcrypt.generate_password_hash(new_pass).decode("utf-8")
+                # Change password
+                update_query = """
+                    UPDATE users
+                    SET passwd_hash = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (hashed_pass, identity))
+                conn.commit()
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                        
+        # Recreate token for security
+        access_token = create_access_token(identity=user["email"])
+        
+        # Apply new access_token to httpOnly cookie
+        response = make_response(
+            jsonify({
+                "message": "Password is updated",
+                "user": user
+            }), 200
+        )
+        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        
+        return response
+                    
     except Exception as e:
         return jsonify({"error": f"Password update error: {str(e)}"}), 500
+
+# Change email
+@profile_bp.route("/change-email", methods=["PATCH"])
+def change_email():
+    data = request.get_json()
+    password = data.get("password")
+    new_email = data.get("new_email")
+    
+    if not password or not new_email:
+        return jsonify({"error": "Information needed"}), 400
+    
+    # Get the access_token from the sent cookie
+    access_token = request.cookies.get("access_token")
+    
+    # Authorize the current userpassword first and then update 
+    try:
+        
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+    
+        with get_test_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if not user:
+                    return jsonify({"error": f"User not found"}), 404
+                
+                if not bcrypt.check_password_hash(user["passwd_hash"], password):
+                    return jsonify({"error": "Password is not correct"}), 400
+                
+                # Change email
+                update_query = """
+                    UPDATE users
+                    SET email = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_email, identity))
+                conn.commit()
+                
+                cursor.execute("SELECT * FROM users WHERE id = %s FOR UPDATE", (user["id"],))
+                user = cursor.fetchone()
+                        
+        # Return new JWT token and user for security
+        access_token = create_access_token(identity=user["email"])
+        
+        # Apply new access_token to httpOnly cookie
+        response = make_response(
+            jsonify({
+                "message": "Password is updated",
+                "user": user
+            }), 200
+        )
+        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        
+        return response
+                    
+    except Exception as e:
+        return jsonify({"error": f"Password update error: {str(e)}"}), 500
+    
+# Change phone
+@profile_bp.route("/change-phone", methods=["PATCH"])
+def change_phone():
+    data = request.get_json()
+    password = data.get("password")
+    new_phone = data.get("new_phone")
+    
+    if not password or not new_phone:
+        return jsonify({"error": "Information needed"}), 400
+    
+    # Get the access_token from the sent cookie
+    access_token = request.cookies.get("access_token")
+    
+    # Authorize the current userpassword first and then update 
+    try:
+        
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+    
+        with get_test_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if not user:
+                    return jsonify({"error": f"User not found"}), 404
+                
+                if not bcrypt.check_password_hash(user["passwd_hash"], password):
+                    return jsonify({"error": "Password is not correct"}), 400
+                
+                # Change email
+                update_query = """
+                    UPDATE users
+                    SET phone = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_phone, identity))
+                conn.commit()
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                        
+        # Return new JWT token and user for security
+        access_token = create_access_token(identity=user["email"])
+        
+        # Apply new access_token to httpOnly cookie
+        response = make_response(
+            jsonify({
+                "message": "Phone number is updated",
+                "user": user
+            }), 200
+        )
+        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        
+        return response
+                    
+    except Exception as e:
+        return jsonify({"error": f"Phone number update error: {str(e)}"}), 500
     

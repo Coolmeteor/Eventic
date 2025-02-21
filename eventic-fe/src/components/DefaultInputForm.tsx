@@ -1,14 +1,14 @@
 type Props = {
-    width?: string,
-    height?: string,
-    background?: string,
-    value?: string,
-    onChange?: (item: any) => void,
-    type?: string,
-    className?: string,
-    id?: string,
-    placeholder?: string,
-    padding?: string
+    width?: string;
+    height?: string;
+    background?: string;
+    value?: string;
+    onChange?: (item: any) => void;
+    type?: string;
+    className?: string;
+    id?: string;
+    placeholder?: string;
+    padding?: string;
 }
 
 export default function DefaultInputForm({

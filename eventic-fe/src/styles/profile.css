@@ -75,3 +75,9 @@
     color: red;
     font-size: 1.1rem;
 }
+
+.errorForm {
+    width: 90%;
+    min-height: 500px;
+    margin-bottom: 0.5rem;
+}

@@ -1,7 +1,7 @@
 import DefaultLinkButton from "../DefaultLinkButton"
 
 type Props = {
-    list: {text: string, url: string, onClick?: () => void}[]
+    list: {text: string, onClick: () => void}[]
 }
 
 /**
