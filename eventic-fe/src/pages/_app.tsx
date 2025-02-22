@@ -55,6 +55,7 @@ const calps = localFont({
 
 type NextPageWithLayout = NextPage & {
 	getLayout?: (page: React.ReactNode) => React.ReactNode;
+	hideTopNav?: boolean;	// Just to resolve type error on IDE (It works without this definition)
 }
 
 type AppPropsWithLayout = AppProps & {

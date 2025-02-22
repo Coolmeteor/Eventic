@@ -101,7 +101,9 @@ export default function ProfileLayout({
 
                 {/* Right Component*/}
                 {
-                    children
+                    <>
+                        {children}
+                    </>
                 }
             </Split>
         </>

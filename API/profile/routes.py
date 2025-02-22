@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, decode_token
+from flask_jwt_extended import create_access_token, decode_token, create_refresh_token
+from jwt import ExpiredSignatureError
 import psycopg2.extras
 from db.db_connect import get_db_connection
 
@@ -59,12 +60,17 @@ def authorization():
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
                 user = cursor.fetchone()
-
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f'JWT Error: {str(e)}'}), 401
     
     if user:
-        return jsonify({"user": user}), 200
+        return jsonify({
+            "message": "Authorized",
+            "user": user
+            }), 200
     else:
         return jsonify({"error": "User not found"}), 404
 
@@ -114,6 +120,8 @@ def change_name():
             "user": user
         }), 200
     
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Username update error: {str(e)}"}), 500
 
@@ -129,6 +137,9 @@ def change_password():
     
     # Get the access_token from the sent cookie
     access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
     
     # Authorize the current userpassword first and then update 
     try:
@@ -176,7 +187,9 @@ def change_password():
         response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
         
         return response
-                    
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Password update error: {str(e)}"}), 500
 
@@ -192,6 +205,8 @@ def change_email():
     
     # Get the access_token from the sent cookie
     access_token = request.cookies.get("access_token")
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
     
     # Authorize the current userpassword first and then update 
     try:
@@ -205,7 +220,7 @@ def change_email():
                 user = cursor.fetchone()
                 
                 if not user:
-                    return jsonify({"error": f"User not found"}), 404
+                    return jsonify({"error": f"User not found with {identity}"}), 404
                 
                 if not bcrypt.check_password_hash(user["passwd_hash"], password):
                     return jsonify({"error": "Password is not correct"}), 400
@@ -224,6 +239,8 @@ def change_email():
                         
         # Return new JWT token and user for security
         access_token = create_access_token(identity=user["email"])
+        # Since email is identity key, refresh token needs to be re-create
+        refresh_token = create_refresh_token(identity=user["email"])
         
         # Apply new access_token to httpOnly cookie
         response = make_response(
@@ -233,9 +250,12 @@ def change_email():
             }), 200
         )
         response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
-        
+        response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Strict")
+
         return response
-                    
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Password update error: {str(e)}"}), 500
     
@@ -251,6 +271,8 @@ def change_phone():
     
     # Get the access_token from the sent cookie
     access_token = request.cookies.get("access_token")
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
     
     # Authorize the current userpassword first and then update 
     try:
@@ -294,7 +316,9 @@ def change_phone():
         response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
         
         return response
-                    
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Phone number update error: {str(e)}"}), 500
     

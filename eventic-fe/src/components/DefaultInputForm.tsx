@@ -2,31 +2,25 @@ type Props = {
     width?: string;
     height?: string;
     background?: string;
-    value?: string;
-    onChange?: (item: any) => void;
-    type?: string;
-    className?: string;
-    id?: string;
-    placeholder?: string;
     padding?: string;
-}
+} & React.InputHTMLAttributes<HTMLInputElement>;
+
+
 
 export default function DefaultInputForm({
     width="20rem",
     height="2.3rem",
     background="var(--color-background-mid)",
-    value="",
-    onChange,
-    type="text",
-    className="",
-    id="",
-    placeholder="",
-    padding="0.5rem"
+    padding="0.5rem",
+    ...inputProps
 }: Props){
 
     return (
         <>
-            <input className = {`defaultStyle ${className}`} id={id} value={value} onChange={onChange} type={type} placeholder={placeholder}/>
+            <input 
+                {...inputProps}
+                className = {`defaultStyle ${inputProps.className}`} 
+            />
             <style jsx>
                 {`
                 .defaultStyle{

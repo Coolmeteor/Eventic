@@ -30,13 +30,7 @@ export default function ProfileMain(){
                 setUser(userData.user);
             }
         });
-    }, []); // For debugging
-
-    // This is the actual code for release
-    // Load profile
-    // useEffect(() => {
-    //     fetchProfile();
-    // })
+    }, []);
 
     // Page transition variables and functions
     const router = useRouter();

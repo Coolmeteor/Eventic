@@ -2,7 +2,8 @@
  * API function library .ts file for profile
  * 
  */
-export const API = 'http://127.0.0.1:5000';
+import { API } from "@/constants";
+import { refreshAccessToken, convertResponse } from "./auth-api";
 
 export interface User {
     id: string,
@@ -26,50 +27,40 @@ type ApiResponse = SuccessResponse | ErrorResponse;
 
 
 export async function fetchProfile(): Promise<{user: User} | void> {
-    const response = await fetch(`${API}/profile/authorization`, {
+    let response = await fetch(`${API}/profile/authorization`, {
         method: "GET",
         credentials: "include",
-    });
+    });    
 
-    // const text = await response.text();
-    // console.log(text);
-    // return;
-    const userData = await response.json();
+    // If the access token expired, try to fetch new access token using refresh token
+    if(response.status == 401) {
+        console.log("Access token expired. Attemping to refresh...");
 
-    if(!response.ok){
-        window.alert(userData["error"]);
-        window.location.href = "/cookie-login";
+        const refreshed = await refreshAccessToken();
+        if(!refreshed){
+            console.error("Refresh failed. Redirecting to login.");
+            window.location.href = "/login";
+            return;
+        }
+        
+        // Refetch
+        response = await fetch(`${API}/profile/authorization`, {
+            method: "GET",
+            credentials: "include",
+        });
     }
 
-    return userData;
+
+    const userData = await convertResponse(response);
+
+    if(response.ok){
+        console.log(userData.message);
+        return userData;
+    } else {
+        console.log(userData.error);
+        return;
+    }
 };
-
-// export async function fetchProfile(setToken:(token: string)=>void): Promise<{user: User} | void> {
-//     const token = localStorage.getItem("access_token");
-//     if(!token){
-//         window.alert("Please login.");
-//         window.location.href = "/login";
-//         return;
-//     }
-
-//     const response = await fetch(`${API}/profile/authorization`, {
-//         headers: {Authorization: `Bearer ${token}`},
-//     });
-
-//     const userData = await response.json();
-
-//     if(response.ok){
-//         localStorage.setItem("user", JSON.stringify(userData.user));
-//         setToken(token);
-//     } else {
-//         window.alert(userData["error"]);
-//         localStorage.removeItem("token");
-//         localStorage.removeItem("user");
-//         window.location.href = "/login";
-//     }
-
-//     return userData;
-// };
 
 export async function changeRequest(
     resetText: () => void,
@@ -82,57 +73,42 @@ export async function changeRequest(
 ): Promise<ApiResponse | void>{
     resetText();
 
-    const response = await fetch(fetchPath, {
+    let response = await fetch(fetchPath, {
         method: fetchMethod,
         credentials: "include",
         headers: fetchHeaders,
         body: fetchBody
     });
 
-    const data = await response.json();
+    // If the access token expired, try to fetch new access token using refresh token
+    if(response.status == 401) {
+        console.log("Access token expired. Attemping to refresh...");
+
+        const refreshed = await refreshAccessToken();
+        if(!refreshed){
+            console.error("Refresh failed. Redirecting to login.");
+            window.location.href = "/login";
+            return;
+        }
+        
+        // Refetch 
+        response = await fetch(fetchPath, {
+            method: fetchMethod,
+            credentials: "include",
+            headers: fetchHeaders,
+            body: fetchBody
+        });
+    }
+
+    const data = await convertResponse(response);
 
     if(response.ok){
+        console.log(data.message);
         setErrorText(data.message);
         return data;
     } else {
+        console.log(data.error);
         setErrorText(data.error);
         return;
     }
 }
-
-
-
-// export async function changeRequest(
-//     resetText: () => void,
-//     fetchPath: string,
-//     fetchMethod: string,
-//     fetchHeaders: {},
-//     fetchBody: string,
-//     token: string,
-//     setErrorText: (text: string) => void,
-
-// ): Promise<ApiResponse | void>{
-//     resetText();
-
-//     if(!token){
-//         window.alert("Token is not available");
-//         return;
-//     }
-//     const response = await fetch(fetchPath, {
-//         method: fetchMethod,
-//         headers: fetchHeaders,
-//         body: fetchBody
-//     });
-
-//     const data = await response.json();
-
-//     if(response.ok){
-//         localStorage.setItem("user", JSON.stringify(data.user));
-//         localStorage.setItem("access_token", JSON.stringify(data.access_token));
-//         setErrorText(data.message);
-//         return data;
-//     } else {
-//         setErrorText(data.error);
-//         return;
-//     }
-// }

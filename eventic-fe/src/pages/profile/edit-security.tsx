@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { fetchProfile, changeRequest, User } from '../../utils/profile-api';
+import { fetchProfile, changeRequest, User } from '@/utils/profile-api';
 
 import ProfileLayout from '@/components/Layouts/ProfileLayout';
 import PersonalForm from '@/components/Profile/PersonalForm';
 import SecurityChangeFormBox from '@/components/Profile/EditComponents/SecurityChangeForm';
 
-import { API } from '../../utils/profile-api'
+import { API } from '@/constants'
+import { unformatPhoneNumber } from '@/utils/format';
 
 
 export default function ProfileSecurityEdit(){
@@ -70,6 +71,7 @@ export default function ProfileSecurityEdit(){
     }
     
     const changePhone = async(new_phone: string, password: string) => {
+        new_phone = unformatPhoneNumber(new_phone);
         const data = await changeRequest(
             resetErrorText,
             `${API}/profile/change-phone`,

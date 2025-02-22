@@ -1,5 +1,6 @@
 import DefaultInputForm from "@/components/DefaultInputForm";
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { formatPhoneNumber } from "@/utils/format"
 
 
 type Props = {
@@ -21,25 +22,64 @@ export default function SecurityChangeFormBox({
     const [passInput, setPassInput] = useState<string>("");
     const [body, setBody] = useState<React.ReactNode>(<></>);
     const [type, setType] = useState<string>("");
+    const [inputErrorText, setInputErrorText] = useState<string>("");
+    const [inputMode, setInputMode] = useState<React.InputHTMLAttributes<HTMLInputElement>["inputMode"]>(undefined);
 
+    const onInvalid = () =>{
+        if(title=="Email")
+            setInputErrorText("Email is invalid");
+        else if (title=="Phone Number")
+            setInputErrorText("Phone number is invalid");
+        else
+            setInputErrorText("Input is invalid");
+    }
+
+    // Assign intial value for each variables
     useEffect(() => {
         if(!currentValue){
             currentValue = "Not registered";
         }
-        
+
         if(title=="Password"){
             setBody(<>Enter new password</>);
             setType("password");
         } else {
+            if(title=="Email"){
+                setType("email")
+            } else if (title=="Phone Number") {
+                setType("tel");
+                setInputMode("numeric");
+                
+            } else {
+                setType("text");
+            }
+        }
+        
+    }, []);
+    useEffect(() => {
+        if (title == "Phone Number" && currentValue != "Not registered"){
+            currentValue = formatPhoneNumber(currentValue);
+        }
+        if(title!="Password"){
             setBody(
                 <>
                     Current {title.toLowerCase()}: {" "}
                     <span style={{fontWeight: "bold"}}>{currentValue}</span>
                 </>
             );
-            setType("text");
         }
     }, [currentValue, title]);
+
+    const handleChange = title=="Phone Number" ? (
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const formattedPhone = formatPhoneNumber(e.target.value || "");
+            setInputValue(formattedPhone);
+        }
+    ) : (
+        (e: ChangeEvent<HTMLInputElement>) => {
+            setInputValue(e.target.value || ""); // Avoid undefined input
+        }
+    )
 
     return (
         <>
@@ -48,17 +88,21 @@ export default function SecurityChangeFormBox({
                 <h2>{children}</h2>
                 <form onSubmit={(e) => {
                     e.preventDefault();
-                    onSubmit(e.target[0].value, e.target[1].value);
+                    onSubmit(e.currentTarget.value.value, e.currentTarget.password.value);
 
                     setInputValue("");
                     setPassInput("");
+                    setInputErrorText("");
                 }}>
                     <p>&bull; {body}</p>
                     <DefaultInputForm 
                         className="input" 
                         value={inputValue} 
-                        onChange={(e) =>setInputValue(e.target.value)} 
-                        id={title} type={type} 
+                        onChange={handleChange} 
+                        onInvalid={onInvalid}
+                        id="value" 
+                        type={type}
+                        inputMode={inputMode}
                         placeholder={`New ${title}`}
                     />
 
@@ -72,7 +116,7 @@ export default function SecurityChangeFormBox({
                         placeholder={`Password`}
                     />
 
-                    <p style={{color: "red"}}>{errorText}</p>
+                    <p style={{color: "red"}}>{inputErrorText}{errorText}</p>
                     <p>
                         <button type="submit">Change {title.toLowerCase()}</button>
                     </p>

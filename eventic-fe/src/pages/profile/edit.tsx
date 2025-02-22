@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchProfile, changeRequest, User } from '../../utils/profile-api';
+import { fetchProfile, changeRequest, User } from '@/utils/profile-api';
+import { convertResponse } from '@/utils/auth-api';
 
 
 import ProfileLayout from '@/components/Layouts/ProfileLayout';
 import PersonalForm from '@/components/Profile/PersonalForm';
 import ChangeFormBox from '@/components/Profile/EditComponents/ChangeFormBox';
 import ChangeAvatorBox from '@/components/Profile/EditComponents/ChangeAvatorBox';
-import { API } from '../../utils/profile-api'
+import { API } from '@/constants'
 
 
 
@@ -83,7 +84,7 @@ export default function ProfileEdit(){
                 body: formData,
             });
 
-            const data = await response.json();
+            const data = await convertResponse(response);
             if(response.ok){
                 setUploadStatus("Upload successful!");
             } else {

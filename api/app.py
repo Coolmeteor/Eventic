@@ -4,10 +4,14 @@ from flask_jwt_extended import JWTManager
 from config import SECRET_KEY
 from profile.routes import profile_bp
 from auth.routes import auth_bp  
-from auth.routes_test import auth_t_bp
 from flask_cors import CORS
+from datetime import timedelta
+
+
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = SECRET_KEY
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30) # flask default is 30 days
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15) # flask default is 15 minutes
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
@@ -17,7 +21,6 @@ def home():
 
 app.register_blueprint(profile_bp, url_prefix="/profile")
 app.register_blueprint(auth_bp, url_prefix="/auth")
-app.register_blueprint(auth_t_bp, url_prefix="/auth_t") # For test cookie version
 
 
 if __name__ == "__main__":
