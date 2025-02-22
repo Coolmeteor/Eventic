@@ -19,7 +19,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
 
     useEffect(() => {
-        console.log("uhiwqduh", eventId === undefined, eventId === null)
+        console.log("Edit page: got event id", eventId === undefined, eventId === null)
         if (isCreate) {
             // blank form
             setLoading(true);
@@ -56,21 +56,18 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 try {
                     setLoading(true);
 
-                    console.log(`fetching event ${API}/event/${eventId}`)
-                    // const response = await fetch(`${API}/event/${id}`)
-                    // if (!response.ok) throw new Error("Failed to fetch event")
-                    // const data: EventData = (await response.json())[0]
+                    // data from, api
+                    console.log(`fetching event ${API}/events/${eventId}`)
+                    const response = await fetch(`${API}/events/${eventId}`)
+                    console.log(response)
+                    if (!response.ok) throw new Error("Failed to fetch event")
+                    const data: EventData = (await response.json())[0]
+                    setEventData(data)
 
-                    // make loading status show for now
-                    // setTimeout(() => {
-                    // console.log(data );
-                    // setEventData(data)
-
-                    setEventData(
-                        mockEvents.filter((event) => event.id === parseInt(eventId))[0]
-                    )
-                    console.log("set event", mockEvents.filter((event) => event.id === parseInt(eventId))[0])
-                    // }, 1000);
+                    // use mock data instead
+                    // setEventData(
+                    //     mockEvents.filter((event) => event.id === parseInt(id))[0]
+                    // )
 
                 } catch (err) {
                     setError((err as Error).message)
@@ -90,9 +87,6 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
  * Upload form to server
  */
     async function submitForm(visibility: string = "private") {
-        window.location.href = "/";
-        return
-
         console.log("submitting form", eventData, images);
 
         try {
