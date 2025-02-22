@@ -79,10 +79,9 @@ export default function Event() {
             try {
                 setLoading(true);
 
-                // console.log(`fetching event ${API}/events/${id}`)
-                // const response = await fetch(`${API}/events/${id}`)
-                // console.log(response)
-
+                console.log(`fetching event ${API}/events/${id}`)
+                const response = await fetch(`${API}/events/${id}`)
+                console.log(response)
                 // if (!response.ok) throw new Error("Failed to fetch event")
                 // const data: EventData = (await response.json())[0]
 
@@ -91,9 +90,9 @@ export default function Event() {
                     // console.log(data );
                     // setEventData(data)
 
-                    setEventData(
-                        mockEvents.filter((event) => event.id === parseInt(id))[0]
-                    )
+                    // setEventData(
+                    //     mockEvents.filter((event) => event.id === parseInt(id))[0]
+                    // )
                     setLoading(false)
                 // }, 2000);
 
