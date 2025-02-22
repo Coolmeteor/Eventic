@@ -28,12 +28,6 @@ export default function ProfileLayout({
         router.push("/profile/edit-security");
     }
 
-    // This is the actual code for release
-    // Load profile
-    // useEffect(() => {
-    //     fetchProfile();
-    // })
-
     const notDefined = () => {
         setErrorText("The link/action event is not defined");
         setTimeout(()=>{setErrorText("")}, 2000);

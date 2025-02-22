@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchProfile, changeRequest, User } from '@/utils/profile-api';
 import { convertResponse } from '@/utils/auth-api';
 

@@ -54,24 +54,6 @@ export default function Login() {
                 return;
             }
 
-            // if (!response.ok) {
-            //     throw new Error(`Login failed: ${response.statusText}`);
-            // }
-
-            // const result = await response.json();
-            // console.log("Login Success:", result);
-            // if (response.ok) {
-            //     // setErrorText("Login successful!");
-            //     localStorage.setItem("authtoken", `${email};${password}`); // later make this session token
-            //     window.location.href = "/";
-            // } else {
-            //     if (response.status === 401) {
-            //         setErrorText("Wrong email or password")
-            //     } else {
-            //         setErrorText(result.msg || "Invalid credentials")
-            //     }
-            // }
-
         } catch (error) {
             setErrorText("Login error: " + (error as Error).message);
             console.error("Login error:", error);
@@ -106,7 +88,7 @@ export default function Login() {
         try {
             const response = await fetch(`${API}/auth/register`, {
                 method: "POST",
-                credentials: "include",
+                credentials: "include", // To send cookie
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
             });
