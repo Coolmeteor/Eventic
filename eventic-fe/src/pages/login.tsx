@@ -2,7 +2,6 @@ import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
 import { API } from "@/constants";
 import { convertResponse } from "@/utils/auth-api";
-import { useRouter } from "next/router";
 import { useState } from "react";
 
 
@@ -17,9 +16,6 @@ export default function Login() {
     const [confirmPassword, setConfirmPassword] = useState<string>("");
 
     const [errorText, setErrorText] = useState<string>("");
-
-    
-    const router = useRouter();
 
     async function login(email: string, password: string) {
         if (!email) {
@@ -44,9 +40,9 @@ export default function Login() {
 
             const data = await convertResponse(response);
 
-            if(response.ok){
-                router.push("/");
+            if(response.ok){;
                 console.log(data.message);
+                window.location.href = "/";
                 return;
             } else {
                 console.log(data.error);
@@ -96,7 +92,7 @@ export default function Login() {
             const data = await convertResponse(response);
 
             if(response.ok){
-                router.push("/");
+                window.location.href = "/";
                 console.log(data.message);
                 return;
             } else {

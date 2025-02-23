@@ -92,38 +92,32 @@ export default function ProfileSecurityEdit(){
     }
 
     if(!user)
-        return (<h1>Loading...</h1>)
+        return <div className="errorForm" style={{fontSize: "3rem", margin: "4rem"}}>Loading...</div>;
 
 
     return(
             <>
-                <PersonalForm pageName="Security information">
-                    {
-                        user ? (
-                            <>
-                                <SecurityChangeFormBox
-                                    currentValue={user["user_name"]}
-                                    errorText={passErrorText}
-                                    onSubmit={changePassword}
-                                    title="Password"
-                                />
-                                <SecurityChangeFormBox
-                                    currentValue={user["email"]}
-                                    errorText={emailErrorText}
-                                    onSubmit={changeEmail}
-                                    title="Email"
-                                />
-                                <SecurityChangeFormBox
-                                    currentValue={user["phone"]}
-                                    errorText={phoneErrorText}
-                                    onSubmit={changePhone}
-                                    title="Phone Number"
-                                />
-                            </>
-                        ) : (
-                            <div className="errorForm" style={{fontSize: "3rem", margin: "4rem"}}>Loading...</div>
-                        )
-                    }
+                <PersonalForm pageName="Security information" user={user}>
+                    <>
+                        <SecurityChangeFormBox
+                            currentValue={user["user_name"]}
+                            errorText={passErrorText}
+                            onSubmit={changePassword}
+                            title="Password"
+                        />
+                        <SecurityChangeFormBox
+                            currentValue={user["email"]}
+                            errorText={emailErrorText}
+                            onSubmit={changeEmail}
+                            title="Email"
+                        />
+                        <SecurityChangeFormBox
+                            currentValue={user["phone"]}
+                            errorText={phoneErrorText}
+                            onSubmit={changePhone}
+                            title="Phone Number"
+                        />
+                    </>
                 </PersonalForm>
             </>
         )

@@ -2,10 +2,11 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import (
     create_access_token, create_refresh_token,
-    verify_jwt_in_request, decode_token
+    verify_jwt_in_request, decode_token,
+    unset_jwt_cookies, set_access_cookies, set_refresh_cookies
 )
 from jwt import ExpiredSignatureError
-from flask_jwt_extended.exceptions import NoAuthorizationError
+from flask_jwt_extended.exceptions import NoAuthorizationError, CSRFError
 import psycopg2.extras
 from db.db_connect import get_db_connection
 
@@ -62,10 +63,10 @@ def register():
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM users WHERE user_name = %s OR email = %s", (user_name, email))
+                cursor.execute("SELECT * FROM users WHERE email = %s", (email))
                 existing_user = cursor.fetchone()
                 if existing_user:
-                    return jsonify({"error": "This email or username is already used"}), 409
+                    return jsonify({"error": "Email already in use"}), 409
 
                 
                 cursor.execute(
@@ -84,12 +85,12 @@ def register():
         response = make_response(jsonify({"message": "Registration success"}), 201)
         
         # Set both tokens in cookie
-        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
-        response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
         
         return response
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return jsonify({"error": f"Internal error: {str(e)}"}), 500
 
 
 @auth_bp.route("/login", methods=["POST"])
@@ -125,16 +126,16 @@ def login():
                         }), 200
                     )
                     
-                    # Set cookie
-                    response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
-                    response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Strict")
+                    # Set cookies
+                    set_access_cookies(response, access_token)
+                    set_refresh_cookies(response, refresh_token)
                     
                     return response
 
                 else:
-                    return jsonify({"error": "email or password wrong"}), 401
+                    return jsonify({"error": "Email or password wrong"}), 401
     except Exception as e:
-        return jsonify({"error": f'Error: {str(e)}'}), 500
+        return jsonify({"error": f'Internal error: {str(e)}'}), 500
     
 
 @auth_bp.route("/logout", methods=["POST"])
@@ -146,8 +147,7 @@ def logout():
     """
     response = make_response(jsonify({"message": "Logged out seccessfully"}), 200)
     
-    response.set_cookie("access_token", "", httponly=True, secure=True, samesite="Strict", max_age=0)
-    response.set_cookie("refresh_token", "", httponly=True, secure=True, samesite="Strict", max_age=0)
+    unset_jwt_cookies(response)
     
     return response
 
@@ -167,7 +167,7 @@ def refresh():
     
     try:
         # Verify refresh token and obtain identity key
-        verify_jwt_in_request(optional=True)
+        verify_jwt_in_request(refresh=True)
         decoded_token = decode_token(refresh_token)
         identity = decoded_token["sub"]
         
@@ -176,8 +176,8 @@ def refresh():
         new_refresh_token = create_refresh_token(identity=identity)
         
         response = make_response(jsonify({"message": "Token refreshed"}), 200)
-        response.set_cookie("access_token", new_access_token, httponly=True, secure=True, samesite="Strict")
-        response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, new_access_token)
+        set_refresh_cookies(response, new_refresh_token)
 
         return response
     except NoAuthorizationError:
@@ -185,4 +185,51 @@ def refresh():
     except ExpiredSignatureError as e:
         return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
-        return jsonify({"error": f'Invalid refresh token: {str(e)}'}), 401
+        return jsonify({"error": f'Internal error: {str(e)}'}), 500
+    
+@auth_bp.route("/check-auth", methods=["POST"])
+def check_auth():
+    """_summary_
+        Check the authorization status using access_token and refresh_token.
+    Returns:
+        _type_: _description_
+    """
+    try:
+        # Verify access token first and obtain identity key if it's available
+        verify_jwt_in_request() # Verify only access_token, not refresh_token
+        
+        response = make_response(   # Store in response for future modifications just in case
+            jsonify({"message": "Login status: Logged in"}), 200
+        )
+        
+        return response
+    except ExpiredSignatureError and CSRFError: # Exception raised when access token has expired
+        try:
+            # Verify refresh token and re-create access token if it's verified
+            verify_jwt_in_request(refresh=True)
+            
+            refresh_token = request.cookies.get("refresh_token")
+            if not refresh_token:
+                return jsonify({"error": "Missing refresh token"}), 401
+            
+            
+            decoded_token = decode_token(refresh_token)
+            identity = decoded_token["sub"]
+            
+            new_access_token = create_access_token(identity=identity)
+            
+            response = make_response(
+                jsonify({"message": "Login status: Logged in. New access_token created."}), 200
+            )
+            set_access_cookies(response, new_access_token)
+            
+            return response
+        except CSRFError:
+            return jsonify({"error": 'CSRF token mismatch (refresh)'}), 403
+        except NoAuthorizationError:
+            return jsonify({"error": 'Invalid refresh token.'}), 401
+        except ExpiredSignatureError as refresh_ese:
+            return jsonify({"error": f'Signiture of both token has expired'}), 401
+        except Exception as e:
+            return jsonify({"error": f'Internal error: {str(e)}'}), 500
+        

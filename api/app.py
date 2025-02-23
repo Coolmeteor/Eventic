@@ -12,6 +12,11 @@ app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = SECRET_KEY
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30) # flask default is 30 days
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15) # flask default is 15 minutes
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]  # Check tokens in Cookies
+app.config["JWT_COOKIE_SECURE"] = True  # Cookies sent and received via https connection
+app.config["JWT_COOKIE_CSRF_PROTECT"] = True    # Enable CSRF protection
+app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token"   # Re-define the default name of access token in Cookies
+app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token" # Re-define the default name of refresh token in Cookies
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)

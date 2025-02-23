@@ -96,31 +96,30 @@ export default function ProfileEdit(){
         }
     }
 
+    if(!user)
+        return <div className="errorForm" style={{fontSize: "3rem", margin: "4rem"}}>Loading...</div>;
+    
+    
     return(
         <>
-            <PersonalForm pageName="Personal information">
+            <PersonalForm pageName="Personal information" user={user as User}>
                 {
-                    user ? (
-                        <>
-                            <ChangeFormBox
-                                currentValue={user.user_name}
-                                errorText={nameErrorText}
-                                onSubmit={changeUsername}
-                                title="Username"
-                            />
-                            <ChangeAvatorBox
-                                title="Avator"
-                                currentUrl={avatorUrl}
-                                previewUrl={previewUrl}
-                                uploadStatus={uploadStatus}
-                                onChange={handleFileChange}
-                                onClick={changeAvator}
-                            />
-
-                        </>
-                    ) : (
-                        <div className="errorForm" style={{fontSize: "3rem", margin: "4rem"}}>Loading...</div>
-                    )
+                    <>
+                        <ChangeFormBox
+                            currentValue={user.user_name}
+                            errorText={nameErrorText}
+                            onSubmit={changeUsername}
+                            title="Username"
+                        />
+                        <ChangeAvatorBox
+                            title="Avator"
+                            currentUrl={avatorUrl}
+                            previewUrl={previewUrl}
+                            uploadStatus={uploadStatus}
+                            onChange={handleFileChange}
+                            onClick={changeAvator}
+                        />
+                    </>
                 }
             </PersonalForm>
         </>

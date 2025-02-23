@@ -3,7 +3,7 @@
  * 
  */
 import { API } from "@/constants";
-import { refreshAccessToken, convertResponse } from "./auth-api";
+import { refreshToken, convertResponse } from "./auth-api";
 
 export interface User {
     id: string,
@@ -27,7 +27,8 @@ type ApiResponse = SuccessResponse | ErrorResponse;
 
 
 export async function fetchProfile(): Promise<{user: User} | void> {
-    let response = await fetch(`${API}/profile/authorization`, {
+    console.trace("fetchProfile called");
+    let response = await fetch(`${API}/profile/get-profile`, {
         method: "GET",
         credentials: "include",
     });    
@@ -36,7 +37,7 @@ export async function fetchProfile(): Promise<{user: User} | void> {
     if(response.status == 401) {
         console.log("Access token expired. Attemping to refresh...");
 
-        const refreshed = await refreshAccessToken();
+        const refreshed = await refreshToken();
         if(!refreshed){
             console.error("Refresh failed. Redirecting to login.");
             window.location.href = "/login";
@@ -44,7 +45,7 @@ export async function fetchProfile(): Promise<{user: User} | void> {
         }
         
         // Refetch
-        response = await fetch(`${API}/profile/authorization`, {
+        response = await fetch(`${API}/profile/get-profile`, {
             method: "GET",
             credentials: "include",
         });
@@ -57,7 +58,7 @@ export async function fetchProfile(): Promise<{user: User} | void> {
         console.log(userData.message);
         return userData;
     } else {
-        console.log(userData.error);
+        console.log(userData.error || userData.msg);
         return;
     }
 };
@@ -84,7 +85,7 @@ export async function changeRequest(
     if(response.status == 401) {
         console.log("Access token expired. Attemping to refresh...");
 
-        const refreshed = await refreshAccessToken();
+        const refreshed = await refreshToken();
         if(!refreshed){
             console.error("Refresh failed. Redirecting to login.");
             window.location.href = "/login";
@@ -107,8 +108,8 @@ export async function changeRequest(
         setErrorText(data.message);
         return data;
     } else {
-        console.log(data.error);
-        setErrorText(data.error);
+        console.log(data.error || data.msg);
+        setErrorText(data.error || data.msg);
         return;
     }
 }

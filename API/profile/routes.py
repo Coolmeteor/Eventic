@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify, make_response
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, decode_token, create_refresh_token
+from flask_jwt_extended import (
+    create_access_token, create_refresh_token, decode_token,
+    set_access_cookies, set_refresh_cookies
+)
 from jwt import ExpiredSignatureError
 import psycopg2.extras
 from db.db_connect import get_db_connection
@@ -36,7 +39,7 @@ def get_test_user():
                 "user": user
             }), 200
         )
-        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, access_token)
         
         return response
         
@@ -44,8 +47,8 @@ def get_test_user():
         return jsonify({"error": "email or password is wrong"}), 401
 
 # Load the corresponding user when the profile page read
-@profile_bp.route("/authorization", methods=["GET"])
-def authorization():
+@profile_bp.route("/get-profile", methods=["GET"])
+def get_profile():
     access_token = request.cookies.get("access_token")
     
     if not access_token:
@@ -68,7 +71,7 @@ def authorization():
     
     if user:
         return jsonify({
-            "message": "Authorized",
+            "message": "Authorized. User info returned",
             "user": user
             }), 200
     else:
@@ -100,7 +103,7 @@ def change_name():
                 user = cursor.fetchone()
                 
                 if user["user_name"] == new_name:
-                    return ({"error": f"You tried the same name"}), 400
+                    return ({"error": f"New username cannot be the same as the current username"}), 400
                 
                 update_query = """
                     UPDATE users
@@ -184,7 +187,7 @@ def change_password():
                 "user": user
             }), 200
         )
-        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, access_token)
         
         return response
     
@@ -222,8 +225,17 @@ def change_email():
                 if not user:
                     return jsonify({"error": f"User not found with {identity}"}), 404
                 
+                if new_email == user["email"]:
+                    return jsonify({"error": "New email cannot be the same as the current email"}), 400
+                
                 if not bcrypt.check_password_hash(user["passwd_hash"], password):
-                    return jsonify({"error": "Password is not correct"}), 400
+                    return jsonify({"error": "Password is not correct"}), 401
+                
+                # Check the availability of the new email
+                cursor.execute("SELECT * FROM users WHERE email = %s", (new_email,))
+                existing_user = cursor.fetchone()
+                if existing_user:
+                    return jsonify({"error": "This email is already used"}), 409
                 
                 # Change email
                 update_query = """
@@ -245,19 +257,19 @@ def change_email():
         # Apply new access_token to httpOnly cookie
         response = make_response(
             jsonify({
-                "message": "Password is updated",
+                "message": "Email is updated",
                 "user": user
             }), 200
         )
-        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
-        response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
 
         return response
     
     except ExpiredSignatureError as e:
         return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
-        return jsonify({"error": f"Password update error: {str(e)}"}), 500
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
     
 # Change phone
 @profile_bp.route("/change-phone", methods=["PATCH"])
@@ -288,8 +300,12 @@ def change_phone():
                 if not user:
                     return jsonify({"error": f"User not found"}), 404
                 
+                if new_phone == user["phone"]:
+                    return jsonify({"error": "New email cannot be the same as the current email"}), 400
+
+                
                 if not bcrypt.check_password_hash(user["passwd_hash"], password):
-                    return jsonify({"error": "Password is not correct"}), 400
+                    return jsonify({"error": "Password is not correct"}), 401
                 
                 # Change email
                 update_query = """
@@ -313,7 +329,7 @@ def change_phone():
                 "user": user
             }), 200
         )
-        response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Strict")
+        set_access_cookies(response, access_token)
         
         return response
     

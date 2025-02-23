@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import DefaultLinkButton from '../DefaultLinkButton';
 import { useRouter } from 'next/router';
-import { fetchProfile, User } from '../../utils/profile-api';
+import { User } from '../../utils/profile-api';
 
 const API = 'http://127.0.0.1:5000'
 
 type Props = {
     pageName: string;
+    user: User;
     children: React.ReactNode;
 }
 
-export default function PersonalForm({pageName, children}: Props){
+export default function PersonalForm({pageName, user, children}: Props){
     // Page transition
     const router = useRouter();
     
@@ -18,17 +19,6 @@ export default function PersonalForm({pageName, children}: Props){
     function goToProfileHome(){
         router.push('/profile');
     }
-    const [user, setUser] = useState<User>();
-
-
-    useEffect(()=>{
-        fetchProfile()
-                .then((userData) => {
-                    if(userData && "user" in userData){
-                        setUser(userData.user as User);
-                    }
-                });
-    }, [])
 
     return(
         <>
