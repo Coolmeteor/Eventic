@@ -1,0 +1,9 @@
+.icon{
+    align-self: start;
+    position: relative;
+
+    font-size: 30px;
+    align-items: center;
+    
+    margin: 20px;
+}

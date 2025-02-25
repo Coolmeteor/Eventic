@@ -1,7 +1,8 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
 import { API } from "@/constants";
-import { useState, useEffect } from "react";
+import { convertResponse } from "@/utils/auth-api";
+import { useState } from "react";
 
 
 export default function Login() {
@@ -27,31 +28,26 @@ export default function Login() {
         }
         setErrorText("");
 
-        const data = { email, password };
+        const body = { email, password };
 
         try {
             const response = await fetch(`${API}/auth/login`, {
                 method: "POST",
+                credentials: "include", // Send cookie data
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(body),
             });
 
-            if (!response.ok) {
-                throw new Error(`Login failed: ${response.statusText}`);
-            }
+            const data = await convertResponse(response);
 
-            const result = await response.json();
-            console.log("Login Success:", result);
-            if (response.ok) {
-                // setErrorText("Login successful!");
-                localStorage.setItem("authtoken", `${email};${password}`); // later make this session token
+            if(response.ok){;
+                console.log(data.message);
                 window.location.href = "/";
+                return;
             } else {
-                if (response.status === 401) {
-                    setErrorText("Wrong email or password")
-                } else {
-                    setErrorText(result.msg || "Invalid credentials")
-                }
+                console.log(data.error);
+                setErrorText(data.error);
+                return;
             }
 
         } catch (error) {
@@ -78,8 +74,8 @@ export default function Login() {
         }
         setErrorText("");
 
-        const data = {
-            user_name: username,  // ✅ 确保参数匹配后端
+        const body = {
+            user_name: username,  // ✅  Ensure the parameters match the backend
             email,
             password,
 
@@ -88,33 +84,21 @@ export default function Login() {
         try {
             const response = await fetch(`${API}/auth/register`, {
                 method: "POST",
+                credentials: "include", // To send cookie
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(body),
             });
 
-            if (!response.ok) {
-                throw new Error(`Registration Failed: ${response.statusText}`);
-            }
+            const data = await convertResponse(response);
 
-            const result = await response.json();
-            console.log("Registration Success:", result);
-            if (response.ok) {
-                // setErrorText("Registration successful!")
-                localStorage.setItem("authtoken", `${email};${password}`) // later make this session token
+            if(response.ok){
                 window.location.href = "/";
-
+                console.log(data.message);
+                return;
             } else {
-                // I have no idea what you guys wrote in chinese in the api, This is my guess based on error codes
-                if (response.status === 500) {
-                    setErrorText("Internal server error")
-                } else if (response.status === 400) {
-                    setErrorText("Invalid registration data")
-
-                } else if (response.status === 409) {
-                    setErrorText("Email already in use")
-                } else {
-                    setErrorText(result.msg || "Registration failed");
-                }
+                console.log("Registration Failed:", data.error);
+                setErrorText(data.error);
+                return;
             }
 
         } catch (error) {
@@ -134,8 +118,9 @@ export default function Login() {
                     <form onSubmit={(e) => {
                         e.preventDefault();
                         login(e.currentTarget.email.value, e.currentTarget.password.value);
+                        console.log("Email: ", e.currentTarget.email.value);
                     }}>
-                        <input id="email" type="email" placeholder="Email address" required />
+                        <input id="email" type="email" placeholder="Email address" required onInvalid={(e) => setErrorText("Email is invalid")} />
                         <input id="password" type="password" placeholder="Password" required />
                         {errorText && <p className="errortext">{errorText}</p>}
                         <button type="submit">Login</button>

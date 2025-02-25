@@ -1,0 +1,83 @@
+.greeting {
+    font-size: 2.5rem;
+    margin: 40px 20px 20px 20px;
+
+    width: 90%;
+    text-align: center;
+}
+
+.dashboard {
+    width: 90%;
+    height: auto;
+    min-height: 100px;
+    margin: 20px 20px 20px 20px;
+
+    border: 3px solid var(--color-onPrimary);
+    border-radius: 15px;
+}
+
+.box{
+    margin: 10px;
+    background: var(--color-background-light)
+}
+
+.listLabel{
+    display:block;
+    text-align: left;
+    margin: 20px;
+    font-size: 2rem;
+}
+
+.input {
+    margin: 0 0 0 1.5rem;
+}
+
+
+.iconList{
+    text-align: center;
+    width: 90%;
+    min-height: 500px;
+    margin: 10px;
+}
+
+.textLink {
+    margin: .1em;
+    font-size: var(--font-size-body-M);
+    font-family: var(--font-roboto);
+    color: var(--color-font-primary);
+    --webkit-transfrom: scale(1);
+    transform: scale(1);
+}
+
+.textLink:hover {
+    color: var(--color-font-primary);
+    text-decoration: underline;
+    transform: scale(1.01);
+}
+
+/* .textLink::marker {
+    font-size: 1em;
+}
+
+.textLink::before{
+    width: 0;
+    height: 0;
+    content: "";
+    transition: .3s;
+}
+
+.textLink:hover::before{
+    margin-right: 5px;
+} */
+
+.errorMessage{
+    text-align: left;
+    color: red;
+    font-size: 1.1rem;
+}
+
+.errorForm {
+    width: 90%;
+    min-height: 500px;
+    margin-bottom: 0.5rem;
+}

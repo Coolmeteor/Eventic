@@ -1,8 +1,7 @@
 import DefaultLinkButton from "@/components/DefaultLinkButton";
 import Section from "@/components/Section";
 import { useState, useEffect } from "react";
-import {API} from "./_app";
-import { data } from "autoprefixer";
+import { API } from "@/constants";
 
 
 export default function Login() {

@@ -2,6 +2,7 @@ import "../styles/globals.css";
 
 // import css here
 import '../styles/homepage.css'
+import '../styles/profile.css'
 import '../styles/gallery.css'
 import '../styles/interaction.css'
 import '../styles/test.css'
@@ -16,8 +17,13 @@ config.autoAddCss = false;
 
 // Fonts
 import { Roboto_Condensed } from "next/font/google"
+
+
 import { TopNavbar } from "@/components/Navigation/TopNav";
 import { BottomNavbar } from "@/components/Navigation/BottomNav";
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
+
 const roboto_condensed = Roboto_Condensed({
 	subsets: ['latin'],
 	weight: ['300', '400', '700']
@@ -47,10 +53,22 @@ const calps = localFont({
 	]
 })
 
+type NextPageWithLayout = NextPage & {
+	getLayout?: (page: React.ReactNode) => React.ReactNode;
+	hideTopNav?: boolean;	// Just to resolve type error on IDE (It works without this definition)
+}
+
+type AppPropsWithLayout = AppProps & {
+	Component: NextPageWithLayout;
+}
+
 export default function App({
 	Component,
 	pageProps: { session, ...pageProps },
-}) {
+}: AppPropsWithLayout) {
+	// Pages with no layout is as is
+	const getLayout = Component.getLayout || ((page) => page);
+
 	return (
 		<>
 			<div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -58,7 +76,7 @@ export default function App({
 
 				<div>
 					{/* <SessionProvider session={session}> */}
-					<Component {...pageProps} />
+					{getLayout(<Component {...pageProps} />)}
 					{/* </SessionProvider> */}
 				</div>
 				<BottomNavbar></BottomNavbar>

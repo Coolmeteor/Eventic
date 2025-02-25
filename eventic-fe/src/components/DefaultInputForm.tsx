@@ -1,30 +1,26 @@
-import React from "react";
-
 type Props = {
-    width?: string,
-    height?: string,
-    background?: string,
-    type?: string,
-    className?: string,
-    id?: string,
-    placeholder?: string,
-    padding?: string
-}
+    width?: string;
+    height?: string;
+    background?: string;
+    padding?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>;
+
+
 
 export default function DefaultInputForm({
     width="20rem",
     height="2.3rem",
     background="var(--color-background-mid)",
-    type="text",
-    className="",
-    id="",
-    placeholder="",
-    padding="0.5rem"
-}: Props) {
+    padding="0.5rem",
+    ...inputProps
+}: Props){
 
     return (
         <>
-            <input className = {`defaultStyle ${className}`}id={id} type={type} placeholder={placeholder}/>
+            <input 
+                {...inputProps}
+                className = {`defaultStyle ${inputProps.className}`} 
+            />
             <style jsx>
                 {`
                 .defaultStyle{

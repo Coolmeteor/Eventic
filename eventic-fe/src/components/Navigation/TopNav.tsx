@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DefaultButton from '../DefaultButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { isAuthenticated } from '@/utils/auth-api';
 
 
 type Props = {
@@ -9,11 +10,14 @@ type Props = {
 }
 export function TopNavbar({ showProfile }: Props) {
 
-    const [isLogin, setIsLogin] = useState<Boolean>(false);
+    const [isLogin, setIsLogin] = useState(false);
     useEffect(() => {
-        if (localStorage.getItem("authtoken") != null) {
-            setIsLogin(true);
+        async function checkAuth() {
+            console.log("Check authorization");
+            const isAuth = await isAuthenticated();
+            setIsLogin(isAuth);
         }
+        checkAuth();
     }, []);
 
 
