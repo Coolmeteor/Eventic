@@ -5,6 +5,7 @@ import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { isAuthenticated } from "@/utils/auth-api";
 
 
 export default function EventEditor({ eventId = undefined }: { eventId?: string }) {
@@ -17,9 +18,30 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+    const [isLogin, setIsLogin] = useState(false)
+
 
     useEffect(() => {
         console.log("Edit page: got event id", eventId === undefined, eventId === null)
+
+        // this page for logged in user only
+        async function checkAuth(): Promise<{ status: Boolean } | void> {
+            console.log("Check authorization");
+            const isAuth: Boolean = await isAuthenticated();
+
+            if (!isAuth) {
+                window.location.href = "/login";
+                return
+            }
+
+            setIsLogin(true)
+        }
+        checkAuth()
+
+
+        if (!isLogin) {
+            return;
+        }
         if (isCreate) {
             // blank form
             setLoading(true);
@@ -79,8 +101,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
             fetchEvent();
         }
 
-
-    }, [eventId]);
+    }, [eventId, isLogin]);
 
 
     /**
@@ -118,7 +139,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 {loading && <p>Please wait</p>}
                 {error && <p>Error loading event: {error}</p>}
 
-                {!loading && eventData != undefined && eventData != null &&
+                {!loading && isLogin && eventData != undefined && eventData != null &&
                     <div>
 
                         <h1>Create new event</h1>
