@@ -29,7 +29,7 @@ export default function ChangeFormBox({
                 <h2>{children}</h2>
                 <form onSubmit={(e) => {
                     e.preventDefault();
-                    onSubmit(e.target[0].value);
+                    onSubmit(e.currentTarget.inputValue.value);
                     setInputValue("");
                 }}>
                     <p>&bull; Current {title.toLowerCase()}: <span>{currentValue}</span></p>
