@@ -1,5 +1,5 @@
 import { EventCard, EventCardProps } from "../Event/EventCard";
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { HorizontalScrollContainer } from "./HorizontalScrollContainer";
 
 type Props = {
