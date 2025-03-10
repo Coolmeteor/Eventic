@@ -1,4 +1,6 @@
 import DefaultButton from "@/components/DefaultButton";
+import DefaultInputForm from "@/components/DefaultInputForm";
+import { PriceInput } from "@/components/Event/PriceInput";
 import EventCard from "@/components/EventCard";
 import InputMultiLine from "@/components/InputMultiLine";
 import Section from "@/components/Section";
@@ -11,7 +13,8 @@ type SearchParams = {
     ascending: boolean,
     category: string,
     tags: string[],
-    price: number
+    priceMin: number,
+    priceMax: number
 }
 export default function Event() {
 
@@ -25,7 +28,8 @@ export default function Event() {
         ascending: true,
         category: "",
         tags: [],
-        price: -1
+        priceMin: -1,
+        priceMax: -1
     })
 
     useEffect(() => {
@@ -55,6 +59,52 @@ export default function Event() {
         fetchEvent();
     }, [])
 
+
+
+
+
+    async function searchRequest() {
+        console.log("Sending search with params", searchParams);
+
+        try {
+            // const response = await fetch(`${API}/event/search`, {
+            //     method: "GET",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //     },
+            //     body: JSON.stringify(searchParams),
+            //     mode: "no-cors"
+            // });
+
+            // if (!response.ok) {
+            //     throw new Error(`Failed to upload data to server: ${response.statusText}`);
+            // }
+
+            // return await response.json();
+        } catch (error) {
+            setError((error as Error).message);
+            console.error("Error in search request:", error);
+            return null;
+        }
+
+    }
+
+    const searchBarStyle: React.CSSProperties = {
+        fontSize: "20px",
+        margin: "0",
+        textAlign: "left",
+        width: "100%",
+        border: "2px solid gray"
+    };
+
+    const priceInputStyle: React.CSSProperties = {
+        fontSize: "var(--font-size-body-L)",
+        margin: "0 0.5rem 0 0rem",
+        textAlign: "right",
+        width: "150px",
+        border: "1px solid gray"
+    };
+
     return (
         <>
             <Section fullWidth={true}>
@@ -68,16 +118,18 @@ export default function Event() {
                             {/* search bar */}
                             <div className="search-bar">
                                 <div className="full-w">
-                                    <InputMultiLine
+                                    <DefaultInputForm
+                                        style={searchBarStyle}
+                                        type="text"
                                         placeholder="Type to search"
-                                        initialValue={""}
-                                        defaultLines={1}
+                                        value={searchParams.query}
                                         onChange={(e) => {
                                             setSearchParams({ ...searchParams, query: e.target.value })
-                                        }} />
+                                        }}
+                                    />
                                 </div>
 
-                                <DefaultButton onClick={() => { }}>Search</DefaultButton>
+                                <DefaultButton onClick={searchRequest}>Search</DefaultButton>
                             </div>
 
                             {/* sort order and uh... */}
@@ -132,6 +184,31 @@ export default function Event() {
 
                                 {/* category and tags in a horztoal list for both */}
                                 <div className="category-tags">
+                                    <h2>Price</h2>
+
+                                    <div className="price-row">
+                                        <h3>Max</h3>
+                                        <PriceInput
+                                            className="price-input"
+                                            setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
+                                            formStyle={priceInputStyle}
+                                        />
+                                    </div>
+                                    <div className="price-row">
+                                        {/* hack for spacing. ignore the big red box vscode is complaining about kthx */}
+                                        <h3>Min ‎</h3>
+                                        <PriceInput
+                                            className="price-input"
+                                            setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
+                                            formStyle={priceInputStyle}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="spacer"></div>
+
+
+                                <div className="category-tags">
                                     <h2>Category</h2>
 
                                     <div className="category-selector">
@@ -152,13 +229,15 @@ export default function Event() {
                                             </label>
                                         ))}
                                     </div>
+
+
                                 </div>
 
                                 <div className="spacer"></div>
 
 
                                 <div className="action-buttons">
-                                    <DefaultButton onClick={() => {}}>Reset filters</DefaultButton>
+                                    <DefaultButton onClick={() => { }}>Reset filters</DefaultButton>
                                 </div>
 
                             </div>
@@ -255,9 +334,9 @@ h1 {
     flex-direction: column;
     background-color: var(--color-background-mid);
 }
-    .rsb div  {
-        margin-bottom: 3em;
-    }
+.rsb div  {
+    // margin-bottom: 3em;
+}
 @media (max-width: 1000px) {
     .rsb {
         min-width: 250px;
@@ -290,6 +369,19 @@ h1 {
 
     .radio-input {
     accent-color: #3b82f6; /* Tailwind blue-500 */
+}
+
+.price-row {
+    display: flex;
+    flex-direction: row;
+    margin: 1em;
+    gap: 1em;
+
+    align-items: center;   
+}
+
+.price-row h3 {
+    font-size: var(--font-size-body-XL);    
 }
 
 .action-buttons {

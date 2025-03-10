@@ -221,11 +221,13 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                                 {/* Price section */}
                                 <h2>Ticket Price</h2>
+                                <div className="price-input"> 
                                 <PriceInput
-                                    className="price-input"
-                                    setEventData={setEventData}
-                                    eventData={eventData}
+                                    // className="price-input"
+                                    setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
+                                   
                                 />
+                                </div>
                                 <div className="spacer"/>
 
                                 {/*  gallery here */}
@@ -318,6 +320,9 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 // background-color: coral;
             }
 
+            .price-input {
+                margin: 1rem;
+            }
 
 
             .rsb p {
