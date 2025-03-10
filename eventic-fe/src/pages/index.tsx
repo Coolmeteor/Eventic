@@ -1,6 +1,11 @@
+import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { HorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
 import React from "react";
+
+import { mockEvents } from "@/constants"; // For debugging
+import { extractEventCardData } from "@/utils/format";
+import { EventCardProps } from "@/components/Event/EventCard";
 
 
 const mockIcons = [
@@ -25,6 +30,9 @@ const mockIcons = [
     "vercel.svg",
     "window.svg",
 ]
+
+// You-might-like events must be fetched from backend in release
+const mockEventCards : EventCardProps[] = mockEvents.map(extractEventCardData);
 
 
 export default function Homepage() {
@@ -52,6 +60,11 @@ export default function Homepage() {
                     { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Trip" },
             ]
             } />
+            <HorizontalEventList 
+                title="You might like..."
+                EventCards={mockEventCards}
+            />
+
         </Section>
     );
 }
