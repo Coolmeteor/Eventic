@@ -15,13 +15,15 @@ const defaultFormStyle: React.CSSProperties = {
 type Props = {
     className?: string;
     formStyle?: React.CSSProperties;
+    data: number | undefined;
     setData: (data: Number) => void;
 }
 export function PriceInput({
     formStyle = defaultFormStyle,
+    data,
     setData,
 }: Props) {
-    const [currentValue, setCurrentValue] = useState<string>("");
+    const [currentValue, setCurrentValue] = useState<number | undefined>(data || undefined);
 
     return (
         <>
@@ -33,7 +35,7 @@ export function PriceInput({
                     value={currentValue}
                     onChange={(e) => {
                         const newPrice = formatPrice(e.target.value);
-                        setCurrentValue(newPrice);
+                        setCurrentValue(Number(newPrice));
 
                         setData(Number(newPrice));
                     }}

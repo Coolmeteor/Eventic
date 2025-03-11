@@ -225,7 +225,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 <PriceInput
                                     // className="price-input"
                                     setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
-                                   
+                                    data={eventData.pricing}
                                 />
                                 </div>
                                 <div className="spacer"/>

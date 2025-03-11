@@ -5,17 +5,31 @@ import EventCard from "@/components/EventCard";
 import InputMultiLine from "@/components/InputMultiLine";
 import Section from "@/components/Section";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { faSortUp, faU, faUpDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
 
-type SearchParams = {
+export type SearchParams = {
     query: string,
     ascending: boolean,
     category: string,
     tags: string[],
-    priceMin: number,
-    priceMax: number
+    sortType: "name" | "date" | "price" | "proximity",
+    priceMin: number | undefined,
+    priceMax: number | undefined
 }
+
+const defaultSearchParams: SearchParams = {
+    query: "",
+    ascending: true,
+    category: "",
+    tags: [],
+    sortType: "name",
+    priceMin: undefined,
+    priceMax: undefined
+}
+
 export default function Event() {
 
     const [eventData, setEventData] = useState<EventData[]>([])
@@ -23,14 +37,7 @@ export default function Event() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const [searchParams, setSearchParams] = useState<SearchParams>({
-        query: "",
-        ascending: true,
-        category: "",
-        tags: [],
-        priceMin: -1,
-        priceMax: -1
-    })
+    const [searchParams, setSearchParams] = useState<SearchParams>({ ...defaultSearchParams })
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -107,13 +114,13 @@ export default function Event() {
 
     return (
         <>
-            <Section fullWidth={true}>
+            <Section fullWidth={true} usePadding={false}>
                 {loading && <p>Please wait</p>}
                 {error && <p>Error loading event: {error}</p>}
                 {eventData.length > 0 &&
                     <div>
                         <div className="top-header">
-                            <h1 className="search-title">Search Eventic</h1>
+                            {/* <h1 className="search-title">Search Eventic</h1> */}
 
                             {/* search bar */}
                             <div className="search-bar">
@@ -131,38 +138,97 @@ export default function Event() {
 
                                 <DefaultButton onClick={searchRequest}>Search</DefaultButton>
                             </div>
+                        </div>
 
-                            {/* sort order and uh... */}
-                            <div className="sort-order">
 
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="sort"
-                                        value="ascending"
-                                        checked={searchParams.ascending === true}
-                                        onChange={(e) => {
-                                            setSearchParams({ ...searchParams, ascending: true })
-                                        }
-                                        }
-                                    />
-                                    Ascending
-                                </label>
+                        {/* sort order and uh... */}
+                        <div className="sort-order">
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sortType"
+                                    value="name"
+                                    checked={searchParams.sortType === "name"}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, sortType: "name" })
+                                    }
+                                    }
+                                />
+                                Name
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sortType"
+                                    value="price"
+                                    checked={searchParams.sortType === "price"}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, sortType: "price" })
+                                    }
+                                    }
+                                />
+                                Price
+                            </label>
 
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="sort"
-                                        value="descending"
-                                        checked={searchParams.ascending === false}
-                                        onChange={(e) => {
-                                            setSearchParams({ ...searchParams, ascending: false })
-                                        }
-                                        }
-                                    />
-                                    Descending
-                                </label>
-                            </div>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sortType"
+                                    value="date-upload"
+                                    checked={searchParams.sortType === "date"}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, sortType: "date" })
+                                    }
+                                    }
+                                />
+                                Date posted
+                            </label>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sortType"
+                                    value="proximity"
+                                    checked={searchParams.sortType === "proximity"}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, sortType: "proximity" })
+                                    }
+                                    }
+                                />
+                                Close to me
+                            </label>
+
+
+                            <div className="vertical-spacer"></div>
+
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sort"
+                                    value="ascending"
+                                    checked={searchParams.ascending === true}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, ascending: true })
+                                    }
+                                    }
+                                />
+                                Ascending
+                            </label>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="sort"
+                                    value="descending"
+                                    checked={searchParams.ascending === false}
+                                    onChange={(e) => {
+                                        setSearchParams({ ...searchParams, ascending: false })
+                                    }
+                                    }
+                                />
+                                Descending
+                            </label>
                         </div>
 
 
@@ -190,7 +256,8 @@ export default function Event() {
                                         <h3>Max</h3>
                                         <PriceInput
                                             className="price-input"
-                                            setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
+                                            data={searchParams.priceMax}
+                                            setData={value => setSearchParams({ ...searchParams, priceMax: value.valueOf() })}
                                             formStyle={priceInputStyle}
                                         />
                                     </div>
@@ -199,6 +266,7 @@ export default function Event() {
                                         <h3>Min ‎</h3>
                                         <PriceInput
                                             className="price-input"
+                                            data={searchParams.priceMin}
                                             setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
                                             formStyle={priceInputStyle}
                                         />
@@ -237,7 +305,7 @@ export default function Event() {
 
 
                                 <div className="action-buttons">
-                                    <DefaultButton onClick={() => { }}>Reset filters</DefaultButton>
+                                    <DefaultButton onClick={() => { setSearchParams({ ...defaultSearchParams }) }}>Reset filters</DefaultButton>
                                 </div>
 
                             </div>
@@ -258,6 +326,10 @@ export default function Event() {
     height: 2em;
 }
 
+.vertical-spacer {
+    width: 2em;
+}
+
 
 h1 {
     font-size: var(--font-size-header-S);
@@ -268,7 +340,6 @@ h1 {
 .search-title {
     font-size: var(--font-size-header-XS);
     margin-bottom: 1em;
-    
 }
 
 .search-bar {
@@ -284,10 +355,11 @@ h1 {
 .top-header {
     display: flex;
     width: 100%;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
 
-    background-color: var(--color-background-eventpage);
+    color: white;
+    background-color: var(--color-onPrimary);
     padding: 1em;
 }
     
@@ -297,6 +369,7 @@ h1 {
     flex-direction: row;
     gap: 1em;
     margin-top: 1em;
+    margin-left: 1em;
 }
 
 .sort-order label {
@@ -310,6 +383,8 @@ h1 {
     display: flex;
     flex-direction: row;
     width: 100%;
+
+    padding: 1em;
 }
 
 .event-list {
@@ -333,7 +408,9 @@ h1 {
     display: flex;
     flex-direction: column;
     background-color: var(--color-background-mid);
-}
+
+    padding: 1em;
+    }
 .rsb div  {
     // margin-bottom: 3em;
 }
@@ -374,7 +451,7 @@ h1 {
 .price-row {
     display: flex;
     flex-direction: row;
-    margin: 1em;
+    margin: 1em 0.1em;
     gap: 1em;
 
     align-items: center;   
