@@ -2,11 +2,8 @@ import DefaultButton from "@/components/DefaultButton";
 import DefaultInputForm from "@/components/DefaultInputForm";
 import { PriceInput } from "@/components/Event/PriceInput";
 import EventCard from "@/components/EventCard";
-import InputMultiLine from "@/components/InputMultiLine";
 import Section from "@/components/Section";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
-import { faSortUp, faU, faUpDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
 
@@ -39,42 +36,16 @@ export default function Event() {
 
     const [searchParams, setSearchParams] = useState<SearchParams>({ ...defaultSearchParams })
 
-    useEffect(() => {
-        const fetchEvent = async () => {
-            try {
-                setLoading(true);
-
-                // use data from, api
-                // console.log(`fetching event ${API}/events`)
-                // const response = await fetch(`${API}/events`)
-                // console.log(response)
-
-                // if (!response.ok) throw new Error("Failed to fetch event page")
-                // const data: EventData = (await response.json())[0]
-                // setEventData(data) // expect an array of data
-
-                // use mock data instead
-                setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
-
-            } catch (err) {
-                setError((err as Error).message)
-            } finally {
-                setLoading(false)
-            }
-        };
-
-        fetchEvent();
-    }, [])
-
-
-
-
-
     async function searchRequest() {
-        console.log("Sending search with params", searchParams);
+        let fetchUrl = `${API}/events`
+        if (searchParams != defaultSearchParams) {
+            fetchUrl = `${API}/events/search`
+            console.log("Sending event with params", searchParams)
+        }
 
         try {
-            // const response = await fetch(`${API}/event/search`, {
+            // use data from, api
+            // const response = await fetch(fetchUrl, {
             //     method: "GET",
             //     headers: {
             //         "Content-Type": "application/json",
@@ -84,17 +55,39 @@ export default function Event() {
             // });
 
             // if (!response.ok) {
-            //     throw new Error(`Failed to upload data to server: ${response.statusText}`);
+            //     throw new Error(`Failed search query to server for events: ${response.statusText}`);
             // }
+            // console.log(response)
 
-            // return await response.json();
+            // const data: EventData = (await response.json())[0]
+            // setEventData(data) // expect an array of data
+
+
+            // use mock data instead
+            setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
+            console.log("Using mock data instead of backend")
+
         } catch (error) {
-            setError((error as Error).message);
-            console.error("Error in search request:", error);
-            return null;
+            setError((error as Error).message)
+            console.error("Error in search request:", error)
         }
-
     }
+
+
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                setLoading(true)
+                await searchRequest()
+            } catch (err) {
+                setError((err as Error).message)
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchEvent();
+    }, [])
 
     const searchBarStyle: React.CSSProperties = {
         fontSize: "20px",
