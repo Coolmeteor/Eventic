@@ -5,33 +5,7 @@ import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll, TextWithIcon } from "@/components/ScrollerLists/HorizontalScroll";
-import { API } from "@/constants";
-
-// event id 100, 101, 102 are avalible currently.
-type EventData = {
-    id: number;
-    name: string;
-    description: string;
-    media: string[]; // url or base64
-    tags: string[]; // aka keywords
-    category: string; // aka generes
-
-    startDate: number; // use iso whatever ms since 1970 i guess
-    endDate: number; // use iso whatever ms since 1970 i guess
-    locationString: string; // human readable address
-    locationLong: number;
-    locationLat: number;
-
-    visibility: string; // private, public
-    maxParticipants: number;
-    currentParticipants: number;
-    pricing: number;
-
-
-    creator: string; // organizer info. maybe later pass a user object
-    createdAt: number;
-    updatedAt: number;
-}
+import { API, EventData } from "@/constants";
 
 // create list of mock eveent data
 
@@ -80,17 +54,17 @@ export default function Event() {
                 setLoading(true);
 
                 // data from, api
-                console.log(`fetching event ${API}/events/${id}`)
-                const response = await fetch(`${API}/events/${id}`)
-                console.log(response)
-                if (!response.ok) throw new Error("Failed to fetch event")
-                const data: EventData = (await response.json())[0]
-                setEventData(data)
+                // console.log(`fetching event ${API}/events/${id}`)
+                // const response = await fetch(`${API}/events/${id}`)
+                // console.log(response)
+                // if (!response.ok) throw new Error("Failed to fetch event")
+                // const data: EventData = (await response.json())[0]
+                // setEventData(data)
 
                 // use mock data instead
-                // setEventData(
-                //     mockEvents.filter((event) => event.id === parseInt(id))[0]
-                // )
+                setEventData(
+                    mockEvents.filter((event) => event.id === parseInt(id))[0]
+                )
 
             } catch (err) {
                 setError((err as Error).message)
