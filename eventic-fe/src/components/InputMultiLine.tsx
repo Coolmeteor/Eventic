@@ -1,16 +1,18 @@
 
 type Props = {
-    initialValue: string,
+    initialValue?: string,
+    placeholder?: string
     defaultLines?: number
     onChange: (e: any) => void
     onEnterPress?: (e: any) => void
 
 }
-export default function InputMultiLine({ initialValue, defaultLines = 2, onChange, onEnterPress }: Props) {
+export default function InputMultiLine({ initialValue, placeholder, defaultLines = 2, onChange, onEnterPress }: Props) {
 
     return (
         <>
             <textarea className="defaultStyle"
+                placeholder={placeholder}
                 rows={defaultLines}
                 onChange={onChange}
                 onKeyDown={(e) => {

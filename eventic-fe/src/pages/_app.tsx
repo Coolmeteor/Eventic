@@ -104,6 +104,8 @@ export default function App({
 					--color-background-mid:rgb(247, 249, 246);
 					--color-background-dark:rgb(90, 90, 90);
 
+					--color-background-eventpage:rgb(105, 247, 109);
+
 					--color-primary-green:rgb(89, 206, 16);
 					
 					--color-font-primary: #000000;

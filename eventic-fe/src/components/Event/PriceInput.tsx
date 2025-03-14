@@ -3,25 +3,28 @@ import DefaultInputForm from "../DefaultInputForm";
 import { formatPrice } from "@/utils/format";
 import { useState } from "react";
 
+const fontSize = "1.5rem"
+const defaultFormStyle: React.CSSProperties = {
+    fontSize: fontSize,
+    margin: "0 0.5rem 0 1rem",
+    textAlign: "right",
+    width: "200px",
+    border: "1px solid gray"
+};
+
 type Props = {
     className?: string;
-    setEventData: (data: EventData) => void;
-    eventData: EventData;
+    formStyle?: React.CSSProperties;
+    data: number | undefined;
+    setData: (data: Number) => void;
 }
 export function PriceInput({
-    setEventData,
-    eventData
-}: Props){
-    const [currentValue, setCurrentValue] = useState<string>("");
-    const fontSize = "1.5rem"
+    formStyle = defaultFormStyle,
+    data,
+    setData,
+}: Props) {
+    const [currentValue, setCurrentValue] = useState<string>(data ? data.toString() : "" );
 
-    const formStyle: React.CSSProperties = {
-        fontSize: fontSize,
-        margin: "0 0.5rem 0 1rem",
-        textAlign: "right",
-        width: "200px",
-        border: "1px solid gray"
-    };
     return (
         <>
             <div className="input-container">
@@ -33,19 +36,21 @@ export function PriceInput({
                     onChange={(e) => {
                         const newPrice = formatPrice(e.target.value);
                         setCurrentValue(newPrice);
-                        
-                        setEventData({...eventData,
-                            pricing: Number(newPrice)
-                        });
+
+                        setData(Number(newPrice));
                     }}
                 />
-                $
+                <p className="dollar">$</p>
             </div>
 
             <style jsx>{`
             .input-container {
-                margin: 1rem;
-                font-size: ${fontSize};
+                display: flex;
+                align-items: center;
+                font-size: ${formStyle.fontSize || fontSize};
+            }
+            .dollar {
+                font-size:${formStyle.fontSize || fontSize};
             }
             `}</style>
         </>

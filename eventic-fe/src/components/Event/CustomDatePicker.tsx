@@ -75,7 +75,7 @@ export function CustomDatePicker({
                     timeIntervals={15}
                     showTimeSelectOnly={false}
                     dateFormat="yyyy/MM/dd HH:mm"
-                    minDate={startDate || today}
+                    minDate={startDate || new Date(new Date().setDate(today.getDate() + 7))}
                     minTime={startDate  && endDate && startDate.toDateString() === endDate.toDateString()
                         ? new Date(startDate) : setHours(setMinutes(new Date(0), 0), 0)}
                     maxTime={setHours(setMinutes(new Date(), 59), 23)}
