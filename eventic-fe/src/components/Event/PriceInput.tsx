@@ -23,7 +23,7 @@ export function PriceInput({
     data,
     setData,
 }: Props) {
-    const [currentValue, setCurrentValue] = useState<number | undefined>(data || undefined);
+    const [currentValue, setCurrentValue] = useState<string>(data ? data.toString() : "" );
 
     return (
         <>
@@ -35,7 +35,7 @@ export function PriceInput({
                     value={currentValue}
                     onChange={(e) => {
                         const newPrice = formatPrice(e.target.value);
-                        setCurrentValue(Number(newPrice));
+                        setCurrentValue(newPrice);
 
                         setData(Number(newPrice));
                     }}
