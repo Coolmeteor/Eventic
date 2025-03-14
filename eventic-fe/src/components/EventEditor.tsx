@@ -169,6 +169,26 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                     }} />
                                 <div className="spacer"></div>
 
+                                {/* Date select section */}
+                                <h2>Date</h2>
+                                <CustomDatePicker
+                                    setDate={([start, end]: [number, number])=>{
+                                        setEventData({...eventData, 
+                                            startDate: start,
+                                            endDate: end})
+                                    }}
+                                />
+
+                                <div className="spacer"/>
+
+                                {/* Price section */}
+                                <h2>Ticket Price</h2>
+                                <PriceInput
+                                    className="price-input"
+                                    setEventData={setEventData}
+                                    eventData={eventData}
+                                />
+                                <div className="spacer"/>
 
                                 {/* category and tags in a horztoal list for both */}
                                 <div className="category-tags">
@@ -206,27 +226,6 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 </div>
 
                                 <div className="spacer"></div>
-
-                                {/* Date select section */}
-                                <h2>Date</h2>
-                                <CustomDatePicker
-                                    setDate={([start, end]: [number, number])=>{
-                                        setEventData({...eventData, 
-                                            startDate: start,
-                                            endDate: end})
-                                    }}
-                                />
-
-                                <div className="spacer"/>
-
-                                {/* Price section */}
-                                <h2>Ticket Price</h2>
-                                <PriceInput
-                                    className="price-input"
-                                    setEventData={setEventData}
-                                    eventData={eventData}
-                                />
-                                <div className="spacer"/>
 
                                 {/*  gallery here */}
                                 <h2>Gallery</h2>

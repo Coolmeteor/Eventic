@@ -10,6 +10,7 @@ export type EventCardProps = {
     thumbnail: string; // URL or data string
     description: string;
     date: number;
+    id: number;
     location: string;
     isSimple?: Boolean;
 }
@@ -25,6 +26,7 @@ export function EventCard({
     thumbnail,
     date,
     location,
+    id,
     isSimple=false
 }: EventCardProps){
     /**
@@ -34,29 +36,32 @@ export function EventCard({
      * @returns 
      */
     const ImageFromString: React.FC<{ imageStr: string }> = ({ imageStr }) => {
+        const link = "/event/" + id;
         return (
-            <div className="thumbnail">
-                {
-                    imageStr ? 
-                    <img className="image" src={imageStr} alt="Thumbnail"/>
-                    :
-                    <div className="image">Loading...</div>
-                }
+            <button onClick={() => window.location.href = link}>
+                <div className="thumbnail">
+                    {
+                        imageStr ? 
+                        <img className="image" src={imageStr} alt="Thumbnail"/>
+                        :
+                        <div className="image">Loading...</div>
+                    }
 
-                <style jsx>{`
+                    <style jsx>{`
 
-                .thumbnail {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
+                    .thumbnail {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
 
-                .image {
-                    width: 75%;
-                }
+                    .image {
+                        width: 75%;
+                    }
 
-                `}</style>
-            </div>
+                    `}</style>
+                </div>
+            </button>
         )
     };
     

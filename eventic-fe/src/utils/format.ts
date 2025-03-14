@@ -40,12 +40,13 @@ export const formatPrice = (value: string): string => {
  * @param data 
  * @returns 
  */
-export const extractEventCardData= (data: EventData) : EventCardProps => {
+export const extractEventCardData = (data: EventData) : EventCardProps => {
     return {
         name: data.name,
         thumbnail: data.media[0],
         description: data.description,
         date: data.startDate,
+        id: data.id,
         location: data.locationString
     };
 }

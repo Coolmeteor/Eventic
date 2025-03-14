@@ -171,13 +171,11 @@ def refresh():
         decoded_token = decode_token(refresh_token)
         identity = decoded_token["sub"]
         
-        # Create new access token and refresh token
+        # Create new access token
         new_access_token = create_access_token(identity=identity)
-        new_refresh_token = create_refresh_token(identity=identity)
         
         response = make_response(jsonify({"message": "Token refreshed"}), 200)
         set_access_cookies(response, new_access_token)
-        set_refresh_cookies(response, new_refresh_token)
 
         return response
     except NoAuthorizationError:

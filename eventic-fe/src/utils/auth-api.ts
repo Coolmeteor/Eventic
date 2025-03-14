@@ -68,32 +68,41 @@ export async function isAuthenticated() {
         }
     });
 
-    let data;
+    const data = await convertResponse(response);
 
-    if(response.ok){
-        data = await convertResponse(response);
+    if (response.ok){
         console.log(data.message);
         return true;
     } else {
-        response = await fetch(`${API}/auth/check-auth`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                // Try refresh token with CSRG token if access token expired
-                "X-CSRF-TOKEN": getRefreshCSRFToken()
-            }
-        });
-
-        data = await convertResponse(response);
-
-        if(response.ok){
-            console.log(data.message);
-            return true;
-        } else {
-            console.error(data.error || data.msg);
-            return false;
-        }
+        console.log(data.error || data.msg);
+        return false;
     }
+    // let data;
+
+    // if(response.ok){
+    //     data = await convertResponse(response);
+    //     console.log(data.message);
+    //     return true;
+    // } else {
+    //     response = await fetch(`${API}/auth/check-auth`, {
+    //         method: "POST",
+    //         credentials: "include",
+    //         headers: {
+    //             // Try refresh token with CSRG token if access token expired
+    //             "X-CSRF-TOKEN": getRefreshCSRFToken()
+    //         }
+    //     });
+
+    //     data = await convertResponse(response);
+
+    //     if(response.ok){
+    //         console.log(data.message);
+    //         return true;
+    //     } else {
+    //         console.error(data.error || data.msg);
+    //         return false;
+    //     }
+    // }
 }
 
 export async function refreshToken() {
