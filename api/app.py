@@ -2,7 +2,7 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from config import SECRET_KEY
-from profile.routes import profile_bp
+from profiles.routes import profile_bp
 from auth.routes import auth_bp  
 from flask_cors import CORS
 from datetime import timedelta
