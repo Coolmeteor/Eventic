@@ -178,27 +178,6 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                             endDate: end})
                                     }}
                                 />
-
-                                <div className="spacer"/>
-
-                                {/* Price section */}
-                                <h2>Ticket Price</h2>
-                                <PriceInput
-                                    className="price-input"
-                                    setEventData={setEventData}
-                                    eventData={eventData}
-                                />
-                                <div className="spacer"/>
-
-                                {/* Date select section */}
-                                <h2>Date</h2>
-                                <CustomDatePicker
-                                    setDate={([start, end]: [number, number])=>{
-                                        setEventData({...eventData, 
-                                            startDate: start,
-                                            endDate: end})
-                                    }}
-                                />
                                 <div className="spacer"/>
 
                                 {/* Price section */}
