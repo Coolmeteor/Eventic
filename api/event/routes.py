@@ -5,7 +5,7 @@ event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.
 
 @event_bp.route("/events", methods=["POST"])
 def create_event_route():
-    """ 创建新事件 """
+    """ 创建新事件 """ 
     data = request.json
     required_fields = ["name", "description", "media", "tags", "category", "start_date",
                        "end_date", "location_string", "location_long", "location_lat",
