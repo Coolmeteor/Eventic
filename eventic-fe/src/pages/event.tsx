@@ -48,23 +48,20 @@ export default function Event() {
             // use data from, api
             console.log(`fetching event ${fetchUrl}`)
             let response
-            
+
             if (isSearch) {
-                const url = new URL(fetchUrl);
-                Object.keys(searchParams).forEach(key => 
-                    url.searchParams.append(key, searchParams[key])
-                );
-                response = await fetch(url, {
-                    method: "GET",
+                response = await fetch(fetchUrl, {
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
+                    body: JSON.stringify(searchParams)
                 })
             } else {
                 response = await fetch(fetchUrl)
             }
             console.log(response)
-            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch? "search": "recommendation"}`)
+            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch ? "search" : "recommendation"}`)
             console.log(response)
 
             const data: EventData[] = await response.json()
@@ -118,7 +115,7 @@ export default function Event() {
             <Section fullWidth={true} usePadding={false}>
                 {loading && <p>Please wait</p>}
                 {error && <p>Error loading event: {error}</p>}
-                {eventData.length > 0 &&
+                {true &&
                     <div>
                         <div className="top-header">
                             {/* <h1 className="search-title">Search Eventic</h1> */}
@@ -236,11 +233,12 @@ export default function Event() {
                         <div className="main-content">
 
                             <div className="event-list">
-
-                                {eventData.map((event) => (
+                                {eventData.length > 0 && eventData.map((event) => (
                                     <EventCard key={event.id} event={event} large={false} />
+                                ))
+                                }
 
-                                ))}
+                                {eventData.length <=0 && <p>No events found</p>}
 
                                 {error && <p className="errortext">{error}</p>}
 
@@ -287,7 +285,7 @@ export default function Event() {
                                                     type="radio"
                                                     name="category"
                                                     value={category}
-                                                    checked={eventData[0].category === category}
+                                                    checked={eventData.length > 0 && eventData[0].category === category}
                                                     onChange={(e) => {
 
                                                     }

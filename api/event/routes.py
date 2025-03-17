@@ -49,7 +49,7 @@ def recommendation():
     """ recommend events """
     return jsonify(get_all_events()), 200
 
-@event_bp.route("/search", methods=["GET"])
+@event_bp.route("/search", methods=["POST"])
 def search():
     """ filter events """
     data = request.json
