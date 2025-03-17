@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 
 export type SearchParams = {
-    query: string,
+    name: string, // aka query
     ascending: boolean,
     category: string,
     tags: string[],
@@ -18,7 +18,7 @@ export type SearchParams = {
 }
 
 const defaultSearchParams: SearchParams = {
-    query: "",
+    name: "",
     ascending: true,
     category: "",
     tags: [],
@@ -37,35 +37,43 @@ export default function Event() {
     const [searchParams, setSearchParams] = useState<SearchParams>({ ...defaultSearchParams })
 
     async function searchRequest() {
-        let fetchUrl = `${API}/events`
-        if (searchParams != defaultSearchParams) {
-            fetchUrl = `${API}/events/search`
+        let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
+        let fetchUrl = `${API}/event/recommendation`
+        if (isSearch) {
+            fetchUrl = `${API}/event/search`
             console.log("Sending event with params", searchParams)
         }
 
         try {
             // use data from, api
-            // const response = await fetch(fetchUrl, {
-            //     method: "GET",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify(searchParams),
-            //     mode: "no-cors"
-            // });
+            console.log(`fetching event ${fetchUrl}`)
+            let response
+            
+            if (isSearch) {
+                const url = new URL(fetchUrl);
+                Object.keys(searchParams).forEach(key => 
+                    url.searchParams.append(key, searchParams[key])
+                );
+                response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                })
+            } else {
+                response = await fetch(fetchUrl)
+            }
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch? "search": "recommendation"}`)
+            console.log(response)
 
-            // if (!response.ok) {
-            //     throw new Error(`Failed search query to server for events: ${response.statusText}`);
-            // }
-            // console.log(response)
-
-            // const data: EventData = (await response.json())[0]
-            // setEventData(data) // expect an array of data
+            const data: EventData[] = await response.json()
+            setEventData(data) // expect an array of data
 
 
             // use mock data instead
-            setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
-            console.log("Using mock data instead of backend")
+            // setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
+            // console.log("Using mock data instead of backend")
 
         } catch (error) {
             setError((error as Error).message)
@@ -122,9 +130,9 @@ export default function Event() {
                                         style={searchBarStyle}
                                         type="text"
                                         placeholder="Type to search"
-                                        value={searchParams.query}
+                                        value={searchParams.name}
                                         onChange={(e) => {
-                                            setSearchParams({ ...searchParams, query: e.target.value })
+                                            setSearchParams({ ...searchParams, name: e.target.value })
                                         }}
                                     />
                                 </div>
