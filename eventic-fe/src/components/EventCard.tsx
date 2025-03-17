@@ -2,7 +2,7 @@ import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendar, faLocationArrow, faPaperclip, IconDefinition } from '@fortawesome/free-solid-svg-icons'
-import { EventData } from '@/constants'
+import { DEV_MODE, EventData } from '@/constants'
 
 type Props = {
     large: boolean,
@@ -34,6 +34,7 @@ export default function EventCard({ large = false, event }: Props) {
 
                 {/* decription and other detail */}
                 <div className='event-content'>
+                    {DEV_MODE &&<p>Dev: event ID is {event.id}</p>}
                     <div className="date-text">
                         <FontAwesomeIcon icon={faCalendar} />
                         <p>{new Date(event.startDate).toLocaleDateString()} — {new Date(event.startDate).toLocaleDateString()}</p>

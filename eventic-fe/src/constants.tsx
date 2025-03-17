@@ -1,5 +1,7 @@
 export const API = "http://127.0.0.1:5000"
 
+export const DEV_MODE = true;
+
 export const eventCategories = [
     "Music",
     "Food & Drink",

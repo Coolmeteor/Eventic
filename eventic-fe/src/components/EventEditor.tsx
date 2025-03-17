@@ -7,7 +7,7 @@ import TagEditor from "@/components/TagEditor";
 import DefaultInputForm from "./DefaultInputForm";
 import { formatPrice } from "@/utils/format";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { API, DEV_MODE, eventCategories, EventData, mockEvents } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
 
@@ -259,7 +259,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 }
 
 
-                <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>
+                {DEV_MODE && <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>}
             </Section >
 
             <style jsx>{`
