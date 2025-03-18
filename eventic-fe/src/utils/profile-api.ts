@@ -6,7 +6,7 @@ import { API } from "@/constants";
 import { refreshToken, convertResponse } from "./auth-api";
 
 export interface User {
-    id: string,
+    id: number,
     user_name: string,
     email: string,
     phone: string,
@@ -27,7 +27,6 @@ type ApiResponse = SuccessResponse | ErrorResponse;
 
 
 export async function fetchProfile(): Promise<{user: User} | void> {
-    console.trace("fetchProfile called");
     let response = await fetch(`${API}/profile/get-profile`, {
         method: "GET",
         credentials: "include",

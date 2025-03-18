@@ -26,6 +26,7 @@
     "eslint-config-next": "^15.1.6",
     "next": "^15.1.6",
     "next-auth": "^4.24.11",
+    "pdfmake": "^0.2.18",
     "postcss": "^8.5.1",
     "quill": "^2.0.3",
     "react": "^19.0.0",
@@ -36,5 +37,8 @@
     "react-split": "^2.0.14",
     "tailwindcss": "3.3.2",
     "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/pdfmake": "^0.2.11"
   }
 }

@@ -1,10 +1,10 @@
-import { EventCard, EventCardProps } from "../Event/EventCard";
+import { EventItem, EventItemProps } from "../Event/EventItem";
 import React from 'react';
 import { HorizontalScrollContainer } from "./HorizontalScrollContainer";
 
 type Props = {
     title: string;
-    EventCards: EventCardProps[];
+    EventCards: EventItemProps[];
 }
 export function HorizontalEventList({ 
     title,
@@ -19,12 +19,12 @@ export function HorizontalEventList({
                 <ul className="scroll-list">
                     {EventCards?.map((eventProps, index) => (
                         <li key={index} className="listed-card">
-                            <EventCard key={index} {...eventProps} />
+                            <EventItem key={index} {...eventProps} />
                         </li>
                     ))}
                     {EventCards?.map((eventProps, index) => (
                         <li key={index} className="listed-card">
-                            <EventCard key={index} {...eventProps} />
+                            <EventItem key={index} {...eventProps} />
                         </li>
                     ))}
                 </ul>

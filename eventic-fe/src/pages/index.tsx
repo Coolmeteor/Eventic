@@ -4,8 +4,8 @@ import Section from "@/components/Section";
 import React from "react";
 
 import { mockEvents } from "@/constants"; // For debugging
-import { extractEventCardData } from "@/utils/format";
-import { EventCardProps } from "@/components/Event/EventCard";
+import { extractEventItemData } from "@/utils/event";
+import { EventItemProps } from "@/utils/event";
 
 
 const mockIcons = [
@@ -32,7 +32,7 @@ const mockIcons = [
 ]
 
 // You-might-like events must be fetched from backend in release
-const mockEventCards : EventCardProps[] = mockEvents.map(extractEventCardData);
+const mockEventCards : EventItemProps[] = mockEvents.map(extractEventItemData);
 
 
 export default function Homepage() {

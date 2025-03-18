@@ -28,6 +28,10 @@ export default function ProfileLayout({
         router.push("/profile/edit-security");
     }
 
+    const goToOrders = () => {
+        router.push("/profile/orders");
+    }
+
     const notDefined = () => {
         setErrorText("The link/action event is not defined");
         setTimeout(()=>{setErrorText("")}, 2000);
@@ -46,7 +50,7 @@ export default function ProfileLayout({
     // User
     const ticketList = [
         {text: "Upcoming event tickets", onClick:notDefined},
-        {text: "Ordered tickets", onClick:notDefined}
+        {text: "Ordered tickets", onClick:goToOrders}
     ]
 
     // Event Organizer

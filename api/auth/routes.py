@@ -201,7 +201,7 @@ def check_auth():
         )
         
         return response
-    except ExpiredSignatureError and CSRFError: # Exception raised when access token has expired
+    except (ExpiredSignatureError, CSRFError): # Exception raised when access token has expired
         try:
             # Verify refresh token and re-create access token if it's verified
             verify_jwt_in_request(refresh=True)

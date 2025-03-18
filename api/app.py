@@ -7,6 +7,9 @@ from auth.routes import auth_bp
 from flask_cors import CORS
 from datetime import timedelta
 
+##################################################################################
+from test.routes import test_bp # For test. Must be deleted when release
+##################################################################################
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = SECRET_KEY
@@ -26,6 +29,10 @@ def home():
 
 app.register_blueprint(profile_bp, url_prefix="/profile")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+
+##################################################################################
+app.register_blueprint(test_bp, url_prefix="/test") # Must be deleted when release
+##################################################################################
 
 
 if __name__ == "__main__":

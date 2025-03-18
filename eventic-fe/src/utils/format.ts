@@ -2,7 +2,6 @@
  * Function library for formatting value
  */
 import { EventData } from "@/constants";
-import { EventCardProps } from "@/components/Event/EventCard";
 
 
 export const formatPhoneNumber = (phone: string) => {
@@ -32,21 +31,4 @@ export const formatPrice = (value: string): string => {
     value = value.replace(/(\.\d{2})\d+/g, "$1"); // Don't accept 2 more number after period
 
     return value;
-}
-
-/**
- *  This function might not be neccessary if the media are stored as URLs.
- *  Defined just in case that the media are binary data.
- * @param data 
- * @returns 
- */
-export const extractEventCardData = (data: EventData) : EventCardProps => {
-    return {
-        name: data.name,
-        thumbnail: data.media[0],
-        description: data.description,
-        date: data.startDate,
-        id: data.id,
-        location: data.locationString
-    };
 }
