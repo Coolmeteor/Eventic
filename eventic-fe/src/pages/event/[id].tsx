@@ -79,9 +79,16 @@ export default function Event() {
             try {
                 setLoading(true);
 
+                const fetchUrl = `${API}/event/events/${id}`
                 // data from, api
-                console.log(`fetching event ${API}/events/${id}`)
-                const response = await fetch(`${API}/events/${id}`)
+                console.log(`fetching event ${fetchUrl}`)
+                const response = await fetch(fetchUrl, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    mode: "no-cors"
+                })
                 console.log(response)
                 if (!response.ok) throw new Error("Failed to fetch event")
                 const data: EventData = (await response.json())[0]
