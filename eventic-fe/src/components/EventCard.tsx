@@ -7,12 +7,16 @@ import DefaultButton from './DefaultButton'
 
 type Props = {
     large: boolean,
-    event: EventData
+    event: EventData,
+    btn?:{
+        click: () => void | undefined,
+        text?: string | undefined,
+    }
 }
 
 const borderRadius = "15px";
 
-export default function EventCard({ large = false, event }: Props) {
+export default function EventCard({ large = false, event, btn }: Props) {
     return (
         <>
             <div className="eventContainer">
@@ -36,22 +40,24 @@ export default function EventCard({ large = false, event }: Props) {
                 {/* decription and other detail */}
                 <div className='event-content'>
                     <div>
-                    {DEV_MODE &&<p>Dev: event ID is {event.id}</p>}
+                        {DEV_MODE && <p>Dev: event ID is {event.id}</p>}
 
 
-                    
-                    <div className="date-text">
-                        <FontAwesomeIcon icon={faCalendar} />
-                        <p>{new Date(event.startDate).toLocaleDateString()} — {new Date(event.startDate).toLocaleDateString()}</p>
+
+                        <div className="date-text">
+                            <FontAwesomeIcon icon={faCalendar} />
+                            <p>{new Date(event.start_date).toLocaleDateString()} — {new Date(event.start_date).toLocaleDateString()}</p>
+
+                        </div>
+
+
+                        <p className='event-desc'>{event.description}</p>
 
                     </div>
-                    
+                    {btn &&
+                        <DefaultButton textColor='var(--color-onPrimary)' bgColor='000000' onClick={btn.click}>{btn.text}</DefaultButton>
 
-                    <p className='event-desc'>{event.description}</p>
-
-                    </div>
-                    <DefaultButton textColor='var(--color-onPrimary)' bgColor='000000' onClick={() => window.location.href = `/event/${event.id}`}>View more</DefaultButton>
-
+                    }
                 </div>
 
 

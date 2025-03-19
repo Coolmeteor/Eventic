@@ -3,7 +3,7 @@ from .services import create_event, get_all_events, get_event, update_event, del
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 
-@event_bp.route("/events", methods=["POST"])
+@event_bp.route("/create", methods=["POST"])
 def create_event_route():
     """ 创建新事件 """
     data = request.json
@@ -32,7 +32,7 @@ def get_event_route(event_id):
     event = get_event(event_id)
     result, status = (jsonify([event]), 200) if event else (jsonify({"error": "not find"}), 404)
     return result, status
-@event_bp.route("/events/<int:event_id>", methods=["PUT"])
+@event_bp.route("/update/<int:event_id>", methods=["PUT"])
 def update_event_route(event_id):
     """ 更新事件 """
     data = request.json
@@ -40,7 +40,7 @@ def update_event_route(event_id):
         return jsonify({"message": "update success"}), 200
     return jsonify({"error": "cant find"}), 404
 
-@event_bp.route("/events/<int:event_id>", methods=["DELETE"])
+@event_bp.route("/delete/<int:event_id>", methods=["DELETE"])
 def delete_event_route(event_id):
     """ 删除事件 """
     if delete_event(event_id):

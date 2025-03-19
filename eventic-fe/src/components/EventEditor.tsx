@@ -59,17 +59,18 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     tags: [],
                     category: "",
 
-                    startDate: 0,
-                    endDate: 0,
+                    start_date: 0,
+                    end_date: 0,
                     locationString: "",
-                    locationLong: 0,
-                    locationLat: 0,
+                    location_long: 0,
+                    location_lat: 0,
 
                     visibility: "private",
-                    maxParticipants: 0,
+                    max_participants: 0,
                     currentParticipants: 0,
                     pricing: 0,
 
+                    creator_id: 1,
                     creator: "",
                     createdAt: 0,
                     updatedAt: 0,
@@ -82,9 +83,10 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 try {
                     setLoading(true);
 
+                    const fetchUrl = `${API}/event/events/${eventId}`
                     // data from, api
-                    console.log(`fetching event ${API}/events/${eventId}`)
-                    const response = await fetch(`${API}/events/${eventId}`)
+                    console.log(`fetching event ${fetchUrl}`)
+                    const response = await fetch(fetchUrl)
                     console.log(response)
                     if (!response.ok) throw new Error("Failed to fetch event")
                     const data: EventData = (await response.json())[0]
@@ -121,10 +123,11 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ ...eventData, visibility: visibility }),
-                mode: "no-cors"
+            
             });
 
             if (!response.ok) {
+                console.log(response)
                 throw new Error(`Failed to upload data to server: ${response.statusText}`);
             }
 
@@ -132,6 +135,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
         } catch (error) {
             setError((error as Error).message);
             console.error("Error posting event:", error);
+            console
             return null;
         }
 
@@ -174,8 +178,8 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 <CustomDatePicker
                                     setDate={([start, end]: [number, number])=>{
                                         setEventData({...eventData, 
-                                            startDate: start,
-                                            endDate: end})
+                                            start_date: start,
+                                            end_date: end})
                                     }}
                                 />
                                 <div className="spacer"/>

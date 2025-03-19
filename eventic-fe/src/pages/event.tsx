@@ -239,7 +239,8 @@ export default function Event() {
 
                             <div className="event-list">
                                 {eventData.length > 0 && eventData.map((event) => (
-                                    <EventCard key={event.id} event={event} large={false} />
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }} 
+                                    key={event.id} event={event} large={false} />
                                 ))
                                 }
                             </div>
