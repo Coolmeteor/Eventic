@@ -38,7 +38,7 @@ export default function Event() {
 
     async function searchRequest() {
         let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
-        let fetchUrl = `${API}/event/recommendation`
+        let fetchUrl = `${API}/event/events`
         if (isSearch) {
             fetchUrl = `${API}/event/search`
             console.log("Sending event with params", searchParams)

@@ -87,7 +87,6 @@ export default function Event() {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    mode: "no-cors"
                 })
                 console.log(response)
                 if (!response.ok) throw new Error("Failed to fetch event")
