@@ -45,6 +45,13 @@ export default function DefaultButton({
 					color: ${textColor};
 					font-family: var(--font-calps);
 				}
+
+				.home-browse-button {
+					color: var(--color-primary);
+					background-color: var(--color-onPrimary);
+					font-size: 3em;
+					border-radius: 0.5em;
+				}
 				`}
 			</style>
 		</>

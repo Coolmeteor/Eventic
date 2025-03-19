@@ -3,6 +3,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendar, faLocationArrow, faPaperclip, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { DEV_MODE, EventData } from '@/constants'
+import DefaultButton from './DefaultButton'
 
 type Props = {
     large: boolean,
@@ -34,14 +35,22 @@ export default function EventCard({ large = false, event }: Props) {
 
                 {/* decription and other detail */}
                 <div className='event-content'>
+                    <div>
                     {DEV_MODE &&<p>Dev: event ID is {event.id}</p>}
+
+
+                    
                     <div className="date-text">
                         <FontAwesomeIcon icon={faCalendar} />
                         <p>{new Date(event.startDate).toLocaleDateString()} — {new Date(event.startDate).toLocaleDateString()}</p>
 
                     </div>
+                    
 
                     <p className='event-desc'>{event.description}</p>
+
+                    </div>
+                    <DefaultButton textColor='var(--color-onPrimary)' bgColor='000000' onClick={() => window.location.href = `/event/${event.id}`}>View more</DefaultButton>
 
                 </div>
 
@@ -85,12 +94,21 @@ export default function EventCard({ large = false, event }: Props) {
                 .event-content {
                     display: flex;
                     flex-direction: column;
+                    justify-content: space-between;
                     padding: 0px 20px 10px 20px;
 
                     width: 100%;
                     height: 50%;
                     border-radius: 0px 0px ${borderRadius} ${borderRadius};
                     background-color: var(--color-background-mid);
+                }
+
+                .see-more {
+            
+                    justify-self: end;
+                    
+                    justify-content: center;
+                
                 }
 
                 h3 {
