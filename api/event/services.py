@@ -9,35 +9,37 @@ import psycopg2.extras
 
 
 def create_event(data):
-    """ 插入新事件 """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        try:
-            start_date = datetime.strptime(data["start_date"], "%Y-%m-%d %H:%M:%S")
-            end_date = datetime.strptime(data["end_date"], "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            return {"error": "must be YYYY-MM-DD HH:MM:SS"}, 400
+        
        
+        start_date = datetime.utcfromtimestamp(data["start_date"] / 1000)  # 转换为 Python 的 datetime
+        end_date = datetime.utcfromtimestamp(data["end_date"] / 1000)
+        
         created_at = datetime.utcnow()
         updated_at = datetime.utcnow()
+
         cursor.execute("""
-            INSERT INTO events (name, description, media, tags, category, start_date, end_date,
-                                location_string, location_long, location_lat, visibility,
-                                max_participants, current_participants, pricing, creator_id, created_at, updated_at)
+            INSERT INTO events (name, description, media, tags, category, start_date, end_date, 
+                               location_string, location_long, location_lat, visibility, 
+                               max_participants, current_participants, pricing, creator_id, 
+                               created_at, updated_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id;
         """, (
-            data["name"], data["description"],  
-            "{" + ",".join(f'"{x}"' for x in data["media"]) + "}",
-            "{" + ",".join(f'"{x}"' for x in data["tags"]) + "}",
-            data["category"], start_date, end_date, 
-            data["location_string"], data["location_long"], data["location_lat"], 
-            data["visibility"], data["max_participants"], 0, 
-            data["pricing"], data["creator_id"], 
-            created_at, updated_at  # 这里使用转换后的 `created_at` 和 `updated_at`
+            data["name"], data["description"], data["media"], data["tags"], data["category"],
+            start_date, end_date,
+            data["location_string"], data["location_long"], data["location_lat"],
+            data["visibility"], data["max_participants"], 0, data["pricing"], data["creator_id"],
+            created_at, updated_at
         ))
-        
+
+        event_id = cursor.fetchone()[0]
         conn.commit()
+
+     
         return {"message": "event create sucess"}, 201
+
 
 def get_all_events():
     """ 获取所有事件 """
@@ -57,23 +59,32 @@ def get_all_events():
 
     return event_list  # 确保返回的是一个列表，而不是单个整数
 
+
 def get_event(event_id):
-    """ 获取指定事件 """
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM events WHERE id = %s", (event_id,))
     event = cursor.fetchone()
+    
+    
+    column_names = [desc[0] for desc in cursor.description]
 
     cursor.close()
     conn.close()
 
     if event:
-        return dict(zip([desc[0] for desc in cursor.description], event))
-    else:
-        return None  # 确保返回 None 而不是整数
+        event_dict = dict(zip(column_names, event))
 
+        
+        for field in ["start_date", "end_date", "created_at", "updated_at"]:
+            if isinstance(event_dict.get(field), datetime):
+                event_dict[field] = int(event_dict[field].timestamp() * 1000)
 
+        return event_dict  
+
+    return None  # 确保返回 None 而不是整数
 def update_event(event_id, data):
     """ 更新事件 """
     with get_db_connection() as conn:
