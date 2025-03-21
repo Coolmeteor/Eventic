@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Section from "@/components/Section";
-import { EventData } from "@/constants";
+import { API, EventData } from "@/constants";
 import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { mockEvents } from "@/constants";
@@ -11,6 +11,7 @@ import GenerateTicketPDF from "@/components/Ticket/GenerateTicketPDF";
 import { fetchProfile } from "@/utils/profile-api";
 import { User } from "@/utils/profile-api";
 import { extractEventItemData } from "@/utils/event";
+import { convertResponse } from "@/utils/auth-api";
 
 
 export default function ticket() {
@@ -18,17 +19,18 @@ export default function ticket() {
     const { id } = router.query;
 
     const [user, setUser] = useState<User>();
-    
-        useEffect(()=>{
-            fetchProfile()
-            .then((user) => {
-                if(user && "user" in user){
-                    setUser(user.user);
-                }
-            });
-        }, [])
-
+    const [numId, setNumId] = useState<number>(-1);
     const [eventData, setEventData] = useState<EventData>();
+    
+    useEffect(()=>{
+        fetchProfile()
+        .then((user) => {
+            if(user && "user" in user){
+                setUser(user.user);
+            }
+        });
+    }, [])
+
     const mockIcons = [
         "file.svg",
         "globe.svg",
@@ -52,13 +54,39 @@ export default function ticket() {
         "window.svg",
     ]
 
+    async function fetchEvent(eventId: number) : Promise<{event: EventData} | void> {
+        const response = await fetch(`${API}/events/${eventId}`);
+
+        
+
+        if(response.ok){
+            const data = await convertResponse(response);
+            console.log("Fetched event data successfully");
+            return data;
+        } else {
+            console.log(response);
+        }
+    }
 
     useEffect(() => {
         if (!id)    return;
+        if(id == "4"){
+            setNumId(4);
+        } else {
+            // setNumId(Number(id))
+            // console.log(Number(id));
+            setNumId(2);
+        }
 
         // Authorize user and ticket
-
-        setEventData(mockEvents[1]);
+        fetchEvent(20)
+        .then((data) => {
+            if(data && "event" in data){
+                setEventData(data.event);
+            } else {
+                console.log(data);
+            }
+        });
 
     }, [id]);
 
@@ -71,7 +99,7 @@ export default function ticket() {
                         <h1>{eventData?.name}</h1>
 
                         <div className="event-hero-container">
-                            <img className="event-hero-image" src={"../" + eventData?.media[0]} alt="Event Image" />
+                            <img className="event-hero-image" src={eventData?.media[0]} alt="Event Image" />
                         </div>
 
                         <div className="event-content">
@@ -97,7 +125,7 @@ export default function ticket() {
 
                                 <GenerateTicketPDF 
                                     userID={user.id} 
-                                    ticketID={1} 
+                                    ticketID={numId}
                                     eventItemProps={extractEventItemData(eventData)}
                                 />
 

@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from config import SECRET_KEY
 from profiles.routes import profile_bp
 from auth.routes import auth_bp  
+from event.routes import event_bp
 from flask_cors import CORS
 from datetime import timedelta
 
@@ -29,6 +30,7 @@ def home():
 
 app.register_blueprint(profile_bp, url_prefix="/profile")
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(event_bp, url_prefix="")
 
 ##################################################################################
 app.register_blueprint(test_bp, url_prefix="/test") # Must be deleted when release

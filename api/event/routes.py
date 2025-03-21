@@ -26,7 +26,10 @@ def get_all_events_route():
 def get_event_route(event_id):
     """ 获取指定事件 """
     event = get_event(event_id)
-    return jsonify(event) if event else jsonify({"error": "事件未找到"}), 404
+    if event:
+        return jsonify({"event": event}), 200 
+    else:
+        jsonify({"error": "事件未找到"}), 404
 
 @event_bp.route("/events/<int:event_id>", methods=["PUT"])
 def update_event_route(event_id):

@@ -51,6 +51,7 @@ export default function GenerateTicketPDF({
                 { text: "QR code", style: "QR"},
                 { image: qrCode, width: 150},
                 { text: "You can download or print this document"},
+                { text: "Ticket ID: " + ticketID}
             ],
             styles: {
                 header: {

@@ -30,18 +30,17 @@ def validate():
     
     try:
         with get_db_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
                 query = """
-                    SELECT ticket.id
-                    FROM ticket
+                    SELECT tickets.id
+                    FROM tickets
                 """
                 cursor.execute(query)
-                tickets = cursor.fetchall()
+                tickets_id = cursor.fetchall()
                 
-                for ticket in tickets:
+                for id in tickets_id:
                     # Generate hashed id to validate
-                    valid_hashed_id = hashlib.sha256(str(ticket.id).encode()).hexdigest()
+                    valid_hashed_id = hashlib.sha256(str(id[0]).encode()).hexdigest()
                     short_valid_hashed = valid_hashed_id[:10]
                     if short_valid_hashed == read_qr:
                         return jsonify({

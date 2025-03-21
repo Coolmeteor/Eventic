@@ -3,19 +3,27 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { API } from '@/constants';
 
 
-export default function ScanPage(){
+export default function ExScanPage(){
     const [message, SetMessage] = useState("");
-
+    const [exError, setExError] = useState("");
     const validation_request = async (text: string) => {
-        const response = await fetch(`${API}/test/ticket/validate?qr=${text}`);
-        if(response.ok) {
-            console.log("QR is valid");
-            SetMessage("Valid ticket.");
+        try{
+            const response = await fetch(`http://192.168.2.146:5000/test/ticket/validate?qr=${text}`);
+            if(response.ok) {
+                console.log("QR is valid");
+                SetMessage("Valid ticket.");
+            }
+            else {
+                console.error(response);
+                SetMessage("This is INVALID ticket.");
+            }
+            setExError("Fetched!")
         }
-        else {
-            console.error(response);
-            SetMessage("This is INVALID ticket.");
+        catch (err) {
+            console.error("Fetch failed!", err);
+            setExError("Fetch failed!" + err)
         }
+        
     }
 
     useEffect(() => {
@@ -32,6 +40,7 @@ export default function ScanPage(){
             (decodedText) => {
             console.log("QR is read successfully", decodedText);
             validation_request(decodedText);
+            SetMessage("Read QR");
             },
             (error) => {
             console.warn("Scanning error:", error);
@@ -49,6 +58,7 @@ export default function ScanPage(){
                 <h1 className="text-xl font-bold mb-4">Scan QR</h1>
                 <div id="qr-reader" style={{ width: "300px" }}></div>
                 <p>{message}</p>
+                <p>{exError}</p>
             </div>
 
             <style jsx>{`
