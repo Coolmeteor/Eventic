@@ -60,7 +60,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                     start_date: 0,
                     end_date: 0,
-                    locationString: "",
+                    location_string: "St. Catharines",
                     location_long: 0,
                     location_lat: 0,
 
@@ -70,7 +70,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     pricing: 0,
 
                     creator_id: 1,
-                    creator: "",
+                    creator: "Bob",
                     createdAt: 0,
                     updatedAt: 0,
                 }
@@ -119,14 +119,21 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
         let media: string[] = [];
 
         for (let img in images) {
-            await blobToBase64(img).then(base64 => {
+            // console.log("Converting image to base64:", images[img]);
+            await blobToBase64(images[img]).then(base64 => {
+                // console.log("Converted image to base64:", base64);
                 media.push(base64);
             })
-            .catch(error => console.error("Image convert error:", error));
+                .catch(error => console.error("Image convert error:", error));
         }
 
+
         try {
-            const response = await fetch(`${API}/event/create`, {
+            let fetchUrl = `${API}/event/create`
+            if (!isCreate) {
+                fetchUrl = `${API}/event/update/${eventId}`
+            }
+            const response = await fetch(fetchUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -184,24 +191,26 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 {/* Date select section */}
                                 <h2>Date</h2>
                                 <CustomDatePicker
-                                    setDate={([start, end]: [number, number])=>{
-                                        setEventData({...eventData, 
+                                    setDate={([start, end]: [number, number]) => {
+                                        setEventData({
+                                            ...eventData,
                                             start_date: start,
-                                            end_date: end})
+                                            end_date: end
+                                        })
                                     }}
                                 />
-                                <div className="spacer"/>
+                                <div className="spacer" />
 
                                 {/* Price section */}
                                 <h2>Ticket Price</h2>
-                                <div className="price-input"> 
-                                <PriceInput
-                                    // className="price-input"
-                                    setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
-                                    data={eventData.pricing}
-                                />
+                                <div className="price-input">
+                                    <PriceInput
+                                        // className="price-input"
+                                        setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
+                                        data={eventData.pricing}
+                                    />
                                 </div>
-                                <div className="spacer"/>
+                                <div className="spacer" />
 
 
                                 {/* category and tags in a horztoal list for both */}
@@ -249,11 +258,11 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                                 <div className="action-buttons">
                                     {/* Save draft and publish for events that are currently private . For public events, user can update or make private*/}
-                                    {eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Save draft</DefaultButton>}
-                                    {eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Publish</DefaultButton>}
+                                    {isCreate && eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Save draft</DefaultButton>}
+                                    {isCreate && eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Publish</DefaultButton>}
 
-                                    {eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("public")}>Update</DefaultButton>}
-                                    {eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("private")}>Unpublish</DefaultButton>}
+                                    {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("public")}>Update</DefaultButton>}
+                                    {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("private")}>Unpublish</DefaultButton>}
 
                                 </div>
 

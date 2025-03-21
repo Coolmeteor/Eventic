@@ -91,10 +91,10 @@ def update_event(event_id, data):
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE events
-            SET name = ?, description = ?, media = ?, tags = ?, category = ?, start_date = ?,
-                end_date = ?, location_string = ?, location_long = ?, location_lat = ?, 
-                visibility = ?, max_participants = ?, pricing = ?, updated_at = ?
-            WHERE id = ?
+            SET name = %s, description = %s, media = %s, tags = %s, category = %s, start_date = %s,
+                end_date = %s, location_string = %s, location_long = %s, location_lat = %s, 
+                visibility = %s, max_participants = %s, pricing = %s, updated_at = %s
+            WHERE id = %s
         """, (
             data["name"], data["description"], json.dumps(data["media"]), json.dumps(data["tags"]),
             data["category"], data["start_date"], data["end_date"], data["location_string"],
@@ -108,7 +108,7 @@ def delete_event(event_id):
     """ 删除事件 """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM events WHERE id = ?", (event_id,))
+        cursor.execute("DELETE FROM events WHERE id = %s", (event_id,))
         conn.commit()
         return cursor.rowcount > 0
 

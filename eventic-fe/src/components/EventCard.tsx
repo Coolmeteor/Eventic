@@ -31,7 +31,7 @@ export default function EventCard({ large = false, event, btn }: Props) {
 
                     <div className="location-text">
                         <FontAwesomeIcon icon={faLocationArrow} />
-                        <p>{event.locationString}</p>
+                        <p>{event.location_string}</p>
                     </div>
                     <h3>{event.name}</h3>
                 </div>

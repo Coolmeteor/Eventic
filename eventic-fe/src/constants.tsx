@@ -23,7 +23,7 @@ export type EventData = {
 
     start_date: number; // use iso whatever ms since 1970 i guess
     end_date: number; // use iso whatever ms since 1970 i guess
-    locationString: string; // human readable address
+    location_string: string; // human readable address
     location_long: number;
     location_lat: number;
 
@@ -57,7 +57,7 @@ export const mockEvents: EventData[] = [
 
         start_date: 1735689600000, // 1 Jan 2025, in milliseconds
         end_date: 1735776000000, // 2 Jan 2025
-        locationString: "San Francisco, CA",
+        location_string: "San Francisco, CA",
         location_long: -122.4194,
         location_lat: 37.7749,
 
@@ -84,7 +84,7 @@ export const mockEvents: EventData[] = [
 
         start_date: 1737000000000, // 15 Jan 2025
         end_date: 1737086400000, // 16 Jan 2025
-        locationString: "New Orleans, LA",
+        location_string: "New Orleans, LA",
         location_long: -90.0715,
         location_lat: 29.9511,
 
@@ -111,7 +111,7 @@ export const mockEvents: EventData[] = [
 
         start_date: 1738200000000, // 1 Feb 2025
         end_date: 1738286400000, // 2 Feb 2025
-        locationString: "New York, NY",
+        location_string: "New York, NY",
         location_long: -74.006,
         location_lat: 40.7128,
 

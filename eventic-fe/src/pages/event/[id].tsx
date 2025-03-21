@@ -107,7 +107,7 @@ export default function Event() {
 
         fetchEvent();
     }, [id]);
-
+    console.log("imggg ", eventData?.media[0])
     return (
         <>
             <Section>
@@ -120,7 +120,7 @@ export default function Event() {
                         <h1>{eventData?.name}</h1>
 
                         <div className="event-hero-container">
-                            <img className="event-hero-image" src={"../" + eventData?.media[0]} alt="Event Image" />
+                            <img className="event-hero-image" src={eventData?.media[0]} alt="Event Image" />
                         </div>
 
                         <div className="event-content">

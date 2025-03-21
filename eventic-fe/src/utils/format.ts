@@ -47,6 +47,6 @@ export const extractEventCardData = (data: EventData) : EventCardProps => {
         description: data.description,
         date: data.start_date,
         id: data.id,
-        location: data.locationString
+        location: data.location_string
     };
 }
