@@ -4,12 +4,11 @@ import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
-import DefaultInputForm from "./DefaultInputForm";
-import { formatPrice } from "@/utils/format";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, DEV_MODE, eventCategories, EventData, mockEvents } from "@/constants";
+import { API, DEV_MODE, eventCategories, EventData } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
+import { blobToBase64 } from "@/utils/helpers";
 
 
 export default function EventEditor({ eventId = undefined }: { eventId?: string }) {
@@ -91,6 +90,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     if (!response.ok) throw new Error("Failed to fetch event")
                     const data: EventData = (await response.json())[0]
                     setEventData(data)
+                    setImages(data.media)
 
                     // use mock data instead
                     // setEventData(
@@ -111,10 +111,19 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
 
     /**
- * Upload form to server
- */
+     * Upload form to server
+     */
     async function submitForm(visibility: string = "private") {
         console.log("submitting form", eventData, images);
+
+        let media: string[] = [];
+
+        for (let img in images) {
+            await blobToBase64(img).then(base64 => {
+                media.push(base64);
+            })
+            .catch(error => console.error("Image convert error:", error));
+        }
 
         try {
             const response = await fetch(`${API}/event/create`, {
@@ -122,8 +131,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ...eventData, visibility: visibility }),
-            
+                body: JSON.stringify({ ...eventData, visibility: visibility, media: media }),
             });
 
             if (!response.ok) {

@@ -1,3 +1,4 @@
+import { base64ToBlob } from '@/utils/helpers'
 import Image from 'next/image'
 import React from 'react'
 
