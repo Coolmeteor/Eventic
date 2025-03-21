@@ -26,7 +26,7 @@ export default function GenerateTicketPDF({
     useEffect(() => {
         if(retryCount > 3) return;
         
-        fetch(`${API}/test/get-qr`, {method: "GET"})
+        fetch(`${API}/test/ticket/gen-qr/${ticketID}`, {method: "GET"})
         .then((response) => {
             return response.blob();
         })
