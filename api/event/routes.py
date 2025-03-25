@@ -30,9 +30,13 @@ def get_all_events_route():
 def get_event_route(event_id):
     
     event = get_event(event_id)
-    result, status = (jsonify([event]), 200) if event else (jsonify({"error": "not find"}), 404)
-    return result, status
-@event_bp.route("/update/<int:event_id>", methods=["POST"])
+
+    if event:
+        return jsonify(event), 200
+    else:
+        return jsonify({"error": "not find"}), 404
+    
+@event_bp.route("/events/<int:event_id>", methods=["PUT"])
 def update_event_route(event_id):
     """ 更新事件 """
     data = request.json
