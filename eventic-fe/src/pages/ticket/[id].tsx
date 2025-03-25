@@ -5,8 +5,6 @@ import { API, EventData } from "@/constants";
 import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { mockEvents } from "@/constants";
-import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
-import { ImageCarousell } from "@/components/ImageCarousell";
 import GenerateTicketPDF from "@/components/Ticket/GenerateTicketPDF";
 import { fetchProfile } from "@/utils/profile-api";
 import { User } from "@/utils/profile-api";

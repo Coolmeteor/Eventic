@@ -1,4 +1,5 @@
-import { EventItem, EventItemProps } from "../Event/EventItem";
+import { EventItem } from "../Event/EventItem";
+import { EventItemProps } from "@/utils/event";
 import React from 'react';
 import { HorizontalScrollContainer } from "./HorizontalScrollContainer";
 

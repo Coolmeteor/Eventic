@@ -43,15 +43,15 @@ export default function GenerateTicketPDF({
             setTimeout(() => setRetryCount(retryCount + 1), 2000);
         });
     }, []);
-
+    const id_text = "Ticket ID: " + ticketID;
     const handlePrintPDF = () => {
         const docDefinition = {
             content: [
                 { text: eventItemProps.name, style: "header"},
-                { text: "QR code", style: "QR"},
+                { text: "QR code", style: "QR"} as any,
                 { image: qrCode, width: 150},
                 { text: "You can download or print this document"},
-                { text: "Ticket ID: " + ticketID}
+                { text: id_text},
             ],
             styles: {
                 header: {
