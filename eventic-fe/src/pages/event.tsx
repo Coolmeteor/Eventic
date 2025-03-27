@@ -4,6 +4,8 @@ import { PriceInput } from "@/components/Event/PriceInput";
 import EventCard from "@/components/EventCard";
 import Section from "@/components/Section";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
 
@@ -36,7 +38,12 @@ export default function Event() {
 
     const [searchParams, setSearchParams] = useState<SearchParams>({ ...defaultSearchParams })
 
+    /**
+     * Get data from backend for the page to load.
+     * This also sends the search parameters for database queries
+     */
     async function searchRequest() {
+        setLoading(true)
         let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
         let fetchUrl = `${API}/event/events`
         if (isSearch) {
@@ -76,7 +83,17 @@ export default function Event() {
         } catch (error) {
             setError((error as Error).message + ": " + (error as Error).name)
             console.error("Error in search request:", error)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    /**
+     * Reload the backend data
+     */
+    const refreshContent = () => {
+        setEventData([])
+        searchRequest()
     }
 
 
@@ -115,9 +132,7 @@ export default function Event() {
     return (
         <>
             <Section fullWidth={true} usePadding={false}>
-
-
-                <div>
+                <div className="full-h">
                     <div className="top-header">
                         {/* <h1 className="search-title">Search Eventic</h1> */}
 
@@ -135,13 +150,19 @@ export default function Event() {
                                 />
                             </div>
 
-                            <DefaultButton onClick={searchRequest}>Search</DefaultButton>
+                            <DefaultButton className="sharp-edge" onClick={searchRequest}>Search</DefaultButton>
                         </div>
                     </div>
 
 
                     {/* sort order and uh... */}
                     <div className="sort-order">
+                        <div className="refrest-btn">
+                            <DefaultButton onClick={refreshContent}>
+                                <FontAwesomeIcon icon={faRefresh} />
+                            </DefaultButton>
+
+                        </div>
                         <label>
                             <input
                                 type="radio"
@@ -232,15 +253,16 @@ export default function Event() {
 
 
                     <div className="main-content">
-                        <div>
+                        {/* load all data */}
+                        <div className="full-w">
                             {loading && <p>Please wait</p>}
                             {eventData.length <= 0 && !loading && <p>No events found</p>}
                             {error && <p className="errortext">{error}</p>}
 
                             <div className="event-list">
                                 {eventData.length > 0 && eventData.map((event) => (
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }} 
-                                    key={event.id} event={event} large={false} />
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
                                 ))
                                 }
                             </div>
@@ -248,7 +270,7 @@ export default function Event() {
 
 
                         <div className="rsb">
-                            {/*  put some extra stuff here */}
+                            {/*  extra search filters */}
 
                             {/* category and tags in a horztoal list for both */}
                             <div className="category-tags">
@@ -313,7 +335,6 @@ export default function Event() {
                         </div>
                     </div>
                 </div>
-
             </Section>
 
 
@@ -323,6 +344,9 @@ export default function Event() {
     width: 100%;
     flex-direction: column;
     display: flex;
+}
+.full-h {
+    min-height: 100vh
 }
 .spacer {
     height: 2em;
@@ -377,6 +401,7 @@ h1 {
 .sort-order label {
     display: flex;
     gap: 0.5em;
+    align-items: center;
 }
 
 

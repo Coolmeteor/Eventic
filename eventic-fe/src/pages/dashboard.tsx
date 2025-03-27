@@ -55,8 +55,8 @@ export default function Dashboard() {
                     <div className="rsb">
                         {/*  put some extra stuff here */}
                         <div className="action-buttons">
-                            <DefaultButton bgColor="var(--color-onPrimary)" textColor="var(--color-primary)" onClick={() => window.location.href = "/event/create"}>Create new</DefaultButton>
-                            <DefaultButton bgColor="var(--color-onPrimary)" textColor="var(--color-primary)" onClick={() => window.location.href = "/event"}>Something else</DefaultButton>
+                            <DefaultButton textColor="var(--color-primary)" onClick={() => window.location.href = "/event/create"}>Create new</DefaultButton>
+                            <DefaultButton textColor="var(--color-primary)" onClick={() => window.location.href = "/event"}>Something else</DefaultButton>
                         </div>
 
                         <div className="spacer"></div>

@@ -55,7 +55,7 @@ export default function EventCard({ large = false, event, btn }: Props) {
 
                     </div>
                     {btn &&
-                        <DefaultButton textColor='var(--color-onPrimary)' bgColor='000000' onClick={btn.click}>{btn.text}</DefaultButton>
+                        <DefaultButton textColor='var(--color-onPrimary)' bgColor={['000000', '000000','000000']} onClick={btn.click}>{btn.text}</DefaultButton>
 
                     }
                 </div>

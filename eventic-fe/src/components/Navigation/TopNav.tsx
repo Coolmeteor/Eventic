@@ -41,7 +41,7 @@ export function TopNavbar({ showProfile }: Props) {
 
                     {showProfile && !isLogin &&
                         <DefaultButton
-                            bgColor='000000'
+                            bgColor={['000000', '000000','000000']}
                             onClick={() => window.location.href = "/login"}>
                             <p>Login</p>
                         </DefaultButton>
@@ -49,7 +49,7 @@ export function TopNavbar({ showProfile }: Props) {
 
                     {showProfile && isLogin &&
                         <DefaultButton
-                            bgColor='000000'
+                            bgColor={['000000', '000000','000000']}
                             onClick={() => window.location.href = "/profile"}>
                             <FontAwesomeIcon icon={faUser} />
                         </DefaultButton>
