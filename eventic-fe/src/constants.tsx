@@ -1,10 +1,12 @@
+import { faBaseballBatBall, faBowlFood, faBrush, faBuildingNgo, faDice, faHandHoldingHeart, faMusic, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
+
 export const API = "http://127.0.0.1:5000"
 
 export const DEV_MODE = true;
 
 export const eventCategories = [
     "Music",
-    "Food & Drink",
+    "Dining",
     "Arts",
     "Sports",
     "Business",
@@ -12,6 +14,31 @@ export const eventCategories = [
     "Charity",
     "Other"
 ]
+
+const eventCategoriesIcons = [
+    faMusic,
+    faBowlFood,
+    faBrush,
+    faBaseballBatBall,
+    faBuildingNgo,
+    faPeopleGroup,
+    faHandHoldingHeart,
+    faDice
+]
+
+export const eventCategoriesWithIcons: TextWithIcon[] = eventCategories.map((category, index) => {
+
+    console.log("category: ", category, eventCategoriesIcons[index]);
+    return {
+        icon: eventCategoriesIcons[index],
+        text: category,
+    }
+})
+
+export type TextWithIcon = {
+    icon: any;
+    text: string;
+}
 
 export type EventData = {
     id: number;

@@ -1,20 +1,14 @@
 import { MicroCard, MiniCard } from "./MiniCard";
-
-
-export type TextWithIcon = {
-    icon: any;
-    text: string;
-}
+import { TextWithIcon } from "@/constants";
 
 export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
     return (
         <>
             <div className="scroll-list-container">
                 <ul className="scroll-list">
-
                     {textWithIcons?.map((item, index) => (
                         <li key={index} className="smallCardli">
-                            <MiniCard icon={"../"+item.icon} text={item.text} />
+                            <MiniCard icon={item.icon} text={item.text} />
                         </li>
                     ))}
 
@@ -53,20 +47,28 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
 
 
 
-export function MiniHorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
+export function MiniHorizontalScroll({ textWithIcons, tags }: { textWithIcons?: TextWithIcon[], tags?: string[] }) {
     return (
         <>
             <div className="scroll-list-container">
                 <ul className="scroll-list">
-
-                {textWithIcons?.map((item, index) => (
+                    {/* icon cards */}
+                    {textWithIcons?.map((item, index) => (
                         <li key={index} className="smallCardli">
-                            <MicroCard icon={"../"+item.icon} text={item.text} />
+                            <MicroCard icon={item.icon} text={item.text} />
                         </li>
                     ))}
 
-                </ul>
+                    {/*  tags */}
 
+                    {tags?.map((item, index) => (
+                        <li key={index} className="smallCardli">
+                            <MicroCard text={item} />
+                        </li>
+                    ))
+                    }
+
+                </ul>
             </div>
 
             <style jsx>{`

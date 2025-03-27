@@ -3,34 +3,10 @@ import { HorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
 import React from "react";
 
-import { mockEvents } from "@/constants"; // For debugging
+import { eventCategoriesWithIcons, mockEvents } from "@/constants"; // For debugging
 import { extractEventCardData } from "@/utils/format";
 import { EventCardProps } from "@/components/Event/EventCard";
 import DefaultButton from "@/components/DefaultButton";
-
-
-const mockIcons = [
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-    "file.svg",
-    "globe.svg",
-    "next.svg",
-    "vercel.svg",
-    "window.svg",
-]
 
 // You-might-like events must be fetched from backend in release
 const mockEventCards: EventCardProps[] = mockEvents.map(extractEventCardData);
@@ -56,15 +32,7 @@ export default function Homepage() {
                 <div className="browse-button-container">
                     <DefaultButton className="home-browse-button" onClick={() => window.location.href = "/event"}>Start Browsing Events</DefaultButton>
                 </div>
-                <HorizontalScroll textWithIcons={
-                    [
-                        { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Artist" },
-                        { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Movie" },
-                        { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Show" },
-                        { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Chill" },
-                        { icon: mockIcons[Math.floor(Math.random() * mockIcons.length)], text: "Trip" },
-                    ]
-                } />
+                <HorizontalScroll textWithIcons={eventCategoriesWithIcons} />
                 <HorizontalEventList
                     title="You might like..."
                     EventCards={mockEventCards}
