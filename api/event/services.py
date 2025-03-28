@@ -59,6 +59,32 @@ def get_all_events():
 
     return event_list  # 确保返回的是一个列表，而不是单个整数
 
+'''
+Get personalized event recommendations
+
+NOTE: Currently this just gets 5 events and there is no algorithm
+'''
+def get_recommended_events(limit):
+    limitedLimit = 20
+
+    # no api abuse lol
+    if limit < limitedLimit:
+        limitedLimit = limit
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM events LIMIT " + str(limitedLimit))
+    events = cursor.fetchall()
+
+    event_list = []
+    for row in events:
+        event_list.append(dict(zip([desc[0] for desc in cursor.description], row)))
+
+    cursor.close()
+    conn.close()
+
+    return event_list
 
 def get_event(event_id):
     

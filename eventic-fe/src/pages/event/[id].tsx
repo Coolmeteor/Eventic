@@ -7,6 +7,9 @@ import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
 import { API, DEV_MODE, EventData } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
+import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
+import { EventCardProps } from "@/components/Event/EventCard";
+import { extractEventCardData } from "@/utils/format";
 
 export default function Event() {
     const router = useRouter();
@@ -14,10 +17,39 @@ export default function Event() {
 
 
     const [eventData, setEventData] = useState<EventData | null>(null)
+    const [quickPicksData, setQuickPicksData] = useState<EventCardProps[]>([])
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+
+    /**
+     * Fetch personalized event recommendations from back end api
+     */
+    async function fetchRecommendations() {
+        // setLoading(true) // this is background task
+        const fetchCount = 5
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
+
+        try {
+            // use data from, api
+            console.log(`fetching events from individual event page ${fetchUrl}`)
+            const response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event "recommendation"`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setQuickPicksData(data.map(extractEventCardData)) // expect an array of data
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+        } finally {
+            // setLoading(false) // this is background task
+        }
+    }
 
     useEffect(() => {
         if (!id) return;
@@ -44,6 +76,8 @@ export default function Event() {
                 // setEventData(
                 //     mockEvents.filter((event) => event.id === parseInt(id))[0]
                 // )
+
+                fetchRecommendations()
 
             } catch (err) {
                 setError((err as Error).message)
@@ -137,20 +171,11 @@ export default function Event() {
                             </div>
                         </div>
 
-                        <div className="related-events">
-                            <div className="placeholder-related-events">
-                            </div>
-                            <div className="placeholder-related-events">
-                            </div>
-                            <div className="placeholder-related-events">
-                            </div>
-                            <div className="placeholder-related-events">
-                            </div>
-                            <div className="placeholder-related-events">
-                            </div>
 
-
-                        </div>
+                        <HorizontalEventList
+                            title="Related Events"
+                            EventCards={quickPicksData}
+                        />
                     </div>
                 }
 
@@ -294,28 +319,6 @@ export default function Event() {
                     object-fit: cover;
                 }
 
-
-
-                .related-events {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: left;
-                    align-items: top;
-
-                    margin-top: 2em;
-                    background-color: purple;
-                    padding: 2em;
-
-                    overflow-x: scroll;
-                   
-                }
-
-                .placeholder-related-events {
-                    width: 400px;
-                    height: 250px;
-                    margin-right: 3em;
-                    background-color: pink;
-                }
             `}</style>
         </>
 

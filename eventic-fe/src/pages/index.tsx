@@ -1,18 +1,64 @@
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { HorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { eventCategoriesWithIcons, mockEvents } from "@/constants"; // For debugging
+import { API, eventCategoriesWithIcons, EventData } from "@/constants"; // For debugging
 import { extractEventCardData } from "@/utils/format";
 import { EventCardProps } from "@/components/Event/EventCard";
 import DefaultButton from "@/components/DefaultButton";
 
-// You-might-like events must be fetched from backend in release
-const mockEventCards: EventCardProps[] = mockEvents.map(extractEventCardData);
-
-
 export default function Homepage() {
+
+    const [quickPicksData, setQuickPicksData] = useState<EventCardProps[]>([])
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+
+    /**
+     * Fetch personalized event recommendations from back end api
+     */
+    async function fetchRecommendations() {
+        setLoading(true)
+        const fetchCount = 5
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
+
+        try {
+            // use data from, api
+            console.log(`fetching events from home page ${fetchUrl}`)
+            const response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event "recommendation"`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setQuickPicksData(data.map(extractEventCardData)) // expect an array of data
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                setLoading(true)
+                await fetchRecommendations()
+            } catch (err) {
+                setError((err as Error).message)
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchEvent();
+    }, [])
+
     return (
         <>
             <Section fullWidth={true}>
@@ -35,7 +81,7 @@ export default function Homepage() {
                 <HorizontalScroll textWithIcons={eventCategoriesWithIcons} />
                 <HorizontalEventList
                     title="You might like..."
-                    EventCards={mockEventCards}
+                    EventCards={quickPicksData}
                 />
 
             </Section>

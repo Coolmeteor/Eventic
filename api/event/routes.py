@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services import create_event, get_all_events, get_event, update_event, delete_event
+from .services import create_event, get_all_events, get_event, get_recommended_events, update_event, delete_event
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 
@@ -61,3 +61,16 @@ def search():
         data['order'] = 'created_at'
 
     return jsonify(search_events(data)), 200
+
+'''
+currently this is set to not allow more than 20 events to be retrieved
+'''
+@event_bp.route("/recommendation/<int:event_count>", methods=["GET"])
+def get_recommendation_route(event_count):
+    
+    events = get_recommended_events(event_count)
+
+    if isinstance(events, list): 
+        return jsonify(events), 200
+    else:
+        return jsonify({"error": "data error"}), 500

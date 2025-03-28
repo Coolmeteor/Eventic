@@ -43,9 +43,10 @@ export default function Event() {
      * This also sends the search parameters for database queries
      */
     async function searchRequest() {
+        const fetchCount = 10
         setLoading(true)
         let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
-        let fetchUrl = `${API}/event/events`
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
         if (isSearch) {
             fetchUrl = `${API}/event/search`
             console.log("Sending event with params", searchParams)
