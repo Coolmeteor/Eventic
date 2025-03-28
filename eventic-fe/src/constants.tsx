@@ -27,8 +27,7 @@ const eventCategoriesIcons = [
 ]
 
 export const eventCategoriesWithIcons: TextWithIcon[] = eventCategories.map((category, index) => {
-
-    console.log("category: ", category, eventCategoriesIcons[index]);
+    // console.log("category: ", category, eventCategoriesIcons[index]);
     return {
         icon: eventCategoriesIcons[index],
         text: category,
@@ -61,8 +60,8 @@ export type EventData = {
 
     creator_id: number;
     creator: string; // organizer info. maybe later pass a user object
-    createdAt: number;
-    updatedAt: number;
+    created_at: number;
+    updated_at: number;
 }
 
 
@@ -95,8 +94,8 @@ export const mockEvents: EventData[] = [
 
         creator_id: 1,
         creator: "Tech Corp",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     },
     {
         id: 101,
@@ -122,8 +121,8 @@ export const mockEvents: EventData[] = [
 
         creator_id: 1,
         creator: "Jazz Events Inc.",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     },
     {
         id: 102,
@@ -149,7 +148,7 @@ export const mockEvents: EventData[] = [
 
         creator_id: 1,
         creator: "VC Fund",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     }
 ];

@@ -131,8 +131,8 @@ export default function Event() {
                                     <div className="organizer-icon">
                                         <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
                                     </div>
-                                    <p>Posted: {new Date(eventData.createdAt).toDateString()}</p>
-                                    <p>Updated: {new Date(eventData.updatedAt).toDateString()}</p>
+                                    <p>Posted: {new Date(eventData.created_at).toDateString()}</p>
+                                    <p>Updated: {new Date(eventData.updated_at).toDateString()}</p>
                                 </div>
                             </div>
                         </div>

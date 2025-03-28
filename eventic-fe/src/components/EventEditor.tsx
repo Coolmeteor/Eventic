@@ -71,8 +71,8 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                     creator_id: 1,
                     creator: "Bob",
-                    createdAt: 0,
-                    updatedAt: 0,
+                    created_at: 0,
+                    updated_at: 0,
                 }
             )
 
