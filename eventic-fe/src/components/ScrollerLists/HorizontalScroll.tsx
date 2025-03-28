@@ -33,7 +33,25 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
 
             .scroll-list li {
                 margin-right: 5px;
+                margin-bottom: 20px;
                 display: inline-block;
+            }
+            // all this mess is for scroll bar
+            .scroll-list::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            .scroll-list::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 3px;
+                width: 6px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb:hover {
+                background: #555;
             }
 
         `}</style>
