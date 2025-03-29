@@ -2,10 +2,20 @@ import DefaultButton from "@/components/DefaultButton";
 import EventCard from "@/components/EventCard";
 import Section from "@/components/Section";
 import { API, mockEvents } from "@/constants";
+import { EventData } from "@/constants";
+import { useEffect, useState } from "react";
 
 
 
 export default function Dashboard() {
+    // Shoei - I temporarily put the event data as events<EventData[]> to fix the hydration error
+    // This useState-useEffect solution works even if we fetch event data from the backend at least in my local environment.
+    const [events, setEvents] = useState<EventData[]>([]);
+
+    useEffect(() => {
+        setEvents(mockEvents);
+    }, []);
+    // Shoei - You can delete this code block between the two Shoei comments if you find a better solution!
 
     return (
         <>
@@ -21,7 +31,7 @@ export default function Dashboard() {
                     <div className="left">
                         <h2>Recently visited</h2>
                         <div className="event-list">
-                            {mockEvents.map((event) => (
+                            {events.map((event) => (
                                 <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
                                     key={event.id} event={event} large={false} />
                             ))
@@ -31,7 +41,7 @@ export default function Dashboard() {
 
                         <h2>Comming soon</h2>
                         <div className="event-list">
-                            {mockEvents.map((event) => (
+                            {events.map((event) => (
                                 <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
                                     key={event.id} event={event} large={false} />
                             ))
@@ -43,7 +53,7 @@ export default function Dashboard() {
                         <h2>Your events</h2>
                         <div className="event-list">
 
-                            {mockEvents.map((event) => (
+                            {events.map((event) => (
                                 <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
                                     key={event.id} event={event} large={false} />
                             ))
