@@ -14,7 +14,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, -200%);
     color: white;
     box-shadow: var(--shadow-large);
     background-color: rgba(0, 0, 0, 0.268);

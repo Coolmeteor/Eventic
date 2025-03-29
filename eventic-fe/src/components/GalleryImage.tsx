@@ -9,6 +9,8 @@ type Props = {
 }
 
 export default function GalleryImage({ src, alt, removable, onRemove }: Props) {
+	console.log("GalleryImage src: ", src)
+	
 	return (
 		<>
 			<div className="galleryImageContainer">

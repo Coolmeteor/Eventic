@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
-from .services import create_event, get_all_events, get_event, update_event, delete_event
+from .services import create_event, get_all_events, get_event, get_recommended_events, update_event, delete_event
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 
-@event_bp.route("/events", methods=["POST"])
+@event_bp.route("/create", methods=["POST"])
 def create_event_route():
     """ 创建新事件 """
     data = request.json
@@ -30,6 +30,7 @@ def get_all_events_route():
 def get_event_route(event_id):
     
     event = get_event(event_id)
+
     if event:
         return jsonify(event), 200
     else:
@@ -43,7 +44,7 @@ def update_event_route(event_id):
         return jsonify({"message": "update success"}), 200
     return jsonify({"error": "cant find"}), 404
 
-@event_bp.route("/events/<int:event_id>", methods=["DELETE"])
+@event_bp.route("/delete/<int:event_id>", methods=["DELETE"])
 def delete_event_route(event_id):
     """ 删除事件 """
     if delete_event(event_id):
@@ -60,3 +61,16 @@ def search():
         data['order'] = 'created_at'
 
     return jsonify(search_events(data)), 200
+
+'''
+currently this is set to not allow more than 20 events to be retrieved
+'''
+@event_bp.route("/recommendation/<int:event_count>", methods=["GET"])
+def get_recommendation_route(event_count):
+    
+    events = get_recommended_events(event_count)
+
+    if isinstance(events, list): 
+        return jsonify(events), 200
+    else:
+        return jsonify({"error": "data error"}), 500

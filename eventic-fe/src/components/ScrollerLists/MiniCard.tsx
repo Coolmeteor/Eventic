@@ -1,13 +1,20 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 type Props = {
-    icon: string;
+    icon?: IconDefinition;
+    image?: string;
     text: string;
 }
-export function MiniCard({ icon, text }: Props) {
+export function MiniCard({ icon = undefined, image = undefined, text }: Props) {
     return (
         <>
             <div className="mini-card">
-                <img src={icon} alt={text} className="mini-card-icon" />
+                {icon && <div className="mini-card-icon">
+                    <FontAwesomeIcon icon={icon} fontSize={"3em"} />
+                </div>}
+                {image && <img src={image} alt={text} className="mini-card-icon" />}
                 <p>{text}</p>
             </div>
 
@@ -25,7 +32,13 @@ export function MiniCard({ icon, text }: Props) {
                     width: 15rem;
                 }
 
-                .mini-card-icon {
+                 .mini-card-icon {
+                    border-radius: 50%;
+                    width: 4rem;
+                    height: 4rem;
+                    padding: 0.5rem;
+                }
+                .mini-card-image {
                     border-radius: 50%;
                     width: 4rem;
                     height: 4rem;
@@ -34,8 +47,7 @@ export function MiniCard({ icon, text }: Props) {
 
                 .mini-card p {
                     padding: 0 1rem;
-                    margin-top: 0.5rem;
-                    font-size: 1rem;
+                    font-size: 1.5rem;
                     font-weight: 500;
                 }
             `}
@@ -47,11 +59,16 @@ export function MiniCard({ icon, text }: Props) {
 
 
 
-export function MicroCard({ icon, text }: Props) {
+export function MicroCard({ icon = undefined, image = undefined, text }: Props) {
     return (
         <>
             <div className="mini-card">
-                <img src={icon} alt={text} className="mini-card-icon" />
+                {icon && <div className="mini-card-icon">
+                    <FontAwesomeIcon icon={icon} fontSize={"1.5em"} />
+                </div>
+                }
+                {image && <img src={image} alt={text} className="mini-card-image" />
+                }
                 <p>{text}</p>
             </div>
 
@@ -65,10 +82,17 @@ export function MicroCard({ icon, text }: Props) {
                     margin: 0 0.5rem;
                     border-radius: 1rem;
                     background-color: var(--color-primary);
-                    width: 10rem;
+                    ${(!icon && !image)? "": "width: 10rem;"};
                 }
 
                 .mini-card-icon {
+                    border-radius: 50%;
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    padding: 0.5rem;
+                    fontsize: 5rem;
+                }
+                .mini-card-image {
                     border-radius: 50%;
                     width: 2.5rem;
                     height: 2.5rem;
@@ -76,8 +100,7 @@ export function MicroCard({ icon, text }: Props) {
                 }
 
                 .mini-card p {
-                    padding: 0 1rem;
-                    margin-top: 0.5rem;
+                    padding: 0.5rem 1rem;
                     font-size: var(--font-size-body-S);
                     font-weight: 500;
                 }

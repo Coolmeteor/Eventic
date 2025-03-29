@@ -1,8 +1,12 @@
+import { faBaseballBatBall, faBowlFood, faBrush, faBuildingNgo, faDice, faHandHoldingHeart, faMusic, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
+
 export const API = "http://127.0.0.1:5000"
+
+export const DEV_MODE = true;
 
 export const eventCategories = [
     "Music",
-    "Food & Drink",
+    "Dining",
     "Arts",
     "Sports",
     "Business",
@@ -10,6 +14,30 @@ export const eventCategories = [
     "Charity",
     "Other"
 ]
+
+const eventCategoriesIcons = [
+    faMusic,
+    faBowlFood,
+    faBrush,
+    faBaseballBatBall,
+    faBuildingNgo,
+    faPeopleGroup,
+    faHandHoldingHeart,
+    faDice
+]
+
+export const eventCategoriesWithIcons: TextWithIcon[] = eventCategories.map((category, index) => {
+    // console.log("category: ", category, eventCategoriesIcons[index]);
+    return {
+        icon: eventCategoriesIcons[index],
+        text: category,
+    }
+})
+
+export type TextWithIcon = {
+    icon: any;
+    text: string;
+}
 
 export type EventData = {
     id: number;
@@ -19,20 +47,21 @@ export type EventData = {
     tags: string[]; // aka keywords
     category: string; // aka generes
 
-    startDate: number; // use iso whatever ms since 1970 i guess
-    endDate: number; // use iso whatever ms since 1970 i guess
-    locationString: string; // human readable address
-    locationLong: number;
-    locationLat: number;
+    start_date: number; // use iso whatever ms since 1970 i guess
+    end_date: number; // use iso whatever ms since 1970 i guess
+    location_string: string; // human readable address
+    location_long: number;
+    location_lat: number;
 
     visibility: string; // private, public
-    maxParticipants: number;
+    max_participants: number;
     currentParticipants: number;
     pricing: number;
 
+    creator_id: number;
     creator: string; // organizer info. maybe later pass a user object
-    createdAt: number;
-    updatedAt: number;
+    created_at: number;
+    updated_at: number;
 }
 
 
@@ -52,20 +81,21 @@ export const mockEvents: EventData[] = [
         tags: ["technology", "conference", "networking"],
         category: "Technology",
 
-        startDate: 1735689600000, // 1 Jan 2025, in milliseconds
-        endDate: 1735776000000, // 2 Jan 2025
-        locationString: "San Francisco, CA",
-        locationLong: -122.4194,
-        locationLat: 37.7749,
+        start_date: 1735689600000, // 1 Jan 2025, in milliseconds
+        end_date: 1735776000000, // 2 Jan 2025
+        location_string: "San Francisco, CA",
+        location_long: -122.4194,
+        location_lat: 37.7749,
 
         visibility: "public",
-        maxParticipants: 500,
+        max_participants: 500,
         currentParticipants: 320,
         pricing: 99.99,
 
+        creator_id: 1,
         creator: "Tech Corp",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     },
     {
         id: 101,
@@ -78,20 +108,21 @@ export const mockEvents: EventData[] = [
         tags: ["music", "jazz", "concert"],
         category: "Music",
 
-        startDate: 1737000000000, // 15 Jan 2025
-        endDate: 1737086400000, // 16 Jan 2025
-        locationString: "New Orleans, LA",
-        locationLong: -90.0715,
-        locationLat: 29.9511,
+        start_date: 1737000000000, // 15 Jan 2025
+        end_date: 1737086400000, // 16 Jan 2025
+        location_string: "New Orleans, LA",
+        location_long: -90.0715,
+        location_lat: 29.9511,
 
         visibility: "public",
-        maxParticipants: 300,
+        max_participants: 300,
         currentParticipants: 250,
         pricing: 49.99,
 
+        creator_id: 1,
         creator: "Jazz Events Inc.",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     },
     {
         id: 102,
@@ -104,19 +135,20 @@ export const mockEvents: EventData[] = [
         tags: ["startup", "entrepreneurship", "business"],
         category: "Business",
 
-        startDate: 1738200000000, // 1 Feb 2025
-        endDate: 1738286400000, // 2 Feb 2025
-        locationString: "New York, NY",
-        locationLong: -74.006,
-        locationLat: 40.7128,
+        start_date: 1738200000000, // 1 Feb 2025
+        end_date: 1738286400000, // 2 Feb 2025
+        location_string: "New York, NY",
+        location_long: -74.006,
+        location_lat: 40.7128,
 
         visibility: "private",
-        maxParticipants: 100,
+        max_participants: 100,
         currentParticipants: 75,
         pricing: 0,
 
+        creator_id: 1,
         creator: "VC Fund",
-        createdAt: 1735000000000,
-        updatedAt: 1735500000000,
+        created_at: 1735000000000,
+        updated_at: 1735500000000,
     }
 ];

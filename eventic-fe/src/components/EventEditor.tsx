@@ -4,12 +4,11 @@ import MediaUploadBox from "@/components/MediaUploadBox";
 import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
-import DefaultInputForm from "./DefaultInputForm";
-import { formatPrice } from "@/utils/format";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { API, DEV_MODE, eventCategories, EventData } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
+import { blobToBase64 } from "@/utils/helpers";
 
 
 export default function EventEditor({ eventId = undefined }: { eventId?: string }) {
@@ -59,20 +58,21 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     tags: [],
                     category: "",
 
-                    startDate: 0,
-                    endDate: 0,
-                    locationString: "",
-                    locationLong: 0,
-                    locationLat: 0,
+                    start_date: 0,
+                    end_date: 0,
+                    location_string: "St. Catharines",
+                    location_long: 0,
+                    location_lat: 0,
 
                     visibility: "private",
-                    maxParticipants: 0,
+                    max_participants: 0,
                     currentParticipants: 0,
                     pricing: 0,
 
-                    creator: "",
-                    createdAt: 0,
-                    updatedAt: 0,
+                    creator_id: 1,
+                    creator: "Bob",
+                    created_at: 0,
+                    updated_at: 0,
                 }
             )
 
@@ -82,13 +82,15 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 try {
                     setLoading(true);
 
+                    const fetchUrl = `${API}/event/events/${eventId}`
                     // data from, api
-                    console.log(`fetching event ${API}/events/${eventId}`)
-                    const response = await fetch(`${API}/events/${eventId}`)
+                    console.log(`fetching event ${fetchUrl}`)
+                    const response = await fetch(fetchUrl)
                     console.log(response)
                     if (!response.ok) throw new Error("Failed to fetch event")
                     const data: EventData = (await response.json())[0]
                     setEventData(data)
+                    setImages(data.media)
 
                     // use mock data instead
                     // setEventData(
@@ -109,22 +111,38 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
 
     /**
- * Upload form to server
- */
+     * Upload form to server
+     */
     async function submitForm(visibility: string = "private") {
         console.log("submitting form", eventData, images);
 
+        let media: string[] = [];
+
+        for (let img in images) {
+            // console.log("Converting image to base64:", images[img]);
+            await blobToBase64(images[img]).then(base64 => {
+                // console.log("Converted image to base64:", base64);
+                media.push(base64);
+            })
+                .catch(error => console.error("Image convert error:", error));
+        }
+
+
         try {
-            const response = await fetch(`${API}/event/create`, {
+            let fetchUrl = `${API}/event/create`
+            if (!isCreate) {
+                fetchUrl = `${API}/event/update/${eventId}`
+            }
+            const response = await fetch(fetchUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ...eventData, visibility: visibility }),
-                mode: "no-cors"
+                body: JSON.stringify({ ...eventData, visibility: visibility, media: media }),
             });
 
             if (!response.ok) {
+                console.log(response)
                 throw new Error(`Failed to upload data to server: ${response.statusText}`);
             }
 
@@ -132,6 +150,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
         } catch (error) {
             setError((error as Error).message);
             console.error("Error posting event:", error);
+            console
             return null;
         }
 
@@ -172,24 +191,26 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                 {/* Date select section */}
                                 <h2>Date</h2>
                                 <CustomDatePicker
-                                    setDate={([start, end]: [number, number])=>{
-                                        setEventData({...eventData, 
-                                            startDate: start,
-                                            endDate: end})
+                                    setDate={([start, end]: [number, number]) => {
+                                        setEventData({
+                                            ...eventData,
+                                            start_date: start,
+                                            end_date: end
+                                        })
                                     }}
                                 />
-                                <div className="spacer"/>
+                                <div className="spacer" />
 
                                 {/* Price section */}
                                 <h2>Ticket Price</h2>
-                                <div className="price-input"> 
-                                <PriceInput
-                                    // className="price-input"
-                                    setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
-                                    data={eventData.pricing}
-                                />
+                                <div className="price-input">
+                                    <PriceInput
+                                        // className="price-input"
+                                        setData={value => setEventData({ ...eventData, pricing: value.valueOf() })}
+                                        data={eventData.pricing}
+                                    />
                                 </div>
-                                <div className="spacer"/>
+                                <div className="spacer" />
 
 
                                 {/* category and tags in a horztoal list for both */}
@@ -237,11 +258,11 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                                 <div className="action-buttons">
                                     {/* Save draft and publish for events that are currently private . For public events, user can update or make private*/}
-                                    {eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Save draft</DefaultButton>}
-                                    {eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Publish</DefaultButton>}
+                                    {isCreate && eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Save draft</DefaultButton>}
+                                    {isCreate && eventData.visibility === "private" && <DefaultButton onClick={() => submitForm("public")}>Publish</DefaultButton>}
 
-                                    {eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("public")}>Update</DefaultButton>}
-                                    {eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("private")}>Unpublish</DefaultButton>}
+                                    {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("public")}>Update</DefaultButton>}
+                                    {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("private")}>Unpublish</DefaultButton>}
 
                                 </div>
 
@@ -259,7 +280,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 }
 
 
-                <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>
+                {DEV_MODE && <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>}
             </Section >
 
             <style jsx>{`

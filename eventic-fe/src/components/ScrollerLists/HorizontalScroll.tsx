@@ -1,20 +1,14 @@
 import { MicroCard, MiniCard } from "./MiniCard";
-
-
-export type TextWithIcon = {
-    icon: any;
-    text: string;
-}
+import { TextWithIcon } from "@/constants";
 
 export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
     return (
         <>
             <div className="scroll-list-container">
                 <ul className="scroll-list">
-
                     {textWithIcons?.map((item, index) => (
                         <li key={index} className="smallCardli">
-                            <MiniCard icon={"../"+item.icon} text={item.text} />
+                            <MiniCard icon={item.icon} text={item.text} />
                         </li>
                     ))}
 
@@ -39,7 +33,25 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
 
             .scroll-list li {
                 margin-right: 5px;
+                margin-bottom: 20px;
                 display: inline-block;
+            }
+            // all this mess is for scroll bar
+            .scroll-list::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            .scroll-list::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 3px;
+                width: 6px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb:hover {
+                background: #555;
             }
 
         `}</style>
@@ -53,20 +65,28 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
 
 
 
-export function MiniHorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIcon[] }) {
+export function MiniHorizontalScroll({ textWithIcons, tags }: { textWithIcons?: TextWithIcon[], tags?: string[] }) {
     return (
         <>
             <div className="scroll-list-container">
                 <ul className="scroll-list">
-
-                {textWithIcons?.map((item, index) => (
+                    {/* icon cards */}
+                    {textWithIcons?.map((item, index) => (
                         <li key={index} className="smallCardli">
-                            <MicroCard icon={"../"+item.icon} text={item.text} />
+                            <MicroCard icon={item.icon} text={item.text} />
                         </li>
                     ))}
 
-                </ul>
+                    {/*  tags */}
 
+                    {tags?.map((item, index) => (
+                        <li key={index} className="smallCardli">
+                            <MicroCard text={item} />
+                        </li>
+                    ))
+                    }
+
+                </ul>
             </div>
 
             <style jsx>{`
