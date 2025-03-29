@@ -103,6 +103,7 @@ export default function App({
 					--color-background-light: #FCFCFC;
 					--color-background-mid:rgb(247, 249, 246);
 					--color-background-dark:rgb(90, 90, 90);
+					--color-background-gray: rgb(199, 199, 199);
 
 					--color-background-eventpage:rgb(105, 247, 109);
 

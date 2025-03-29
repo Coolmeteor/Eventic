@@ -112,3 +112,39 @@ export async function changeRequest(
         return;
     }
 }
+
+export async function fetchOrders(){
+    let response = await fetch(`${API}/profile/orders`, {
+        "method": "GET",
+        "credentials": "include",
+    });
+    
+    
+
+    if(!response.ok){
+        if(response.status === 401){
+            const refreshed = await refreshToken();
+            if(!refreshed){
+                console.error("Refresh failed. Redirecting to login.");
+                window.location.href = "/login";
+                return undefined;
+            }
+
+            response = await fetch(`${API}/profile/orders`, {
+                "method": "GET",
+                "credentials": "include",
+            });
+        }
+    }
+
+    const data = await convertResponse(response);
+
+    if(!response.ok){
+        console.log(data);
+        return undefined;
+    }
+
+    console.log(data.message);
+
+    return data;
+}

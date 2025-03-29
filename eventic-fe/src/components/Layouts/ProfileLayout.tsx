@@ -21,15 +21,15 @@ export default function ProfileLayout({
     const router = useRouter();
 
     const goToEdit = () => {
-        router.push("/profile/edit");
+        window.location.href = "/profile/edit";
     }
 
     const goToSecurityEdit = () => {
-        router.push("/profile/edit-security");
+        window.location.href = "/profile/edit-security";
     }
 
     const goToOrders = () => {
-        router.push("/profile/orders");
+        window.location.href = "/profile/orders";
     }
 
     const notDefined = () => {

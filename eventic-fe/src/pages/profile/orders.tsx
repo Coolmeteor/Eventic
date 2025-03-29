@@ -1,14 +1,14 @@
 import ProfileLayout from "@/components/Layouts/ProfileLayout"
 import PersonalForm from "@/components/Profile/PersonalForm";
-import { useEffect, useMemo, useState } from "react";
-import { EventData, mockEvents } from "@/constants";
-import EventCard from "@/components/EventCard";
-import { User, fetchProfile } from "@/utils/profile-api";
+import { useEffect, useState } from "react";
+import { User, fetchProfile, fetchOrders } from "@/utils/profile-api";
+import { Ticket, Purchase } from "@/utils/tickest_purchases";
+import OrderCard from "@/components/Profile/Order/OrderCard";
 
-
-const tickets = mockEvents;
-export default function orders(){
-    const [tickets, setTickets] = useState<EventData[]>([]);
+export default function Orders(){
+    const [tickets, setTickets] = useState<Ticket[]>([]);
+    const [purchases, setPurchases] = useState<Purchase[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const [user, setUser] = useState<User>();
 
@@ -19,31 +19,49 @@ export default function orders(){
                 setUser(user.user);
             }
         });
+
+        fetchOrders()
+        .then((data) => {
+            if(data && "tickets" in data && "purchases" in data){
+                setTickets(data.tickets);
+                setPurchases(data.purchases);
+            }
+        });
     }, [])
 
-    // Fetch purchased tickets/event data
-    // const tickets = await fetch(######);
-    // const error;
 
     useEffect(() => {
-        setTickets(mockEvents);
-    });
+        if(tickets && purchases)
+            setIsLoading(false);
+    }, [tickets, purchases]);
 
-    if(!tickets || !user)
+
+
+    if(isLoading || !user)
         return <h1>Loading...</h1>;
+
+
 
     return (
         <>
-            <PersonalForm pageName="Orders" user={user}>
+            <PersonalForm pageName="Your Orders" user={user}>
                 <div className="order-container">
                     <h1 className="listLabel">Ordered Tickets</h1>
-                    <div className="order-list">
-                        {tickets.map((event) => {
-                            console.log("Event id: ", event.id);
-                            return <EventCard key={event.id} event={event} large={false} />
-                        })}
-                    </div>
+                    { !isLoading && purchases.length==0? (
+                        <h1 className="no-order-text">You have no orders.</h1>
+                    ) : (
+                        <div className="order-list">
+                            {tickets.map((ticket, index) => {
+                                console.log("Event id: ", ticket.event_id);
+                                return <OrderCard
+                                    ticketData={ticket}
+                                    purchaseData={purchases[index]}
+                                />
+                            })}
+                        </div>
+                    )}
                 </div>
+                
             </PersonalForm>
             <style jsx>{`
                 .order-container{
@@ -52,11 +70,16 @@ export default function orders(){
                     width: 90%;
                     min-height: 500px;
                     margin: 10px;
-                    border: 1px solid black;
+                }
+
+                .no-order-text {
+                    font-size: 3rem;
+                    margin-top: 2rem;
                 }
                     
                 .order-list {
                     display: flex;
+                    flex-direction: column;
                     padding: 0 2rem 0 2rem;
                     gap: 1em;
                     justify-content: left;
@@ -68,6 +91,6 @@ export default function orders(){
     );
 }
 
-orders.getLayout = function getLayout(page: React.ReactNode){
+Orders.getLayout = function getLayout(page: React.ReactNode){
     return <ProfileLayout>{page}</ProfileLayout>
 }

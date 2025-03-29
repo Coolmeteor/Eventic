@@ -32,3 +32,11 @@ export const formatPrice = (value: string): string => {
 
     return value;
 }
+
+export function getMonthDayYear(date: string){
+    const parts = date.split(' ');
+    const formattedDate = `${parts[1]} ${parts[2]}, ${parts[3]}`;
+
+    return formattedDate;
+}
+

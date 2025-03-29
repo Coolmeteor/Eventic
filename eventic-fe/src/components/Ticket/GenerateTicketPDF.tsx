@@ -8,13 +8,11 @@ import { API } from "@/constants";
 pdfMake.vfs = pdfFonts.vfs;
 
 export type PrintProps = {
-    userID: number;
     ticketID: number;
     eventItemProps: EventItemProps;
 }
 
 export default function GenerateTicketPDF({
-    userID,
     ticketID,
     eventItemProps
 } : PrintProps) {
@@ -26,7 +24,10 @@ export default function GenerateTicketPDF({
     useEffect(() => {
         if(retryCount > 3) return;
         
-        fetch(`${API}/test/ticket/gen-qr/${ticketID}`, {method: "GET"})
+        fetch(`${API}/ticket/get-qr/${ticketID}`, {
+            method: "GET",
+            "credentials": "include",
+        })
         .then((response) => {
             return response.blob();
         })
@@ -43,6 +44,8 @@ export default function GenerateTicketPDF({
             setTimeout(() => setRetryCount(retryCount + 1), 2000);
         });
     }, []);
+
+
     const id_text = "Ticket ID: " + ticketID;
     const handlePrintPDF = () => {
         const docDefinition = {

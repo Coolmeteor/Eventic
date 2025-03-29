@@ -1,11 +1,17 @@
 from flask import Blueprint, send_file, request, jsonify
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import (
+    verify_jwt_in_request
+)
+from flask_jwt_extended.exceptions import NoAuthorizationError, CSRFError
 import qrcode
 import io
 import hashlib
 import psycopg2
 
 from db.db_connect import get_db_connection
+from .services import get_orders_by_token
+from exceptions import UserIdNotFoundFromTokenError
 
 
 test_bp = Blueprint("test", __name__)
@@ -52,3 +58,26 @@ def validate():
                 }), 404
     except Exception as e:
         return jsonify({"error": f"Internal error: {str(e)}"}), 500
+    
+@test_bp.route("/orders", methods=["GET"])
+def get_orders():
+    # Verify access token
+    try:
+        verify_jwt_in_request()
+    except NoAuthorizationError:
+        return jsonify({"error": 'Invalid access_token'}), 401
+    
+    access_token = request.cookies.get("access_token")
+    
+    # Get purchases using user id
+    try:
+        data = get_orders_by_token(access_token)
+    except UserIdNotFoundFromTokenError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f'Internal Error: {str(e)}'}), 500
+    
+    return jsonify(data), 200
+    
+    
+    

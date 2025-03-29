@@ -33,14 +33,41 @@ export default function ProfileMain(){
     }, []);
 
     // Page transition variables and functions
-    const router = useRouter();
-
     const goToEdit = () => {
-        router.push("/profile/edit");
+        window.location.href = "/profile/edit";
     }
 
     const goToSecurityEdit = () => {
-        router.push("/profile/edit-security");
+        window.location.href = "/profile/edit-security";
+    }
+
+    const goToOrders = () => {
+        window.location.href = "/profile/orders";
+    }
+
+    const goToUpcomingEvents = () => {
+        return;
+    }
+
+    const goToPaymentMethod = () => {
+        return;
+    }
+
+
+    const goToManageEvent = () => {
+        return;
+    }
+
+    const goToOrgUpcoming = () => {
+        return;
+    }
+
+    const goToCreateEvent = () => {
+        window.location.href = "/event/create";
+    }
+
+    const goToAnalitics = () => {
+        return;
     }
 
 
@@ -51,23 +78,23 @@ export default function ProfileMain(){
     const userAccountIcons = [
         {label: "Edit Profile", onClick:goToEdit, icon: faUserAlt},
         {label: "Security Information", onClick:goToSecurityEdit, icon: faShieldAlt},
-        {label: "Ordered Tickets", onClick:undefined, icon: faTicket},
-        {label: "Upcoming Events", onClick:undefined, icon: faCalendarAlt},
-        {label: "Payment Method", onClick:undefined, icon: faIdCard}
+        {label: "Ordered Tickets", onClick:goToOrders, icon: faTicket},
+        {label: "Upcoming Events", onClick:goToUpcomingEvents, icon: faCalendarAlt},
+        {label: "Payment Method", onClick:goToPaymentMethod, icon: faIdCard},
     ]
 
     // Event Organizer
     const managementIcons = [
-        {label: "Manage Events", onClick:undefined, icon: faCalendarAlt},
-        {label: "Upcoming Events", onClick:undefined, icon: faRunning},
-        {label: "Create New Events", onClick:undefined, icon: faPlusCircle},
-        {label: "Payment Method", onClick:undefined, icon: faIdCard},
-        {label: "Analytics", onClick:undefined, icon: faChartLine},
+        {label: "Manage Events", onClick:goToManageEvent, icon: faCalendarAlt},
+        {label: "Upcoming Events", onClick:goToOrgUpcoming, icon: faRunning},
+        {label: "Create New Events", onClick:goToCreateEvent, icon: faPlusCircle},
+        {label: "Payment Method", onClick:goToPaymentMethod, icon: faIdCard},
+        {label: "Analytics", onClick:goToAnalitics, icon: faChartLine},
     ]
     
         const orgAccountIcons = [
         {label: "Edit Profile", onClick:goToEdit, icon: faUserAlt},
-        {label: "Security Information", onClick:goToSecurityEdit, icon: faShieldAlt}
+        {label: "Security Information", onClick:goToSecurityEdit, icon: faShieldAlt},
     ]
 
     return(

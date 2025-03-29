@@ -2,11 +2,14 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import (
     create_access_token, create_refresh_token, decode_token,
-    set_access_cookies, set_refresh_cookies
+    set_access_cookies, set_refresh_cookies, verify_jwt_in_request
 )
 from jwt import ExpiredSignatureError
 import psycopg2.extras
 from db.db_connect import get_db_connection
+from .services import get_orders_by_token
+from exceptions import UserIdNotFoundFromTokenError
+from flask_jwt_extended.exceptions import NoAuthorizationError
 
 profile_bp = Blueprint("profile", __name__)
 bcrypt = Bcrypt()
@@ -338,3 +341,22 @@ def change_phone():
     except Exception as e:
         return jsonify({"error": f"Phone number update error: {str(e)}"}), 500
     
+@profile_bp.route("/orders", methods=["GET"])
+def get_orders():
+    # Verify access token
+    try:
+        verify_jwt_in_request()
+    except NoAuthorizationError:
+        return jsonify({"error": 'Invalid access_token'}), 401
+    
+    access_token = request.cookies.get("access_token")
+    
+    # Get purchases using user id
+    try:
+        data = get_orders_by_token(access_token)
+    except UserIdNotFoundFromTokenError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f'Internal Error: {str(e)}'}), 500
+    
+    return jsonify(data), 200

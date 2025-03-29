@@ -1,98 +1,77 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Section from "@/components/Section";
-import { API, EventData } from "@/constants";
 import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { mockEvents } from "@/constants";
 import GenerateTicketPDF from "@/components/Ticket/GenerateTicketPDF";
-import { fetchProfile } from "@/utils/profile-api";
-import { User } from "@/utils/profile-api";
 import { extractEventItemData } from "@/utils/event";
-import { convertResponse } from "@/utils/auth-api";
+import { fetchTicketEvent } from "@/utils/event";
+
+import { Event } from "@/utils/event";
+import { AuthorizeTicket } from "@/utils/tickest_purchases";
+import { Forbidden } from "@/components/Forbidden";
+import { LoadingMessage } from "@/components/LoadingMessage";
 
 
 export default function ticket() {
     const router = useRouter();
     const { id } = router.query;
 
-    const [user, setUser] = useState<User>();
-    const [numId, setNumId] = useState<number>(-1);
-    const [eventData, setEventData] = useState<EventData>();
-    
-    useEffect(()=>{
-        fetchProfile()
-        .then((user) => {
-            if(user && "user" in user){
-                setUser(user.user);
-            }
-        });
-    }, [])
-
-    const mockIcons = [
-        "file.svg",
-        "globe.svg",
-        "next.svg",
-        "vercel.svg",
-        "window.svg",
-        "file.svg",
-        "globe.svg",
-        "next.svg",
-        "vercel.svg",
-        "window.svg",
-        "file.svg",
-        "globe.svg",
-        "next.svg",
-        "vercel.svg",
-        "window.svg",
-        "file.svg",
-        "globe.svg",
-        "next.svg",
-        "vercel.svg",
-        "window.svg",
-    ]
-
-    async function fetchEvent(eventId: number) : Promise<{event: EventData} | void> {
-        const response = await fetch(`${API}/events/${eventId}`);
-
-        
-
-        if(response.ok){
-            const data = await convertResponse(response);
-            console.log("Fetched event data successfully");
-            return data;
-        } else {
-            console.log(response);
-        }
-    }
+    const [ticketId, setTicketId] = useState<number>(-1);
+    const [isIdDefined, setIsIdDefined] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+    const [eventData, setEventData] = useState<Event>();
 
     useEffect(() => {
-        if (!id)    return;
-        if(id == "4"){
-            setNumId(4);
-        } else {
-            // setNumId(Number(id))
-            // console.log(Number(id));
-            setNumId(2);
+        // Store ticket_id as number type
+        if(id){
+            setTicketId(Number(id));
+            setIsIdDefined(true);
         }
-
-        // Authorize user and ticket
-        fetchEvent(20)
-        .then((data) => {
-            if(data && "event" in data){
-                setEventData(data.event);
-            } else {
-                console.log(data);
-            }
-        });
-
     }, [id]);
+
+
+    useEffect(() => {
+        console.log(isIdDefined);
+        if(isIdDefined){
+            // Authorize user and ticket
+            const loadData = async () => {
+                const authorized = await AuthorizeTicket(ticketId);
+                setIsAuthorized(authorized);
+                console.log("Ticket Authorized:", authorized);
+                if(!authorized) {
+                    setTimeout(() => {window.location.href = "/profile";}, 2000);
+                    setIsLoading(false);
+                    return;
+                }
+
+                 // fetch event using ticket id
+                const data = await fetchTicketEvent(ticketId);
+                if(data) {
+                    setEventData(data);
+                }
+
+                setIsLoading(false);
+            };
+
+            loadData();
+        }
+    }, [isIdDefined]);
+    
+    if(!isLoading && !isAuthorized){
+        return ( 
+            <Forbidden>
+                <LoadingMessage>Automatically redirecting to your profile page</LoadingMessage>
+            </Forbidden>
+        );
+    }
 
     
     return (
         <Section>
             {
-                (eventData && user) ? (
+                (eventData && isIdDefined) ? (
                     <div>
                         <h1>{eventData?.name}</h1>
 
@@ -107,13 +86,13 @@ export default function ticket() {
                                 <div className="location-date">
                                     <div className="location-date-inner">
                                         <FontAwesomeIcon icon={faLocationArrow} />
-                                        <p>{eventData.locationString}</p>
+                                        <p>{eventData.location_string}</p>
                                     </div>
                                     <div className="location-date-inner">
                                         <FontAwesomeIcon icon={faCalendar} />
-                                        <p>{new Date(eventData.startDate).toDateString()}</p>
+                                        <p>{new Date(eventData.start_date).toDateString()}</p>
                                         <p>—</p>
-                                        <p>{new Date(eventData.startDate).toDateString()}</p>
+                                        <p>{new Date(eventData.end_date).toDateString()}</p>
                                     </div>
 
                                 </div>
@@ -122,8 +101,7 @@ export default function ticket() {
                                 <div className="spacer"></div>
 
                                 <GenerateTicketPDF 
-                                    userID={user.id} 
-                                    ticketID={numId}
+                                    ticketID={ticketId}
                                     eventItemProps={extractEventItemData(eventData)}
                                 />
 
@@ -133,13 +111,13 @@ export default function ticket() {
                                 <div className="ticket-detail">
                                     <h2>Ticket Details</h2>
                                     <p>Price: {eventData.pricing}</p>
-                                    <p>Max Participants: {eventData.maxParticipants}</p>
-                                    <p>Current Participants: {eventData.currentParticipants}</p>
+                                    <p>Max Participants: {eventData.max_participants}</p>
+                                    <p>Current Participants: {eventData.current_participants}</p>
                                 </div>
 
                                 <div className="organizer-detail">
                                     <h2>Organizer</h2>
-                                    <p>{eventData.creator}</p>
+                                    <p>{eventData.creator_id}</p>
                                     <div className="organizer-icon">
                                         <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
                                     </div>
@@ -150,7 +128,7 @@ export default function ticket() {
                         
                     </div>
                 ) : (
-                    <h1>Data is not ready yet.</h1>
+                    <LoadingMessage>Loading</LoadingMessage>                   
                 )
             }
 
