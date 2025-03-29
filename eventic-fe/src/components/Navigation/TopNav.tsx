@@ -29,19 +29,19 @@ export function TopNavbar({ showProfile }: Props) {
                     {/* <img src="globe.svg" alt="Eventic Logo" width={28} /> */}
                     <h1><a href="/">Eventic</a></h1>
 
-                    <h1>SEARCH HERE</h1>
+                    {/* <h1>SEARCH HERE</h1> */}
                 </div>
                 <div className='horiz'>
                     <nav>
                         <a href="/">Home</a>
-                        <a href="#about">About</a>
-                        <a href="#services">Services</a>
-                        <a href="#contact">Contact</a>
+                        <a href="/event">Events</a>
+                        <a href="/dashboard">Dashboard</a>
+                        <a href="/">Cart</a>
                     </nav>
 
                     {showProfile && !isLogin &&
                         <DefaultButton
-                            bgColor='000000'
+                            bgColor={['000000', '000000','000000']}
                             onClick={() => window.location.href = "/login"}>
                             <p>Login</p>
                         </DefaultButton>
@@ -49,7 +49,7 @@ export function TopNavbar({ showProfile }: Props) {
 
                     {showProfile && isLogin &&
                         <DefaultButton
-                            bgColor='000000'
+                            bgColor={['000000', '000000','000000']}
                             onClick={() => window.location.href = "/profile"}>
                             <FontAwesomeIcon icon={faUser} />
                         </DefaultButton>

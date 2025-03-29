@@ -59,6 +59,32 @@ def get_all_events():
 
     return event_list  # 确保返回的是一个列表，而不是单个整数
 
+'''
+Get personalized event recommendations
+
+NOTE: Currently this just gets 5 events and there is no algorithm
+'''
+def get_recommended_events(limit):
+    limitedLimit = 20
+
+    # no api abuse lol
+    if limit < limitedLimit:
+        limitedLimit = limit
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM events LIMIT " + str(limitedLimit))
+    events = cursor.fetchall()
+
+    event_list = []
+    for row in events:
+        event_list.append(dict(zip([desc[0] for desc in cursor.description], row)))
+
+    cursor.close()
+    conn.close()
+
+    return event_list
 
 def get_event(event_id):
     
@@ -91,10 +117,10 @@ def update_event(event_id, data):
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE events
-            SET name = ?, description = ?, media = ?, tags = ?, category = ?, start_date = ?,
-                end_date = ?, location_string = ?, location_long = ?, location_lat = ?, 
-                visibility = ?, max_participants = ?, pricing = ?, updated_at = ?
-            WHERE id = ?
+            SET name = %s, description = %s, media = %s, tags = %s, category = %s, start_date = %s,
+                end_date = %s, location_string = %s, location_long = %s, location_lat = %s, 
+                visibility = %s, max_participants = %s, pricing = %s, updated_at = %s
+            WHERE id = %s
         """, (
             data["name"], data["description"], json.dumps(data["media"]), json.dumps(data["tags"]),
             data["category"], data["start_date"], data["end_date"], data["location_string"],
@@ -108,7 +134,7 @@ def delete_event(event_id):
     """ 删除事件 """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM events WHERE id = ?", (event_id,))
+        cursor.execute("DELETE FROM events WHERE id = %s", (event_id,))
         conn.commit()
         return cursor.rowcount > 0
 

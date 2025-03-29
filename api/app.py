@@ -31,7 +31,7 @@ def home():
 
 app.register_blueprint(profile_bp, url_prefix="/profile")
 app.register_blueprint(auth_bp, url_prefix="/auth")
-app.register_blueprint(event_bp, url_prefix="")
+app.register_blueprint(event_bp, url_prefix="/event")
 app.register_blueprint(ticket_bp, url_prefix="/ticket")
 
 ##################################################################################

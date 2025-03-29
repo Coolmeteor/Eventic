@@ -4,11 +4,13 @@ import { PriceInput } from "@/components/Event/PriceInput";
 import EventCard from "@/components/EventCard";
 import Section from "@/components/Section";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
+import { faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 
 
 export type SearchParams = {
-    query: string,
+    name: string, // aka query
     ascending: boolean,
     category: string,
     tags: string[],
@@ -18,7 +20,7 @@ export type SearchParams = {
 }
 
 const defaultSearchParams: SearchParams = {
-    query: "",
+    name: "",
     ascending: true,
     category: "",
     tags: [],
@@ -36,41 +38,63 @@ export default function Event() {
 
     const [searchParams, setSearchParams] = useState<SearchParams>({ ...defaultSearchParams })
 
+    /**
+     * Get data from backend for the page to load.
+     * This also sends the search parameters for database queries
+     */
     async function searchRequest() {
-        let fetchUrl = `${API}/events`
-        if (searchParams != defaultSearchParams) {
-            fetchUrl = `${API}/events/search`
+        const fetchCount = 10
+        setLoading(true)
+        let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
+        if (isSearch) {
+            fetchUrl = `${API}/event/search`
             console.log("Sending event with params", searchParams)
         }
 
         try {
             // use data from, api
-            // const response = await fetch(fetchUrl, {
-            //     method: "GET",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify(searchParams),
-            //     mode: "no-cors"
-            // });
+            console.log(`fetching event ${fetchUrl}`)
+            let response
 
-            // if (!response.ok) {
-            //     throw new Error(`Failed search query to server for events: ${response.statusText}`);
-            // }
-            // console.log(response)
+            if (isSearch) {
+                response = await fetch(fetchUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(searchParams),
+                    mode: "no-cors"
+                })
+            } else {
+                response = await fetch(fetchUrl)
+            }
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch ? "search" : "recommendation"}`)
+            console.log(response)
 
-            // const data: EventData = (await response.json())[0]
-            // setEventData(data) // expect an array of data
+            const data: EventData[] = await response.json()
+            setEventData(data) // expect an array of data
 
 
             // use mock data instead
-            setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
-            console.log("Using mock data instead of backend")
+            // setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
+            // console.log("Using mock data instead of backend")
 
         } catch (error) {
-            setError((error as Error).message)
+            setError((error as Error).message + ": " + (error as Error).name)
             console.error("Error in search request:", error)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    /**
+     * Reload the backend data
+     */
+    const refreshContent = () => {
+        setEventData([])
+        searchRequest()
     }
 
 
@@ -94,7 +118,8 @@ export default function Event() {
         margin: "0",
         textAlign: "left",
         width: "100%",
-        border: "2px solid gray"
+        border: "2px solid gray",
+        color: "black"
     };
 
     const priceInputStyle: React.CSSProperties = {
@@ -108,203 +133,209 @@ export default function Event() {
     return (
         <>
             <Section fullWidth={true} usePadding={false}>
-                {loading && <p>Please wait</p>}
-                {error && <p>Error loading event: {error}</p>}
-                {eventData.length > 0 &&
-                    <div>
-                        <div className="top-header">
-                            {/* <h1 className="search-title">Search Eventic</h1> */}
+                <div className="full-h">
+                    <div className="top-header">
+                        {/* <h1 className="search-title">Search Eventic</h1> */}
 
-                            {/* search bar */}
-                            <div className="search-bar">
-                                <div className="full-w">
-                                    <DefaultInputForm
-                                        style={searchBarStyle}
-                                        type="text"
-                                        placeholder="Type to search"
-                                        value={searchParams.query}
-                                        onChange={(e) => {
-                                            setSearchParams({ ...searchParams, query: e.target.value })
-                                        }}
-                                    />
-                                </div>
-
-                                <DefaultButton onClick={searchRequest}>Search</DefaultButton>
-                            </div>
-                        </div>
-
-
-                        {/* sort order and uh... */}
-                        <div className="sort-order">
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sortType"
-                                    value="name"
-                                    checked={searchParams.sortType === "name"}
+                        {/* search bar */}
+                        <div className="search-bar">
+                            <div className="full-w">
+                                <DefaultInputForm
+                                    style={searchBarStyle}
+                                    type="text"
+                                    placeholder="Type to search"
+                                    value={searchParams.name}
                                     onChange={(e) => {
-                                        setSearchParams({ ...searchParams, sortType: "name" })
-                                    }
-                                    }
+                                        setSearchParams({ ...searchParams, name: e.target.value })
+                                    }}
                                 />
-                                Name
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sortType"
-                                    value="price"
-                                    checked={searchParams.sortType === "price"}
-                                    onChange={(e) => {
-                                        setSearchParams({ ...searchParams, sortType: "price" })
-                                    }
-                                    }
-                                />
-                                Price
-                            </label>
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sortType"
-                                    value="date-upload"
-                                    checked={searchParams.sortType === "date"}
-                                    onChange={(e) => {
-                                        setSearchParams({ ...searchParams, sortType: "date" })
-                                    }
-                                    }
-                                />
-                                Date posted
-                            </label>
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sortType"
-                                    value="proximity"
-                                    checked={searchParams.sortType === "proximity"}
-                                    onChange={(e) => {
-                                        setSearchParams({ ...searchParams, sortType: "proximity" })
-                                    }
-                                    }
-                                />
-                                Close to me
-                            </label>
-
-
-                            <div className="vertical-spacer"></div>
-
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sort"
-                                    value="ascending"
-                                    checked={searchParams.ascending === true}
-                                    onChange={(e) => {
-                                        setSearchParams({ ...searchParams, ascending: true })
-                                    }
-                                    }
-                                />
-                                Ascending
-                            </label>
-
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="sort"
-                                    value="descending"
-                                    checked={searchParams.ascending === false}
-                                    onChange={(e) => {
-                                        setSearchParams({ ...searchParams, ascending: false })
-                                    }
-                                    }
-                                />
-                                Descending
-                            </label>
-                        </div>
-
-
-                        <div className="main-content">
-
-                            <div className="event-list">
-
-                                {eventData.map((event) => (
-                                    <EventCard key={event.id} event={event} large={false} />
-
-                                ))}
-
-                                {error && <p className="errortext">{error}</p>}
-
                             </div>
 
-                            <div className="rsb">
-                                {/*  put some extra stuff here */}
-
-                                {/* category and tags in a horztoal list for both */}
-                                <div className="category-tags">
-                                    <h2>Price</h2>
-
-                                    <div className="price-row">
-                                        <h3>Max</h3>
-                                        <PriceInput
-                                            className="price-input"
-                                            data={searchParams.priceMax}
-                                            setData={value => setSearchParams({ ...searchParams, priceMax: value.valueOf() })}
-                                            formStyle={priceInputStyle}
-                                        />
-                                    </div>
-                                    <div className="price-row">
-                                        {/* hack for spacing. ignore the big red box vscode is complaining about kthx */}
-                                        <h3>Min ‎</h3>
-                                        <PriceInput
-                                            className="price-input"
-                                            data={searchParams.priceMin}
-                                            setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
-                                            formStyle={priceInputStyle}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="spacer"></div>
-
-
-                                <div className="category-tags">
-                                    <h2>Category</h2>
-
-                                    <div className="category-selector">
-                                        {eventCategories.map((category) => (
-                                            <label key={category} className="radio-label">
-                                                <input
-                                                    type="radio"
-                                                    name="category"
-                                                    value={category}
-                                                    checked={eventData[0].category === category}
-                                                    onChange={(e) => {
-
-                                                    }
-                                                    }
-                                                    className="radio-input"
-                                                />
-                                                {category}
-                                            </label>
-                                        ))}
-                                    </div>
-
-
-                                </div>
-
-                                <div className="spacer"></div>
-
-
-                                <div className="action-buttons">
-                                    <DefaultButton onClick={() => { setSearchParams({ ...defaultSearchParams }) }}>Reset filters</DefaultButton>
-                                </div>
-
-                            </div>
+                            <DefaultButton className="sharp-edge" onClick={searchRequest}>Search</DefaultButton>
                         </div>
                     </div>
-                }
+
+
+                    {/* sort order and uh... */}
+                    <div className="sort-order">
+                        <div className="refrest-btn">
+                            <DefaultButton onClick={refreshContent}>
+                                <FontAwesomeIcon icon={faRefresh} />
+                            </DefaultButton>
+
+                        </div>
+                        <label>
+                            <input
+                                type="radio"
+                                name="sortType"
+                                value="name"
+                                checked={searchParams.sortType === "name"}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, sortType: "name" })
+                                }
+                                }
+                            />
+                            Name
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="sortType"
+                                value="price"
+                                checked={searchParams.sortType === "price"}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, sortType: "price" })
+                                }
+                                }
+                            />
+                            Price
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="sortType"
+                                value="date-upload"
+                                checked={searchParams.sortType === "date"}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, sortType: "date" })
+                                }
+                                }
+                            />
+                            Date posted
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="sortType"
+                                value="proximity"
+                                checked={searchParams.sortType === "proximity"}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, sortType: "proximity" })
+                                }
+                                }
+                            />
+                            Close to me
+                        </label>
+
+
+                        <div className="vertical-spacer"></div>
+
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="sort"
+                                value="ascending"
+                                checked={searchParams.ascending === true}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, ascending: true })
+                                }
+                                }
+                            />
+                            Ascending
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="sort"
+                                value="descending"
+                                checked={searchParams.ascending === false}
+                                onChange={(e) => {
+                                    setSearchParams({ ...searchParams, ascending: false })
+                                }
+                                }
+                            />
+                            Descending
+                        </label>
+                    </div>
+
+
+                    <div className="main-content">
+                        {/* load all data */}
+                        <div className="full-w">
+                            {loading && <p>Please wait</p>}
+                            {eventData.length <= 0 && !loading && <p>No events found</p>}
+                            {error && <p className="errortext">{error}</p>}
+
+                            <div className="event-list">
+                                {eventData.length > 0 && eventData.map((event) => (
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                ))
+                                }
+                            </div>
+                        </div>
+
+
+                        <div className="rsb">
+                            {/*  extra search filters */}
+
+                            {/* category and tags in a horztoal list for both */}
+                            <div className="category-tags">
+                                <h2>Price</h2>
+
+                                <div className="price-row">
+                                    <h3>Max</h3>
+                                    <PriceInput
+                                        className="price-input"
+                                        data={searchParams.priceMax}
+                                        setData={value => setSearchParams({ ...searchParams, priceMax: value.valueOf() })}
+                                        formStyle={priceInputStyle}
+                                    />
+                                </div>
+                                <div className="price-row">
+                                    {/* hack for spacing. ignore the big red box vscode is complaining about kthx */}
+                                    <h3>Min ‎</h3>
+                                    <PriceInput
+                                        className="price-input"
+                                        data={searchParams.priceMin}
+                                        setData={value => setSearchParams({ ...searchParams, priceMin: value.valueOf() })}
+                                        formStyle={priceInputStyle}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="spacer"></div>
+
+
+                            <div className="category-tags">
+                                <h2>Category</h2>
+
+                                <div className="category-selector">
+                                    {eventCategories.map((category) => (
+                                        <label key={category} className="radio-label">
+                                            <input
+                                                type="radio"
+                                                name="category"
+                                                value={category}
+                                                checked={eventData.length > 0 && eventData[0].category === category}
+                                                onChange={(e) => {
+
+                                                }
+                                                }
+                                                className="radio-input"
+                                            />
+                                            {category}
+                                        </label>
+                                    ))}
+                                </div>
+
+
+                            </div>
+
+                            <div className="spacer"></div>
+
+
+                            <div className="action-buttons">
+                                <DefaultButton onClick={() => { setSearchParams({ ...defaultSearchParams }) }}>Reset filters</DefaultButton>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </Section>
 
 
@@ -314,6 +345,9 @@ export default function Event() {
     width: 100%;
     flex-direction: column;
     display: flex;
+}
+.full-h {
+    min-height: 100vh
 }
 .spacer {
     height: 2em;
@@ -368,6 +402,7 @@ h1 {
 .sort-order label {
     display: flex;
     gap: 0.5em;
+    align-items: center;
 }
 
 

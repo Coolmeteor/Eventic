@@ -97,6 +97,10 @@ export default function App({
 
 
 					--color-primary-dark:rgb(201, 222, 63);
+					
+					--color-btn-primary:rgb(77, 184, 11);
+					--color-btn-hover:rgb(59, 135, 12);
+					--color-btn-click:rgb(44, 99, 9);
 
 					--color-onPrimary:rgb(57, 62, 20);
 

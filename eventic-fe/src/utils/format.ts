@@ -2,6 +2,7 @@
  * Function library for formatting value
  */
 import { EventData } from "@/constants";
+import { EventItemProps } from "@/utils/event";
 
 
 export const formatPhoneNumber = (phone: string) => {
@@ -33,10 +34,26 @@ export const formatPrice = (value: string): string => {
     return value;
 }
 
+/**
+ *  This function might not be neccessary if the media are stored as URLs.
+ *  Defined just in case that the media are binary data.
+ * @param data 
+ * @returns 
+ */
+export const extractEventCardData = (data: EventData) : EventItemProps => {
+    return {
+        name: data.name,
+        thumbnail: data.media[0],
+        description: data.description,
+        date: data.start_date,
+        id: data.id,
+        location: data.location_string
+    };
+}
+
 export function getMonthDayYear(date: string){
     const parts = date.split(' ');
     const formattedDate = `${parts[1]} ${parts[2]}, ${parts[3]}`;
 
     return formattedDate;
 }
-
