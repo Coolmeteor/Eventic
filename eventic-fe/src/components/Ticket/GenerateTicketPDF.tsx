@@ -47,25 +47,84 @@ export default function GenerateTicketPDF({
 
 
     const id_text = "Ticket ID: " + ticketID;
+    const dateText = new Date(eventItemProps.date).toLocaleDateString();
+    const locText = eventItemProps.location;
+
     const handlePrintPDF = () => {
         const docDefinition = {
             content: [
                 { text: eventItemProps.name, style: "header"},
-                { text: "QR code", style: "QR"} as any,
-                { image: qrCode, width: 150},
-                { text: "You can download or print this document"},
-                { text: id_text},
+                {
+                    stack: [
+                        { text: "QR code", style: "QR", alignment: 'center'} as any,
+                        { image: qrCode, width: 150, alignment: 'center'},
+                        { text: id_text, alignment: 'center'},
+                    ],
+                    style: "qrContainer",
+                },
+                {
+                    stack: [
+                        { text: "Date", style: "label"},
+                        { text: dateText, style: "text"},
+                    ],
+                    style: "infoContainer"
+                },
+                {
+                    stack: [
+                        { text: "Location", style: "label"},
+                        { text: locText, style: "text"},
+                    ],
+                    style: "infoContainer"
+                },
+                {
+                    stack: [
+                        { text: "Description", style: "label"},
+                        { text: eventItemProps.description, style: "description"},
+                    ],
+                    style: "infoContainer"
+                },
+                {
+                    stack: [
+                        { text: "You can download or print this document."},
+                        { text: "Please present this QR code at the entrance. You can't check-in without the QR in any case."},
+                    ],
+                    style: "messageContainer"
+                }
+                
             ],
             styles: {
                 header: {
                     margin: 24,
-                    fontSize: 24
+                    fontSize: 24,
+                    bold: true
                 },
                 QR: {
-                    marginLeft: 30,
                     fontSize: 18,
                     bold: true
                 },
+                label: {
+                    fontSize: 20,
+                    marginBottom: 5,
+                },
+                text: {
+                    fontSize: 12,
+                    marginLeft: 5,
+                },
+                description: {
+                    fontSize: 12,
+                    marginLeft: 5,
+                },
+                infoContainer: {
+                    marginLeft: 24,
+                    marginTop: 12
+                },
+                messageContainer: {
+                    margin: 36,
+                    fontSize: 12,
+                },
+                qrContainer: {
+                    margin: 24,
+                }
             },
         };
 

@@ -4,7 +4,7 @@ import { Ticket, Purchase } from "@/utils/tickest_purchases";
 import { Event } from "@/utils/event";
 import { getMonthDayYear } from "@/utils/format";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarCheck, faMapLocation, faCommentDots } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarCheck, faMapLocation, faQuoteLeftAlt } from "@fortawesome/free-solid-svg-icons";
 import { LoadingMessage } from "@/components/LoadingMessage";
 
 type Props = {
@@ -82,19 +82,19 @@ export default function OrderCard({
                         </div>
                         <div className="description-container">
                             <h2 className="label">
-                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faCommentDots}/>
+                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faQuoteLeftAlt}/>
                                 Description
                             </h2>
                             <p className="description">{event.description}</p>
                             <h2 className="label">
-                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faCalendarCheck}/>
+                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faMapLocation}/>
                                 Location
                             </h2>
                             <p className="one-line-desc">
                                 {event.location_string}
                             </p>
                             <h2 className="label">
-                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faMapLocation}/>
+                                <FontAwesomeIcon style={{marginRight: '0.5rem'}} fontSize={'1rem'} icon={faCalendarCheck}/>
                                 Date
                             </h2>
                             <p className="one-line-desc">
