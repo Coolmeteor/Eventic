@@ -5,12 +5,35 @@ import React, { useEffect, useState } from "react";
 
 import { API, eventCategoriesWithIcons, EventData } from "@/constants"; // For debugging
 import { extractEventCardData } from "@/utils/format";
-import { EventCardProps } from "@/components/Event/EventCard";
+import { EventItemProps } from "@/utils/event";
 import DefaultButton from "@/components/DefaultButton";
+
+const mockIcons = [
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+    "file.svg",
+    "globe.svg",
+    "next.svg",
+    "vercel.svg",
+    "window.svg",
+]
 
 export default function Homepage() {
 
-    const [quickPicksData, setQuickPicksData] = useState<EventCardProps[]>([])
+    const [quickPicksData, setQuickPicksData] = useState<EventItemProps[]>([])
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)

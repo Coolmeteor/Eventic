@@ -2,7 +2,7 @@
  * Function library for formatting value
  */
 import { EventData } from "@/constants";
-import { EventCardProps } from "@/components/Event/EventCard";
+import { EventItemProps } from "@/utils/event";
 
 
 export const formatPhoneNumber = (phone: string) => {
@@ -40,7 +40,7 @@ export const formatPrice = (value: string): string => {
  * @param data 
  * @returns 
  */
-export const extractEventCardData = (data: EventData) : EventCardProps => {
+export const extractEventCardData = (data: EventData) : EventItemProps => {
     return {
         name: data.name,
         thumbnail: data.media[0],
@@ -49,4 +49,11 @@ export const extractEventCardData = (data: EventData) : EventCardProps => {
         id: data.id,
         location: data.location_string
     };
+}
+
+export function getMonthDayYear(date: string){
+    const parts = date.split(' ');
+    const formattedDate = `${parts[1]} ${parts[2]}, ${parts[3]}`;
+
+    return formattedDate;
 }

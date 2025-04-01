@@ -8,7 +8,6 @@ function getAccessCSRFToken(){
     for (const cookie of cookies){
         const [name, value] = cookie.split("=");
         if (name === "csrf_access_token") {
-            console.log("access_CRSF:", value);
             return value || "";
         }
     }
@@ -22,7 +21,6 @@ function getRefreshCSRFToken(){
     for (const cookie of cookies){
         const [name, value] = cookie.split("=");
         if (name === "csrf_refresh_token") {
-            console.log('refresh_CSRF:', value);
             return value || "";
         }
     }
@@ -68,41 +66,31 @@ export async function isAuthenticated() {
         }
     });
 
-    const data = await convertResponse(response);
+    let data = await convertResponse(response);
 
-    if (response.ok){
+    if(response.ok){;
         console.log(data.message);
         return true;
     } else {
-        console.log(data.error || data.msg);
-        return false;
+        response = await fetch(`${API}/auth/check-auth`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                // Try refresh token with CSRG token if access token expired
+                "X-CSRF-TOKEN": getRefreshCSRFToken()
+            }
+        });
+
+        data = await convertResponse(response);
+
+        if(response.ok){
+            console.log(data.message);
+            return true;
+        } else {
+            console.error(data.error || data.msg);
+            return false;
+        }
     }
-    // let data;
-
-    // if(response.ok){
-    //     data = await convertResponse(response);
-    //     console.log(data.message);
-    //     return true;
-    // } else {
-    //     response = await fetch(`${API}/auth/check-auth`, {
-    //         method: "POST",
-    //         credentials: "include",
-    //         headers: {
-    //             // Try refresh token with CSRG token if access token expired
-    //             "X-CSRF-TOKEN": getRefreshCSRFToken()
-    //         }
-    //     });
-
-    //     data = await convertResponse(response);
-
-    //     if(response.ok){
-    //         console.log(data.message);
-    //         return true;
-    //     } else {
-    //         console.error(data.error || data.msg);
-    //         return false;
-    //     }
-    // }
 }
 
 export async function refreshToken() {

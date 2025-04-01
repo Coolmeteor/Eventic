@@ -6,7 +6,7 @@ import { API } from "@/constants";
 import { refreshToken, convertResponse } from "./auth-api";
 
 export interface User {
-    id: string,
+    id: number,
     user_name: string,
     email: string,
     phone: string,
@@ -27,7 +27,6 @@ type ApiResponse = SuccessResponse | ErrorResponse;
 
 
 export async function fetchProfile(): Promise<{user: User} | void> {
-    console.trace("fetchProfile called");
     let response = await fetch(`${API}/profile/get-profile`, {
         method: "GET",
         credentials: "include",
@@ -112,4 +111,40 @@ export async function changeRequest(
         setErrorText(data.error || data.msg);
         return;
     }
+}
+
+export async function fetchOrders(){
+    let response = await fetch(`${API}/profile/orders`, {
+        "method": "GET",
+        "credentials": "include",
+    });
+    
+    
+
+    if(!response.ok){
+        if(response.status === 401){
+            const refreshed = await refreshToken();
+            if(!refreshed){
+                console.error("Refresh failed. Redirecting to login.");
+                window.location.href = "/login";
+                return undefined;
+            }
+
+            response = await fetch(`${API}/profile/orders`, {
+                "method": "GET",
+                "credentials": "include",
+            });
+        }
+    }
+
+    const data = await convertResponse(response);
+
+    if(!response.ok){
+        console.log(data);
+        return undefined;
+    }
+
+    console.log(data.message);
+
+    return data;
 }

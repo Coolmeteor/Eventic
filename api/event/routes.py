@@ -34,7 +34,7 @@ def get_event_route(event_id):
     if event:
         return jsonify(event), 200
     else:
-        return jsonify({"error": "not find"}), 404
+        return jsonify({"error": "not found"}), 404
     
 @event_bp.route("/events/<int:event_id>", methods=["PUT"])
 def update_event_route(event_id):

@@ -21,11 +21,15 @@ export default function ProfileLayout({
     const router = useRouter();
 
     const goToEdit = () => {
-        router.push("/profile/edit");
+        window.location.href = "/profile/edit";
     }
 
     const goToSecurityEdit = () => {
-        router.push("/profile/edit-security");
+        window.location.href = "/profile/edit-security";
+    }
+
+    const goToOrders = () => {
+        window.location.href = "/profile/orders";
     }
 
     const notDefined = () => {
@@ -46,7 +50,7 @@ export default function ProfileLayout({
     // User
     const ticketList = [
         {text: "Upcoming event tickets", onClick:notDefined},
-        {text: "Ordered tickets", onClick:notDefined}
+        {text: "Ordered tickets", onClick:goToOrders}
     ]
 
     // Event Organizer

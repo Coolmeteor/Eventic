@@ -3,17 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faCalendarAlt, faMapLocation
 } from '@fortawesome/free-solid-svg-icons';
+import { EventItemProps } from '@/utils/event';
 
 
-export type EventCardProps = {
-    name: string;
-    thumbnail: string; // URL or data string
-    description: string;
-    date: number;
-    id: number;
-    location: string;
-    isSimple?: Boolean;
-}
+
 
 
 
@@ -21,14 +14,14 @@ export type EventCardProps = {
  * EventCard component
  * isSimple makes the card have only the event name and thumbnail
  */
-export function EventCard({
+export function EventItem({
     name,
     thumbnail,
     date,
     location,
     id,
     isSimple=false
-}: EventCardProps){
+}: EventItemProps){
     /**
      *  Convert string into image as React.FC.
      *  Currently this assumes the input string is a url.

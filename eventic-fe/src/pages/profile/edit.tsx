@@ -111,14 +111,14 @@ export default function ProfileEdit(){
                             onSubmit={changeUsername}
                             title="Username"
                         />
-                        <ChangeAvatorBox
+                        {/* <ChangeAvatorBox
                             title="Avator"
                             currentUrl={avatorUrl}
                             previewUrl={previewUrl}
                             uploadStatus={uploadStatus}
                             onChange={handleFileChange}
                             onClick={changeAvator}
-                        />
+                        /> */}
                     </>
                 }
             </PersonalForm>
