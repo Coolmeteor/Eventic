@@ -57,7 +57,7 @@ export default function OrderCard({
                     </div>
 
                     <div className="info-text">
-                        <p>Paid Amount</p>
+                        <p>Amount Paid</p>
                         <p>{purchaseData.total_price}$</p>
                     </div>
 
@@ -99,7 +99,7 @@ export default function OrderCard({
                             </h2>
                             <p className="one-line-desc">
                                 {new Date(event.start_date).toLocaleString()}
-                                {' - '}
+                                {' — '}
                                 {new Date(event.end_date).toLocaleString()}
                             </p>
 
