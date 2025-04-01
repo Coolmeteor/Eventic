@@ -110,7 +110,7 @@ export default function OrderCard({
                         <button className="button" onClick={() => {window.location.href = `/event/${event.id}`}}>
                             View Event
                         </button>
-                        <button className="button" onClick={() => {window.location.href = `/ticket/${ticketData.id}`}}>
+                        <button className="button" onClick={() => {window.location.href = `/customer/ticket/${ticketData.id}`}}>
                             View Ticket
                         </button>
                     </div>

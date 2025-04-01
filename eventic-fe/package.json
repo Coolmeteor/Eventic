@@ -36,6 +36,7 @@
     "react-markdown": "^9.0.3",
     "react-responsive-carousel": "^3.2.23",
     "react-split": "^2.0.14",
+    "recharts": "^2.15.1",
     "tailwindcss": "3.3.2",
     "typescript": "^5.7.3"
   },

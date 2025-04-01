@@ -7,11 +7,13 @@ const API = 'http://127.0.0.1:5000'
 
 type Props = {
     pageName: string;
-    user: User;
     children: React.ReactNode;
 }
 
-export default function PersonalForm({pageName, user, children}: Props){
+export default function RightContainer({
+    pageName,
+    children
+}: Props){
     // Page transition
     const router = useRouter();
     
@@ -22,30 +24,34 @@ export default function PersonalForm({pageName, user, children}: Props){
 
     return(
         <>
-            
-            {
-                user ? (
-                    <div className="changeForm">
-                        <div className="topLink">
-                            <DefaultLinkButton onClick={goToProfileHome} className="textLink">Profile</DefaultLinkButton>
-                            {' -> '} {pageName}
-                        </div>
-                        {children}
-                    </div>
-                ) : (
-                    <div className="changeForm" style={{fontSize: "3rem", margin: "4rem"}}>Loading...</div>
-                )
-            }
+            <div className="container">
+                <div className="topLink">
+                    <DefaultLinkButton onClick={goToProfileHome} className="textLink">Profile</DefaultLinkButton>
+                    {' -> '} {pageName}
+                </div>
+                <div className="children-container">
+                    {children}
+                </div>
+            </div>
             
 
             <style jsx>{`
             .topLink {
                 margin: 0.5rem;
+                max-height: 10%;
             }
-            .changeForm {
+            .container {
                 width: 90%;
                 min-height: 500px;
+                height: 100%;
                 margin-bottom: 0.5rem;
+            }
+
+            .children-container {
+                width: 100%;
+                min-height: 90%;
+                margin: 0;
+                padding: 0;
             }
             
             .formBox {

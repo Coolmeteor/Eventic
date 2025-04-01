@@ -1,65 +1,31 @@
-import { useState, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import Split from "react-split";
-import { useRouter } from "next/router";
 import DashboardList from "@/components/Profile/DashboardList";
-
-const API = 'http://127.0.0.1:5000'
+import { organizerList, profileList, ticketList } from "@/utils/profile-page-mng";
+import { fetchProfile, User } from "@/utils/profile-api";
+import { LoadingMessage } from "../LoadingMessage";
 
 interface ProfileLayoutProps {
     children: ReactNode;
-    isUser?: boolean;
 }
 
 export default function ProfileLayout({ 
     children,
-    isUser=true
 }: ProfileLayoutProps){
 
-    const [errorText, setErrorText] = useState<string>("");
+    const [user, setUser] = useState<User>();
+    
+    useEffect(()=>{
+        fetchProfile()
+        .then((userData) => {
+            if(userData && "user" in userData){
+                setUser(userData.user as User);
+            }
+        });
+    }, []);
 
-    // Page transition variables and functions
-    const router = useRouter();
-
-    const goToEdit = () => {
-        window.location.href = "/profile/edit";
-    }
-
-    const goToSecurityEdit = () => {
-        window.location.href = "/profile/edit-security";
-    }
-
-    const goToOrders = () => {
-        window.location.href = "/profile/orders";
-    }
-
-    const notDefined = () => {
-        setErrorText("The link/action event is not defined");
-        setTimeout(()=>{setErrorText("")}, 2000);
-    } // Just for debugging
-
-
-    // For both account
-    const profileList = [
-        {text: "Edit personal information", onClick:goToEdit},
-        {text: "Edit security information", onClick:goToSecurityEdit},
-        {text: "Saved payment option", onClick:notDefined},
-        {text: "Setup your preference", onClick:notDefined},
-        {text: "Notification settings", onClick: notDefined}
-    ]
-
-    // User
-    const ticketList = [
-        {text: "Upcoming event tickets", onClick:notDefined},
-        {text: "Ordered tickets", onClick:goToOrders}
-    ]
-
-    // Event Organizer
-    const organizerList = [
-        {text: "Manage events", onClick:notDefined},
-        {text: "Upcoming events", onClick:notDefined},
-        {text: "Previous events", onClick:notDefined},
-        {text: "Event analytics", onClick:notDefined},
-    ]
+    if (!user)
+        return <LoadingMessage>Loading</LoadingMessage>
 
     return(
         <>  
@@ -67,7 +33,7 @@ export default function ProfileLayout({
                 {/* Left Component*/}
                 
                 {
-                    isUser ? (
+                    !user.is_org ? (
                         <div>
                             <div className="dashboard">
                                 <div className="box">
@@ -96,14 +62,22 @@ export default function ProfileLayout({
                     )
                 }
                 
+                
 
                 {/* Right Component*/}
                 {
-                    <>
+                    <div className="right-container">
                         {children}
-                    </>
+                    </div>
                 }
             </Split>
+
+            <style jsx>{`
+            .right-container {
+                min-height: 500px;
+                width: 100%;
+            }
+            `}</style>
         </>
     )
 }
