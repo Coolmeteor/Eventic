@@ -41,7 +41,7 @@ export default function RightContainer({
                 max-height: 10%;
             }
             .container {
-                width: 90%;
+                width: 100%;
                 min-height: 500px;
                 height: 100%;
                 margin-bottom: 0.5rem;

@@ -17,12 +17,10 @@ export default function Stats(){
             if (userData && "user" in userData) {
                 setUser(userData.user as User);
             }
-
             setLoadingUser(false);
         }
 
         loadUser();
-
     }, []);
 
     if(!user){
