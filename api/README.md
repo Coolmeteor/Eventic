@@ -1,7 +1,7 @@
 Python Virtual Environment Setup Guide
 
 ## 1. Create virtual environment(For the first time)
-**Make sure you are in Eventic folder.** If you created it before, you can skip this step. But the name of folder should be "venv" since "venv" is ignored when to push by .gitignore. 
+**Make sure you are in Eventic (root) folder.** If you created it before, you can skip this step. But the name of folder should be "venv" since "venv" is ignored when to push by .gitignore. 
 ```bash
 python -m venv venv
 ```

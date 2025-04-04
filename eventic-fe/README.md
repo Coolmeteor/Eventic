@@ -1,20 +1,17 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Setting up front end
+1. Install nodejs https://nodejs.org/en (we are using v22 LTS)
+2. cd into `eventic-fe`
+3. Run `npm install
+
+
 ## Getting Started
+After you start the development server, you can proceed.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000) with your browser to see the result.
+- DO NOT use localhost
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
