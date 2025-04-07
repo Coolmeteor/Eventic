@@ -21,10 +21,6 @@ export function EventCard({ large = false, event, btn }: Props) {
         <>
             <div className="eventContainer">
                 {/* event image */}
-                <div className="image-wrapper">
-                    <img src={event.media[0]} alt={event.name} className="event-image" />
-                    <div className="image-overlay"></div>
-                </div>
 
                 {/* event title and location */}
                 <div className='top'>
@@ -101,7 +97,7 @@ export function EventCard({ large = false, event, btn }: Props) {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    padding: 0px 20px 10px 20px;
+                    padding: 20px 20px 10px 20px;
 
                     width: 100%;
                     height: 50%;
@@ -158,15 +154,21 @@ export function EventCard({ large = false, event, btn }: Props) {
                     flex-direction: column;
 
                     width: 100%;
-                    margin-bottom: ${borderRadius};
-                    margin-top: 10px;
+                    height: 50%;
+                 
                     padding-right: 20px;
                     padding-left: 30px;
 
                     color: white;
 
                     border-radius: ${borderRadius} ${borderRadius} 0px 0px;
-                }
+                    background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 0%,rgba(255, 255, 255, 0) 35%, rgba(0, 0, 0, 0.09) 50%, rgba(0, 0, 0, 0.61) 90%, rgba(0, 0, 0, 0.8) 100%),
+                    url(${event.media[0]});
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                
+                    }
 
                 
                 .location-text {
@@ -221,35 +223,6 @@ export function EventCard({ large = false, event, btn }: Props) {
                     margin-left: 1em;
                 }
 
-
-
-                .image-wrapper {
-                    position: absolute;
-                    width: 250px;
-                    height: 200px; /* Adjust height as needed */
-                    overflow: hidden;
-                    z-index: -9999999;
-                }
-
-                .event-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: ${borderRadius} ${borderRadius} 0px 0px;
-                }
-
-                .image-overlay {
-                    position: absolute;
-                    top: 0;
-                    width: 100%;
-
-                    height: 70%;
-                    background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.61) 50%, rgba(0, 0, 0, 0.8) 100%);
-                    
-                    // height: 60%;
-                    // background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
-                    border-radius: ${borderRadius} ${borderRadius} 0px 0px;
-                }
                 `}
             </style>
         </>

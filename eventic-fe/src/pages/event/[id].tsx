@@ -154,7 +154,7 @@ export default function Event() {
                             <div className="rsb">
                                 <div className="ticket-detail">
                                     <h2>Ticket Details</h2>
-                                    <p>Price: {eventData.pricing}</p>
+                                    <p>Price: ${eventData.pricing}</p>
                                     <p>Max Participants: {eventData.max_participants}</p>
                                     <p>Current Participants: {eventData.currentParticipants}</p>
                                 </div>
