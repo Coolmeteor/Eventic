@@ -114,3 +114,66 @@ export function MiniHorizontalScroll({ textWithIcons, tags }: { textWithIcons?: 
         </>
     );
 }
+
+
+type Props = {
+    children: React.ReactNode;
+};
+
+export function HorizontalScrollList({
+
+    children,
+}: Props) {
+    return (
+        <>
+            <div className="scroll-list-container">
+            <ul className="scroll-list">
+                {children}
+                </ul>
+            </div>
+
+            <style jsx>{`
+
+            .scroll-list-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 2rem;
+            }
+
+
+
+            .scroll-list {
+                display: flex;
+                overflow-x: scroll;
+                gap: 2.989em;
+            }
+
+            .scroll-list li {
+                margin-right: 5px;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+            // all this mess is for scroll bar
+            .scroll-list::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            .scroll-list::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 3px;
+                width: 6px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+            .scroll-list::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+        `}</style>
+
+
+        </>
+    );
+}
