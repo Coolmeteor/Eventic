@@ -1,4 +1,5 @@
 import { faBaseballBatBall, faBowlFood, faBrush, faBuildingNgo, faDice, faHandHoldingHeart, faMusic, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
+import { image1, image2 } from "./constants_mockimages";
 
 export const API = "http://127.0.0.1:5000"
 
@@ -75,8 +76,7 @@ export const mockEvents: EventData[] = [
         name: "Tech Conference 2025",
         description: "A gathering of tech enthusiasts and professionals.",
         media: [
-            "eventmock.png",
-            "eventmock2.jpg"
+            image1, image2
         ],
         tags: ["technology", "conference", "networking"],
         category: "Technology",
@@ -102,8 +102,7 @@ export const mockEvents: EventData[] = [
         name: "Jazz Music Night",
         description: "A night filled with soulful jazz performances.",
         media: [
-
-            "eventmock2.jpg"
+            image2
         ],
         tags: ["music", "jazz", "concert"],
         category: "Music",
@@ -129,8 +128,7 @@ export const mockEvents: EventData[] = [
         name: "Startup Pitch Competition",
         description: "Pitch your startup idea and win funding. Open to all entrepreneurs. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         media: [
-
-            "eventmock2.jpg"
+            image2
         ],
         tags: ["startup", "entrepreneurship", "business"],
         category: "Business",
