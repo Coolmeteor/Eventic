@@ -346,7 +346,8 @@ h1 {
     border-left: 5px solid #ff3414;
 }
 .terms-conditions {
-    margin-top: 50px;
+    margin-top: 30px;
+    margin-bottom: 50px;
     padding: 15px;
     background: var(--color-background-light);
     border-left: 5px solid #007bff;
