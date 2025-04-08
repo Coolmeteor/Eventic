@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchProfile, changeRequest, User } from '@/utils/profile-api';
 
 import ProfileLayout from '@/components/Layouts/ProfileLayout';
-import PersonalForm from '@/components/Profile/PersonalForm';
+import RightContainer from '@/components/Profile/RightContainer';
 import SecurityChangeFormBox from '@/components/Profile/EditComponents/SecurityChangeForm';
 
 import { API } from '@/constants'
@@ -96,33 +96,33 @@ export default function ProfileSecurityEdit(){
 
 
     return(
-            <>
-                <PersonalForm pageName="Security information" user={user}>
-                    <>
-                        <SecurityChangeFormBox
-                            currentValue={user["user_name"]}
-                            errorText={passErrorText}
-                            onSubmit={changePassword}
-                            title="Password"
-                        />
-                        <SecurityChangeFormBox
-                            currentValue={user["email"]}
-                            errorText={emailErrorText}
-                            onSubmit={changeEmail}
-                            title="Email"
-                        />
-                        <SecurityChangeFormBox
-                            currentValue={user["phone"]}
-                            errorText={phoneErrorText}
-                            onSubmit={changePhone}
-                            title="Phone Number"
-                        />
-                    </>
-                </PersonalForm>
-            </>
-        )
-    };
-    
-    ProfileSecurityEdit.getLayout = function getLayout(page: React.ReactNode){
-        return <ProfileLayout>{page}</ProfileLayout>
-    }
+        <>
+            <RightContainer pageName="Security information">
+                <>
+                    <SecurityChangeFormBox
+                        currentValue={user["user_name"]}
+                        errorText={passErrorText}
+                        onSubmit={changePassword}
+                        title="Password"
+                    />
+                    <SecurityChangeFormBox
+                        currentValue={user["email"]}
+                        errorText={emailErrorText}
+                        onSubmit={changeEmail}
+                        title="Email"
+                    />
+                    <SecurityChangeFormBox
+                        currentValue={user["phone"]}
+                        errorText={phoneErrorText}
+                        onSubmit={changePhone}
+                        title="Phone Number"
+                    />
+                </>
+            </RightContainer>
+        </>
+    )
+};
+
+ProfileSecurityEdit.getLayout = function getLayout(page: React.ReactNode){
+    return <ProfileLayout>{page}</ProfileLayout>
+}

@@ -5,7 +5,7 @@ import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
-import { API, DEV_MODE, EventData } from "@/constants";
+import { API, DEV_MODE, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { EventCardProps } from "@/components/Event/EventCard";
@@ -57,6 +57,11 @@ export default function Event() {
         const fetchEvent = async () => {
             try {
                 setLoading(true);
+
+                if (id == "100" || id == "101" || id == "102") {
+                    setEventData(mockEvents.filter((e) => e.id === parseInt(id))[0])
+                    return
+                }
 
                 const fetchUrl = `${API}/event/events/${id}`
                 // data from, api
