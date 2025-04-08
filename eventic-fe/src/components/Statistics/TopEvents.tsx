@@ -67,8 +67,9 @@ export default function TopEvents({
 
             .event-info {
                 display: flex;
-                justify-content: left;
+                justify-content: space-between;
                 align-items: left;
+                max-width: 700px;
             }
 
             .button {

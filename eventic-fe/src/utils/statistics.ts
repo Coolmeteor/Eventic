@@ -2,6 +2,7 @@
     Statistics utilities
 */
 
+import { mockEvents } from "@/constants";
 import { useState } from "react";
 
 
@@ -80,8 +81,8 @@ export const mockStats: EventStats[] = [
         profit: 88.88
     },
     {
-        id: 1,
-        name: "Test7",
+        id: mockEvents[0].id,
+        name: mockEvents[0].name,
         sold_num: 55,
         rem_num: 12,
         date: 1743397200000,
@@ -100,8 +101,8 @@ export const mockStats: EventStats[] = [
         profit: 300.00
     },
     {
-        id: 1,
-        name: "Test3",
+        id: mockEvents[1].id,
+        name: mockEvents[1].name,
         sold_num: 90,
         rem_num: 10,
         date: 1743397200000,
@@ -130,8 +131,8 @@ export const mockStats: EventStats[] = [
         profit: 180.25
     },
     {
-        id: 1,
-        name: "Test6Test6Test6Test6Test6Test6Test6Test6Test6Test6Test6Test6Test6Test6",
+        id: mockEvents[2].id,
+        name: mockEvents[2].name,
         sold_num: 75,
         rem_num: 25,
         date: 1743397200000,
