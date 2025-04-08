@@ -53,6 +53,7 @@ def register():
     date_of_birth = data.get("date_of_birth", None)  # 默认为 None
     sex = data.get("sex", None)  # 默认为 None
     password = data.get("password")
+    is_org = data.get("is_org")
 
     
     if not user_name or not email or not password:
@@ -63,7 +64,7 @@ def register():
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM users WHERE email = %s", (email))
+                cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
                 existing_user = cursor.fetchone()
                 if existing_user:
                     return jsonify({"error": "Email already in use"}), 409
@@ -71,10 +72,10 @@ def register():
                 
                 cursor.execute(
                     """
-                    INSERT INTO users (user_name, email, passwd_hash, phone, date_of_birth, sex) 
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    INSERT INTO users (user_name, email, passwd_hash, phone, date_of_birth, sex, is_org) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (user_name, email, passwd_hash, phone, date_of_birth, sex)
+                    (user_name, email, passwd_hash, phone, date_of_birth, sex, is_org)
                 )
                 conn.commit()
         

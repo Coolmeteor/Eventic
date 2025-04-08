@@ -3,6 +3,7 @@ import DefaultButton from '../DefaultButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { isAuthenticated } from '@/utils/auth-api';
+import { UserIcon } from './UserIcon';
 
 
 type Props = {
@@ -39,7 +40,10 @@ export function TopNavbar({ showProfile }: Props) {
                         <a href="/">Cart</a>
                     </nav>
 
-                    {showProfile && !isLogin &&
+
+                    <UserIcon isLogin={isLogin}/>
+
+                    {/* {showProfile && !isLogin &&
                         <DefaultButton
                             bgColor={['000000', '000000','000000']}
                             onClick={() => window.location.href = "/login"}>
@@ -53,7 +57,7 @@ export function TopNavbar({ showProfile }: Props) {
                             onClick={() => window.location.href = "/profile"}>
                             <FontAwesomeIcon icon={faUser} />
                         </DefaultButton>
-                    }
+                    } */}
                 </div>
             </header>
 

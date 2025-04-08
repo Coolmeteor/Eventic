@@ -4,7 +4,7 @@ import { convertResponse } from '@/utils/auth-api';
 
 
 import ProfileLayout from '@/components/Layouts/ProfileLayout';
-import PersonalForm from '@/components/Profile/PersonalForm';
+import RightContainer from '@/components/Profile/RightContainer';
 import ChangeFormBox from '@/components/Profile/EditComponents/ChangeFormBox';
 import ChangeAvatorBox from '@/components/Profile/EditComponents/ChangeAvatorBox';
 import { API } from '@/constants'
@@ -102,7 +102,7 @@ export default function ProfileEdit(){
     
     return(
         <>
-            <PersonalForm pageName="Personal information" user={user as User}>
+            <RightContainer pageName="Personal information">
                 {
                     <>
                         <ChangeFormBox
@@ -121,7 +121,7 @@ export default function ProfileEdit(){
                         /> */}
                     </>
                 }
-            </PersonalForm>
+            </RightContainer>
         </>
     )
 };

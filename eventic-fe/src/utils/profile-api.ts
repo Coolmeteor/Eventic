@@ -6,12 +6,14 @@ import { API } from "@/constants";
 import { refreshToken, convertResponse } from "./auth-api";
 
 export interface User {
-    id: number,
-    user_name: string,
-    email: string,
-    phone: string,
-    data_of_birth: string,
-    sex: string
+    id: number;
+    user_name: string;
+    email: string;
+    phone: string;
+    data_of_birth: string;
+    sex: string;
+    is_org: boolean;
+    avator: string;
 }
 
 interface SuccessResponse {

@@ -57,3 +57,7 @@ export function getMonthDayYear(date: string){
 
     return formattedDate;
 }
+
+export const formatCurrency = (value: number) => {
+    return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};

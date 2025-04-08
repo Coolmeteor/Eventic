@@ -1,5 +1,5 @@
 import ProfileLayout from "@/components/Layouts/ProfileLayout"
-import PersonalForm from "@/components/Profile/PersonalForm";
+import RightContainer from "@/components/Profile/RightContainer";
 import { useEffect, useState } from "react";
 import { User, fetchProfile, fetchOrders } from "@/utils/profile-api";
 import { Ticket, Purchase } from "@/utils/tickest_purchases";
@@ -40,11 +40,14 @@ export default function Orders(){
     if(isLoading || !user)
         return <h1>Loading...</h1>;
 
+    if(user.is_org)
+        window.location.href = "/profile";
+
 
 
     return (
         <>
-            <PersonalForm pageName="Your Orders" user={user}>
+            <RightContainer pageName="Your Orders">
                 <div className="order-container">
                     <h1 className="listLabel">Ordered Tickets</h1>
                     { !isLoading && purchases.length==0? (
@@ -62,7 +65,7 @@ export default function Orders(){
                     )}
                 </div>
                 
-            </PersonalForm>
+            </RightContainer>
             <style jsx>{`
                 .order-container{
                     text-align: center;
