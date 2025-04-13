@@ -1,7 +1,7 @@
 import DefaultButton from "@/components/DefaultButton";
 import DefaultInputForm from "@/components/DefaultInputForm";
 import { PriceInput } from "@/components/Event/PriceInput";
-import EventCard from "@/components/EventCard";
+import { EventCard } from "@/components/EventCard";
 import Section from "@/components/Section";
 import { API, eventCategories, EventData, mockEvents } from "@/constants";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
