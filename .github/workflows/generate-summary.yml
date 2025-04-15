@@ -7,6 +7,9 @@ on:
             - 'scripts/generate-summary.js'
     workflow_dispatch:
 
+permissions:
+    contents: write
+
 jobs:
     generate-summary:
         runs-on: ubuntu-latest
