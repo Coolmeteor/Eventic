@@ -22,12 +22,9 @@ jobs:
             with:
                 node-version: '18'
 
-        - 
-            name: Install dependencies (if needed)
-            run: npm install
-
         -
             name: Generate Summary.md
+            working-directory: $GITHUB_WORKSPACE
             run: npm run gen-summary
 
         -
