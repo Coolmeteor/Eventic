@@ -13,56 +13,60 @@ export default function RegisterForm({
     const [errorText, setErrorText] = useState("");
 
     async function register(email: string, username: string, password: string, confirmPassword: string) {
-            if (!username) {
-                setErrorText("Please enter your username");
-                return;
-            }
-            if (!password) {
-                setErrorText("Please enter your password");
-                return;
-            }
-            if (password.length < 5) {
-                setErrorText("Password must be at least 5 characters long");
-                return;
-            }
-            if (password !== confirmPassword) {
-                setErrorText("Passwords do not match");
-                return;
-            }
-            setErrorText("");
-    
-            const body = {
-                user_name: username,  // Ensure the parameters match the backend
-                email,
-                password,
-    
-            };
-    
-            try {
-                const response = await fetch(`${API}/auth/register`, {
-                    method: "POST",
-                    credentials: "include", // To send cookie
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body),
-                });
-    
-                const data = await convertResponse(response);
-    
-                if(response.ok){
-                    window.location.href = "/";
-                    console.log(data.message);
-                    return;
-                } else {
-                    console.log("Registration Failed:", data.error);
-                    setErrorText(data.error);
-                    return;
-                }
-    
-            } catch (error) {
-                setErrorText("Registration error: " + (error as Error).message);
-                console.error("Registration error:", error);
-            }
+        if (!email){
+            setErrorText("Please enter your email");
+            return;
+        }    
+        if (!username) {
+            setErrorText("Please enter your username");
+            return;
         }
+        if (!password) {
+            setErrorText("Please enter your password");
+            return;
+        }
+        if (password.length < 5) {
+            setErrorText("Password must be at least 5 characters long");
+            return;
+        }
+        if (password !== confirmPassword) {
+            setErrorText("Passwords do not match");
+            return;
+        }
+        setErrorText("");
+
+        const body = {
+            user_name: username,  // Ensure the parameters match the backend
+            email,
+            password,
+
+        };
+
+        try {
+            const response = await fetch(`${API}/auth/register`, {
+                method: "POST",
+                credentials: "include", // To send cookie
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+
+            const data = await convertResponse(response);
+
+            if(response.ok){
+                window.location.href = "/";
+                console.log(data.message);
+                return;
+            } else {
+                console.log("Registration Failed:", data.error);
+                setErrorText("Registration Failed: " +  data.error);
+                return;
+            }
+
+        } catch (error) {
+            setErrorText("Registration error: " + (error as Error).message);
+            console.error("Registration error:", error);
+        }
+    }
     
     return (
         <>
@@ -70,17 +74,18 @@ export default function RegisterForm({
                 <h1>Create an account</h1>
                 <form onSubmit={(e) => {
                     e.preventDefault();
+                    const form = e.currentTarget;
                     register(
-                        e.currentTarget.email.value,
-                        e.currentTarget.username.value,
-                        e.currentTarget.password.value,
-                        e.currentTarget.passwordconf.value
+                        (form.elements.namedItem('email') as HTMLInputElement).value,
+                        (form.elements.namedItem('username') as HTMLInputElement).value,
+                        (form.elements.namedItem('password') as HTMLInputElement).value,
+                        (form.elements.namedItem('passwordconf') as HTMLInputElement).value
                     );
                 }}>
-                    <input id="email" type="email" placeholder="Email address" required />
-                    <input id="username" type="text" placeholder="Username" required />
-                    <input id="password" type="password" placeholder="Password" required />
-                    <input id="passwordconf" type="password" placeholder="Confirm Password" required />
+                    <input id="email" name="email" type="email" placeholder="Email address"/>
+                    <input id="username" name="username" type="text" placeholder="Username"/>
+                    <input id="password" name="password" type="password" placeholder="Password"/>
+                    <input id="passwordconf" name="passwordconf" type="password" placeholder="Confirm Password"/>
                     {errorText && <p className="errortext">{errorText}</p>}
                     <button type="submit">Register</button>
                 </form>
