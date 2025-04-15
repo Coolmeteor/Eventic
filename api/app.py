@@ -6,6 +6,7 @@ from profiles.routes import profile_bp
 from auth.routes import auth_bp  
 from event.routes import event_bp
 from ticket.routes import ticket_bp
+from payment.routes import payment_bp
 from flask_cors import CORS
 from datetime import timedelta
 
@@ -32,8 +33,9 @@ def home():
 app.register_blueprint(profile_bp, url_prefix="/profile")
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(event_bp, url_prefix="/event")
-# app.register_blueprint(stats_bp, url_prefix="/stats")
+app.register_blueprint(stats_bp, url_prefix="/stats")
 app.register_blueprint(ticket_bp, url_prefix="/ticket")
+app.register_blueprint(payment_bp, url_prefix="/payment")
 
 ##################################################################################
 app.register_blueprint(test_bp, url_prefix="") # Must be deleted when release
