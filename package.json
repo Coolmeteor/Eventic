@@ -1,0 +1,7 @@
+{
+    "name": "generate-summary",
+    "version": "1.0.0",
+    "scripts": {
+        "gen-summary": "node scripts/generate-summary.js"
+    }
+}
