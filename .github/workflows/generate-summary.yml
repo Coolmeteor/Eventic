@@ -24,7 +24,7 @@ jobs:
 
         -
             name: Generate Summary.md
-            working-directory: $GITHUB_WORKSPACE
+            working-directory: ${{ github.workspace }}
             run: npm run gen-summary
 
         -
