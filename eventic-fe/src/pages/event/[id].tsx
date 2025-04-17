@@ -5,7 +5,7 @@ import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
-import { API, DEV_MODE, EventData, mockEvents } from "@/constants";
+import { API, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { EventCardProps } from "@/components/Event/EventCard";
@@ -185,7 +185,7 @@ export default function Event() {
                 }
 
 
-                {DEV_MODE && <p>dev: Event ID: {id} visibility: {eventData?.visibility}</p>}
+                {process.env.NEXT_PUBLIC_DEV_MODE == "true" && <p>dev: Event ID: {id} visibility: {eventData?.visibility}</p>}
             </Section >
 
             <style jsx>{`

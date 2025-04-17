@@ -5,7 +5,7 @@ import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, DEV_MODE, eventCategories, EventData } from "@/constants";
+import { API, eventCategories, EventData } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
 import { blobToBase64 } from "@/utils/helpers";
@@ -280,7 +280,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 }
 
 
-                {DEV_MODE && <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>}
+                {process.env.NEXT_PUBLIC_DEV_MODE == "true" && <p>dev: Event ID: {eventId} visibility: {eventData?.visibility}</p>}
             </Section >
 
             <style jsx>{`

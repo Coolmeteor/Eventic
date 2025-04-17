@@ -2,7 +2,7 @@ import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendar, faLocationArrow, faSquarePersonConfined, } from '@fortawesome/free-solid-svg-icons'
-import { DEV_MODE, EventData } from '@/constants'
+import {  EventData } from '@/constants'
 import DefaultButton from './DefaultButton'
 
 type Props = {
@@ -36,7 +36,7 @@ export function EventCard({ large = false, event, btn }: Props) {
                 {/* decription and other detail */}
                 <div className='event-content'>
                     <div>
-                        {DEV_MODE && <p>Dev: event ID is {event.id}</p>}
+                        {process.env.NEXT_PUBLIC_DEV_MODE == "true" && <p>Dev: event ID is {event.id}</p>}
 
 
 
