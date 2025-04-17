@@ -40,7 +40,7 @@ export default function Dashboard() {
             response = await fetch(fetchUrl)
 
             console.log(response)
-            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch ? "search" : "recommendation"}`)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
             console.log(response)
 
             const data: EventData[] = await response.json()
