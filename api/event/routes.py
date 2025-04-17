@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services import create_event, get_all_events, get_event, get_recommended_events, update_event, delete_event
+from .services import create_event, get_all_events, get_event, get_recommended_events, search_events, update_event, delete_event
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 

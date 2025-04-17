@@ -5,6 +5,7 @@ from db.db_connect import get_db_connection
 from datetime import datetime  
 import psycopg2
 import psycopg2.extras
+from psycopg2 import sql
 
 
 
