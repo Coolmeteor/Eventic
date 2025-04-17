@@ -10,7 +10,7 @@ export default function EventEditorPage() {
     return (
         <>
             <Section>
-                {id != undefined && <EventEditor eventId={id} />}
+                {typeof id === "string" && <EventEditor eventId={id} />}
             </Section >
         </>
 

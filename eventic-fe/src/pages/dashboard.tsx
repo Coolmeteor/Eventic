@@ -1,5 +1,5 @@
 import DefaultButton from "@/components/DefaultButton";
-import EventCard from "@/components/EventCard";
+import { EventCard } from "@/components/EventCard";
 import Section from "@/components/Section";
 import { API, mockEvents } from "@/constants";
 import { EventData } from "@/constants";

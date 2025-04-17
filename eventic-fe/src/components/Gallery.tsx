@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Gallery({children}) {
+export default function Gallery({children}:{children: React.ReactNode}) {
 
 	return (
 		<>

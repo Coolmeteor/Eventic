@@ -8,8 +8,8 @@ import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScrol
 import { API, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
-import { EventCardProps } from "@/components/Event/EventCard";
 import { extractEventCardData } from "@/utils/format";
+import { EventItemProps } from "@/utils/event";
 
 export default function Event() {
     const router = useRouter();
@@ -17,7 +17,7 @@ export default function Event() {
 
 
     const [eventData, setEventData] = useState<EventData | null>(null)
-    const [quickPicksData, setQuickPicksData] = useState<EventCardProps[]>([])
+    const [quickPicksData, setQuickPicksData] = useState<EventItemProps[]>([])
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
