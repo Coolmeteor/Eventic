@@ -7,6 +7,7 @@ from auth.routes import auth_bp
 from event.routes import event_bp
 from ticket.routes import ticket_bp
 from payment.routes import payment_bp
+from event.statsroutes import stats_bp
 from flask_cors import CORS
 from datetime import timedelta
 
