@@ -84,7 +84,10 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                     // load mock events
                     if (enableMockEvents && eventId == "100" || eventId == "101" || eventId == "102") {
-                        setEventData(mockEvents.filter((e) => e.id === parseInt(eventId))[0])
+                        let event = mockEvents.filter((e) => e.id === parseInt(eventId))[0]
+                        setEventData(event)
+                        setImages(event.media)
+                        
                         return
                     }
 
@@ -94,7 +97,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     const response = await fetch(fetchUrl)
                     console.log(response)
                     if (!response.ok) throw new Error("Failed to fetch event")
-                    const data: EventData = (await response.json())[0]
+                    const data: EventData = (await response.json())
                     setEventData(data)
                     setImages(data.media)
 
