@@ -86,15 +86,18 @@ export default function Homepage() {
         <>
             <Section fullWidth={true}>
                 <div className="hero-container">
+
                     <img
                         src="hero.jpg"
                         alt="Hero"
                         className="hero-image"
                     />
 
-                    <p className="hero-text">
-                        Welcome to the site! We are a site that is dedicated to providing you with the latest and greatest.
-                    </p>
+                    <div className="hero-text-container">
+                        <p className="hero-text">
+                            Explore local happenings, from concerts and food festivals to business meetups and charity events. Find your vibe, get the details, and RSVP in seconds.
+                        </p>
+                    </div>
 
 
                 </div>
