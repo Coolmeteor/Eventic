@@ -1,5 +1,5 @@
 # Prelude
-This doccument details the steps required to setup, and run the frontend web server
+This doccument details the steps required to setup, and run the Eventic frontend web server
 
 
 # Instalation
