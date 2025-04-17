@@ -5,7 +5,7 @@ import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, eventCategories, EventData } from "@/constants";
+import { API, enableMockEvents, eventCategories, EventData, mockEvents } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
 import { blobToBase64 } from "@/utils/helpers";
@@ -81,6 +81,12 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
             const fetchEvent = async () => {
                 try {
                     setLoading(true);
+
+                    // load mock events
+                    if (enableMockEvents && eventId == "100" || eventId == "101" || eventId == "102") {
+                        setEventData(mockEvents.filter((e) => e.id === parseInt(eventId))[0])
+                        return
+                    }
 
                     const fetchUrl = `${API}/event/events/${eventId}`
                     // data from, api

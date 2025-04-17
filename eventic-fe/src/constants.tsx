@@ -1,7 +1,8 @@
 import { faBaseballBatBall, faBowlFood, faBrush, faBuildingNgo, faDice, faHandHoldingHeart, faMusic, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 import { image1, image2 } from "./constants_mockimages";
-
 export const API = `http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}`;
+export const enableMockEvents = process.env.NEXT_PUBLIC_ENABLE_MOCK_EVENTS == "true"
+
 
 export const eventCategories = [
     "Music",
