@@ -1,5 +1,6 @@
 import DefaultButton from "@/components/DefaultButton";
 import { EventCard } from "@/components/EventCard";
+import { HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
 import { API, mockEvents } from "@/constants";
 import { EventData } from "@/constants";
@@ -12,8 +13,69 @@ export default function Dashboard() {
     // This useState-useEffect solution works even if we fetch event data from the backend at least in my local environment.
     const [events, setEvents] = useState<EventData[]>([]);
 
+    const [yourEvents, setYourEvents] = useState<EventData[]>([])
+
+
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+
+
+    /**
+         * Get data from backend for the page to load.
+         * This also sends the search parameters for database queries
+         */
+    async function searchRequest() {
+        const fetchCount = 10
+        setLoading(true)
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
+
+
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response
+
+            response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event ${isSearch ? "search" : "recommendation"}`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setYourEvents(data) // expect an array of data
+
+
+            // use mock data instead
+            // setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
+            // console.log("Using mock data instead of backend")
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+
     useEffect(() => {
         setEvents(mockEvents);
+
+        const fetchEvent = async () => {
+            try {
+                setLoading(true)
+                await searchRequest()
+            } catch (err) {
+                setError((err as Error).message)
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchEvent();
     }, []);
     // Shoei - You can delete this code block between the two Shoei comments if you find a better solution!
 
@@ -30,35 +92,41 @@ export default function Dashboard() {
 
                     <div className="left">
                         <h2>Recently visited</h2>
-                        <div className="event-list">
+                        <HorizontalScrollList>
                             {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                    key={event.id} event={event} large={false} />
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
                             ))
                             }
-                        </div>
-
+                        </HorizontalScrollList>
 
                         <h2>Comming soon</h2>
-                        <div className="event-list">
+                        <HorizontalScrollList>
                             {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                    key={event.id} event={event} large={false} />
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
                             ))
                             }
-                        </div>
+                        </HorizontalScrollList>
+
 
 
 
                         <h2>Your events</h2>
-                        <div className="event-list">
-
-                            {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
-                                    key={event.id} event={event} large={false} />
+                        <HorizontalScrollList>
+                            {yourEvents.map((event) => (
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
                             ))
                             }
-                        </div>
+                        </HorizontalScrollList>
+
                     </div>
 
 
@@ -135,21 +203,10 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 1em;
+
+    overflow-x: hidden;
     
 }
-
-.event-list {
-    display: flex;
-    flex-direction: row;
-    // flex-wrap: scroll;
-    
-    gap: 1em;
-    justify-content: left;
-    align-items: top;
-    width: 100%;
-    padding: 1em;
-}
-
 
 
 
