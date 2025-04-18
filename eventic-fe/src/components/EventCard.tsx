@@ -129,9 +129,9 @@ export function EventCard({ large = false, event, btn }: Props) {
                 }
 
                 .event-desc {
-                    // all this is for max 8 lines
+                    // all this is for max 6 lines
                     display: -webkit-box;
-                    -webkit-line-clamp: 8;
+                    -webkit-line-clamp: 6;
                     -webkit-box-orient: vertical;
                     overflow: hidden;
                     text-overflow: ellipsis;

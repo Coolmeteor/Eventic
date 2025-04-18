@@ -46,10 +46,18 @@ export function EventItem({
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        width: 400px;
+                        height: 250px;
+                        overflow: hidden;
+                        border-radius: 1rem;
+                        border: 3px solid var(--color-background-dark);
+                  
                     }
 
                     .image {
-                        width: 75%;
+                        // width: 75%;
+                        object-fit: cover;
+                    
                     }
 
                     `}</style>
@@ -89,11 +97,19 @@ export function EventItem({
             .card{
                 width: 450px;
                 padding: 0 2rem 0 2rem;
+                overflow:hidden;
+                white-space:nowrap;
             }
 
             .title {
+            display:block;
                 font-size: 2rem;
                 margin: 1rem;
+                margin-right: 0.2em;
+     
+                // max-width: 300px;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
 
             .icon-style {

@@ -1,21 +1,165 @@
 import DefaultButton from "@/components/DefaultButton";
 import { EventCard } from "@/components/EventCard";
+import { HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
 import { API, mockEvents } from "@/constants";
 import { EventData } from "@/constants";
+import { fetchProfile, User } from "@/utils/profile-api";
 import { useEffect, useState } from "react";
 
 
 
 export default function Dashboard() {
-    // Shoei - I temporarily put the event data as events<EventData[]> to fix the hydration error
-    // This useState-useEffect solution works even if we fetch event data from the backend at least in my local environment.
-    const [events, setEvents] = useState<EventData[]>([]);
+
+    // event data
+    const [fillerevents, setFillerEvents] = useState<EventData[]>([]);
+    const [yourEvents, setYourEvents] = useState<EventData[]>([])
+    const [newEvents, setNewrEvents] = useState<EventData[]>([])
+    const [happenSoonEvents, setHappenSoonEvents] = useState<EventData[]>(fillerevents.filter((event) => event.start_date > Date.now()).slice(0, 10))
+
+
+    // user 
+    const [isOrganizer, setIsOrganizer] = useState<boolean>(true)
+    const [user, setUser] = useState<User>()
+
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+
+
+    /**
+         * Get data from backend for the page to load.
+         * This also sends the search parameters for database queries
+         */
+    async function fetchYourEvents() {
+        const fetchCount = 10
+        setLoading(true)
+        let fetchUrl = `${API}/event/recommendation/${fetchCount}`
+
+
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response
+
+            response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setYourEvents(data) // expect an array of data
+
+
+            // use mock data instead
+            // setEventData([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents])
+            // console.log("Using mock data instead of backend")
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function fetchtNewEvents() {
+
+        setLoading(true)
+        let fetchUrl = `${API}/event/new_postings`
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setNewrEvents(data) // expect an array of data
+
+
+
+            // use mock data instead
+            // setNewrEvents(mockEvents)
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+            setNewrEvents(mockEvents)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function fetchtHappenSoonEvents() {
+
+        setLoading(true)
+        let fetchUrl = `${API}/event/happening_soon`
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setHappenSoonEvents(data) // expect an array of data
+
+
+
+            // use mock data instead
+            // setHappenSoonEvents(mockEvents)
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+            setHappenSoonEvents(mockEvents)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+
 
     useEffect(() => {
-        setEvents(mockEvents);
+        setFillerEvents(mockEvents);
+
+        const fetchEvent = async () => {
+            try {
+                setLoading(true)
+                // Fetch user info
+                const loadUser = async () => {
+                    const userData = await fetchProfile();
+
+                    if (userData && "user" in userData) {
+                        setUser(userData.user);
+                        setIsOrganizer(userData.user.is_org);
+                    }
+                }
+
+                loadUser();
+                await fetchYourEvents()
+                await fetchtNewEvents()
+                await fetchtHappenSoonEvents()
+            } catch (err) {
+                setError((err as Error).message)
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchEvent();
     }, []);
-    // Shoei - You can delete this code block between the two Shoei comments if you find a better solution!
+
+    if (!user)
+        return <h1 style={{ fontSize: "4rem", display: "block", textAlign: "center" }}>Loading...</h1>
 
     return (
         <>
@@ -29,38 +173,49 @@ export default function Dashboard() {
                 <div className="main-content">
 
                     <div className="left">
-                        <h2>Recently visited</h2>
-                        <div className="event-list">
-                            {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                    key={event.id} event={event} large={false} />
+                        <h2>Recently posted</h2>
+                        <HorizontalScrollList>
+                            {newEvents.map((event) => (
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
                             ))
                             }
-                        </div>
+                        </HorizontalScrollList>
 
-
-                        <h2>Comming soon</h2>
-                        <div className="event-list">
-                            {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                    key={event.id} event={event} large={false} />
+                        <h2>Happening soon</h2>
+                        <HorizontalScrollList>
+                            {happenSoonEvents.map((event) => (
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
                             ))
                             }
-                        </div>
+                        </HorizontalScrollList>
 
 
 
-                        <h2>Your events</h2>
-                        <div className="event-list">
+                        {isOrganizer && <h2>Your events</h2>}
+                        {isOrganizer &&
+                            <HorizontalScrollList>
+                                {yourEvents.map((event) => (
+                                    <li className="scroll-list">
+                                        <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                            key={event.id} event={event} large={false} />
+                                    </li>
+                                ))
+                                }
+                            </HorizontalScrollList>
+                        }
 
-                            {events.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
-                                    key={event.id} event={event} large={false} />
-                            ))
-                            }
-                        </div>
+
+
+
+                        <div className="spacer"></div>
+
                     </div>
-
 
                     <div className="rsb">
                         {/*  put some extra stuff here */}
@@ -135,21 +290,10 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 1em;
+
+    overflow-x: hidden;
     
 }
-
-.event-list {
-    display: flex;
-    flex-direction: row;
-    // flex-wrap: scroll;
-    
-    gap: 1em;
-    justify-content: left;
-    align-items: top;
-    width: 100%;
-    padding: 1em;
-}
-
 
 
 
@@ -186,7 +330,8 @@ h2 {
 .action-buttons {
     display: flex;
     flex-direction: row;
-    justify-content: end;
+    justify-content: center;
+    flex-wrap: wrap;
     align-items: top;
     margin: 1em;
     gap: 1em;

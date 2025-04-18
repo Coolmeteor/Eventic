@@ -5,7 +5,7 @@ import DefaultButton from "@/components/DefaultButton";
 import InputMultiLine from "@/components/InputMultiLine";
 import TagEditor from "@/components/TagEditor";
 import { CustomDatePicker } from "./Event/CustomDatePicker";
-import { API, eventCategories, EventData } from "@/constants";
+import { API, enableMockEvents, eventCategories, EventData, mockEvents } from "@/constants";
 import { isAuthenticated } from "@/utils/auth-api";
 import { PriceInput } from "./Event/PriceInput";
 import { blobToBase64 } from "@/utils/helpers";
@@ -82,13 +82,22 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 try {
                     setLoading(true);
 
+                    // load mock events
+                    if (enableMockEvents && (eventId == "100" || eventId == "101" || eventId == "102")) {
+                        let event = mockEvents.filter((e) => e.id === parseInt(eventId))[0]
+                        setEventData(event)
+                        setImages(event.media)
+                        
+                        return
+                    }
+
                     const fetchUrl = `${API}/event/events/${eventId}`
                     // data from, api
                     console.log(`fetching event ${fetchUrl}`)
                     const response = await fetch(fetchUrl)
                     console.log(response)
                     if (!response.ok) throw new Error("Failed to fetch event")
-                    const data: EventData = (await response.json())[0]
+                    const data: EventData = (await response.json())
                     setEventData(data)
                     setImages(data.media)
 
@@ -114,8 +123,45 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
      * Upload form to server
      */
     async function submitForm(visibility: string = "private") {
+        // do nothing for mock events
         console.log("submitting form", eventData, images);
+        if (enableMockEvents && eventId == "100" || eventId == "101" || eventId == "102") {
+            window.location.href = "/dashboard";
+            return
+        }
 
+        // delete event
+        if (visibility == "delete") {
+            try {
+                let fetchUrl = `${API}/event/delete/${eventId}`
+     
+                const response = await fetch(fetchUrl, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                   
+                });
+
+                if (!response.ok) {
+                    console.log(response)
+                    throw new Error(`Failed to upload data to server: ${response.statusText}`);
+                }
+
+                await response.json()
+
+                window.location.href = "/dashboard";
+                return true
+            } catch (error) {
+                setError((error as Error).message);
+                console.error("Error posting event:", error);
+                console
+                return null;
+            }
+
+        }
+
+        // and now for eveything else, publish and unpublish (unpublish changes visibility, and publish submits a new event to backend)
         let media: string[] = [];
 
         for (let img in images) {
@@ -146,7 +192,10 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                 throw new Error(`Failed to upload data to server: ${response.statusText}`);
             }
 
-            return await response.json();
+            await response.json()
+
+            window.location.href = "/dashboard";
+            return true
         } catch (error) {
             setError((error as Error).message);
             console.error("Error posting event:", error);
@@ -263,6 +312,8 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                                     {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("public")}>Update</DefaultButton>}
                                     {!isCreate && eventData.visibility === "public" && <DefaultButton onClick={() => submitForm("private")}>Unpublish</DefaultButton>}
+
+                                    {!isCreate && <DefaultButton onClick={() => submitForm("delete")}>Delete</DefaultButton>}
 
                                 </div>
 

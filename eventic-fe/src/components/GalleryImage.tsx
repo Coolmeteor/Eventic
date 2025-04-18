@@ -9,7 +9,7 @@ type Props = {
 }
 
 export default function GalleryImage({ src, alt, removable, onRemove }: Props) {
-	console.log("GalleryImage src: ", src)
+	// console.log("GalleryImage src: ", src)
 	
 	return (
 		<>

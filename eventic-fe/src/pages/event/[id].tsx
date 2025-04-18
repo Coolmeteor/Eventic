@@ -5,7 +5,7 @@ import { faCalendar, faLocationArrow, faSquarePersonConfined } from "@fortawesom
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ImageCarousell } from "@/components/ImageCarousell";
 import { MiniHorizontalScroll } from "@/components/ScrollerLists/HorizontalScroll";
-import { API, EventData, mockEvents } from "@/constants";
+import { API, enableMockEvents, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { extractEventCardData } from "@/utils/format";
@@ -58,7 +58,7 @@ export default function Event() {
             try {
                 setLoading(true);
 
-                if (id == "100" || id == "101" || id == "102") {
+                if (enableMockEvents && (id == "100" || id == "101" || id == "102")) {
                     setEventData(mockEvents.filter((e) => e.id === parseInt(id))[0])
                     return
                 }

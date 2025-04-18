@@ -20,7 +20,6 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
 
             .scroll-list-container {
                 display: flex;
-                justify-content: center;
                 margin-top: 2rem;
             }
 
@@ -29,12 +28,12 @@ export function HorizontalScroll({ textWithIcons }: { textWithIcons: TextWithIco
             .scroll-list {
                 display: flex;
                 overflow-x: auto;
+     
             }
 
             .scroll-list li {
                 margin-right: 5px;
                 margin-bottom: 20px;
-                display: inline-block;
             }
             // all this mess is for scroll bar
             .scroll-list::-webkit-scrollbar {
@@ -104,10 +103,6 @@ export function MiniHorizontalScroll({ textWithIcons, tags }: { textWithIcons?: 
                 overflow-x: auto;
             }
 
-            .scroll-list li {
-                display: inline-block;
-            }
-
         `}</style>
 
 
@@ -136,8 +131,6 @@ export function HorizontalScrollList({
 
             .scroll-list-container {
                 display: flex;
-                justify-content: center;
-                margin-top: 2rem;
             }
 
 
@@ -148,11 +141,10 @@ export function HorizontalScrollList({
                 gap: 2.989em;
             }
 
-            .scroll-list li {
-                margin-right: 5px;
-                margin-bottom: 20px;
-                display: inline-block;
+            .scroll-list {
+               padding: 1em;
             }
+
             // all this mess is for scroll bar
             .scroll-list::-webkit-scrollbar {
                 width: 8px;

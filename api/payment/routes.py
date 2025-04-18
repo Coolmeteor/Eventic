@@ -17,7 +17,7 @@ def save_payment_route():
         return jsonify({"error": "User ID and ticket ID are required"}), 400
     
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 sql = 'INSERT INTO payments (user_id, ticket_id, status) VALUES (%s, %s, %s) RETURNING id'
                 cursor.execute(sql, (user_id, ticket_id, 'registered'))
@@ -41,7 +41,7 @@ def save_payment_route():
 @jwt_required()
 def get_payment_info_route(id):
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM payments WHERE id = %s", (id,))
                 row = cursor.fetchone()
@@ -62,7 +62,7 @@ def charge_payment_route():
         return jsonify({"error": "Payment ID is required"}), 400
     
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE payments SET status='charged' WHERE id = %s", (payment_id,))
                 conn.commit()
@@ -81,7 +81,7 @@ def check_in_payment_route():
         return jsonify({"error": "Payment ID is required"}), 400
     
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE payments SET status='checked_in' WHERE id = %s", (payment_id,))
                 conn.commit()
@@ -101,7 +101,7 @@ def change_payment_status():
         return jsonify({"error": "Payment ID and new status are required"}), 400
 
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM payments WHERE id = %s", (payment_id,))
                 payment = cursor.fetchone()
@@ -128,7 +128,7 @@ def change_payment_status():
 @jwt_required()
 def get_all_payments():
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM payments")
                 payments = cursor.fetchall()
@@ -147,7 +147,7 @@ def get_all_payments():
 def get_user_payments():
     current_user = get_jwt_identity()
     try:
-        with db_connect() as conn:
+        with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("SELECT * FROM payments WHERE user_id = %s", (current_user,))
                 user_payments = cursor.fetchall()

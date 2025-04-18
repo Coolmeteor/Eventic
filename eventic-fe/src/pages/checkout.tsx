@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import Section from "@/components/Section";
-import { API, EventData, mockEvents } from "@/constants";
-import { EventCard, EventCardLarge } from "@/components/EventCard";
-import { HorizontalScroll, HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
-import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
+import {  EventData, mockEvents } from "@/constants";
+import { EventCard,  } from "@/components/EventCard";
+import {  HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
+
 
 
 export default function Checkout() {
@@ -17,13 +16,29 @@ export default function Checkout() {
     // payment
     const [processing, setProcessing] = useState(false);
 
+
+    const formRef = useRef<HTMLFormElement>(null);
+
+    
     function submitPayment() {
         // Simulate payment processing
         return new Promise((resolve) => {
+            setError(null);
             setProcessing(true);
+
+            if (!(formRef.current && formRef.current.checkValidity())) {
+                setError("Please fill in all form fields");
+                setProcessing(false);
+                return
+            }
+
+
             setTimeout(() => {
                 resolve(true);
                 setProcessing(false);
+               
+                // navigate to ordered tickets
+                window.location.href = "/customer/orders";
             }, 2000);
         });
     }
@@ -70,7 +85,7 @@ export default function Checkout() {
         <>
             <Section>
                 {loading && <p>Loading...</p>}
-                {error && <p>Error loading event: {error}</p>}
+                {/* {error && <p>Error loading event: {error}</p>} */}
 
                 {eventData != undefined && eventData != null &&
                     <div>
@@ -93,7 +108,7 @@ export default function Checkout() {
 
                                     <div className="payment-inner-container">
                                         <div><h2>Billing Information</h2>
-                                            <form className="payment-form" onSubmit={(e) => e.preventDefault()}>
+                                            <form className="payment-form"  ref={formRef} onSubmit={(e) => e.preventDefault()}>
                                                 <input
                                                     type="text"
                                                     name="first name"
@@ -216,6 +231,7 @@ export default function Checkout() {
                                 <button className="pay-btn" onClick={submitPayment} disabled={processing}>
                                     {processing ? "Processing..." : "Confirm Order"}
                                 </button>
+                                {error && <p className="error-text">{error}</p>}
 
                                 <div className="next-steps-list">
                                     <h2>Instructions</h2>
@@ -406,6 +422,14 @@ margin: 0 2em;
     cursor: not-allowed;
 }
 // end payment
+
+
+.error-text {
+    color: red;
+    margin-top: 1rem;
+                margin-left: 2rem;
+                font-size: var(--font-size-body-L);
+}
 
 
 hr {
