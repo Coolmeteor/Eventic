@@ -181,6 +181,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
             }
             const response = await fetch(fetchUrl, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },

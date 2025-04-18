@@ -37,7 +37,7 @@ export function UserIcon({
                 )}
 
                 {/* Popup menu */}
-                {isOpen && (
+                {isOpen && isLogin && (
                     <div 
                         className="absolute right-0 mt-0 z-50"
                     >

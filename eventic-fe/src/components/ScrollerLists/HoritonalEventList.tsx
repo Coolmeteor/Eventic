@@ -47,6 +47,9 @@ export function HorizontalEventList({
 
             .scroll-list {
                 display: flex;
+                flex-direction: row;
+                justify-content: space-evenly;
+                align-items: center;
                 flex-wrap: nowrap;
                 padding: 0;
                 margin: 0;

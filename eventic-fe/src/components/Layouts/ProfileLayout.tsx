@@ -21,6 +21,9 @@ export default function ProfileLayout({
             if(userData && "user" in userData){
                 setUser(userData.user as User);
             }
+            else {
+                window.location.href = '/';
+            }
         });
     }, []);
 

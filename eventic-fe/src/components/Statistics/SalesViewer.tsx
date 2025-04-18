@@ -3,7 +3,7 @@ import SalesChart from "@/components/Statistics/SalesChart";
 import EventTable from "@/components/Statistics/EventTable";
 import WeeklyChart from "./WeeklyChart";
 import DailyChart from "./DailyChart";
-import { EventStats, mockStats, mockTotalStats } from "@/utils/statistics";
+import { EventStats, FetchEventStats, mockStats, mockTotalStats } from "@/utils/statistics";
 import { LoadingMessage } from "../LoadingMessage";
 import TopEvents from "./TopEvents";
 
@@ -21,6 +21,9 @@ export default function SalesViewer({
     // Initialization (Fetch stats data)
     useEffect(() => {
         const loadStats = async () => {
+            console.log("Start loading stats");
+            // const fetchData = FetchEventStats();
+
             setStatsData(mockStats);
             setTotalStats(mockTotalStats);
             setIsLoading(false);

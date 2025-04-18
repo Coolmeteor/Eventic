@@ -196,3 +196,26 @@ def search_events(data):
         rows = cursor.fetchall()
         column_names = [desc[0] for desc in cursor.description]
         return [convert_to_dict(row, column_names) for row in rows]
+    
+def get_creator_id(identity):
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            query = """
+                SELECT id
+                FROM users
+                WHERE email = %s
+            """
+            
+            cursor.execute(query, (identity,))
+            creator_id = cursor.fetchone()["id"]
+            
+            if not creator_id:
+                return {
+                    "error": "Organizer not found",
+                    "code": 404
+                }
+            
+            return {
+                "creator_id": creator_id,
+                "code": 200,
+            }

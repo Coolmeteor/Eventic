@@ -2,8 +2,9 @@
     Statistics utilities
 */
 
-import { mockEvents } from "@/constants";
+import { API, mockEvents } from "@/constants";
 import { useState } from "react";
+import { convertResponse } from "./auth-api";
 
 
 export interface EventStats {
@@ -18,6 +19,14 @@ export interface EventStats {
 }
 
 export type SortKey = keyof EventStats;
+export type RequestDuration = "threeWeeks" | "threeMonths" | "oneYear";
+export type RequestInterval = "day" | "week" | "month";
+
+
+export type ChartRequestBody = {
+    duration: RequestDuration;
+    interval: RequestInterval;
+}
 
 export const currencyKey: SortKey[] = [
     'sales',
@@ -47,6 +56,11 @@ export type DoWLabels = [
 
 ]
 
+export type ChartData = {
+    date: number,
+    sales: number,
+}
+
 export type dailyChartData = {
     hour: number,
     sales: number,
@@ -67,6 +81,91 @@ export const sortStatsData = (data: EventStats[], sortConfig: SortConfig) => {
     })
 
     return sortedData;
+}
+
+export async function FetchEventStats(){
+    const response = await fetch(`${API}/stats/get-stats-list`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if(response.ok){
+        console.log(data);
+    }
+    else {
+        return undefined;
+    }
+}
+
+export async function FetchChart(body: ChartRequestBody): Promise<ChartData[]> {
+    const response = await fetch(`${API}/stats/get-chart`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "aaplication/json" },
+        body: JSON.stringify(body),
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok) {
+        console.log(data);
+        return data;
+    }
+    else {
+        return [];
+    }
+}
+
+export async function FetchDailyChart(){
+    const response = await fetch(`${API}/stats/get-daily-chart`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok) {
+        console.log(data);
+    }
+    else {
+        return undefined;
+    }
+}
+
+export async function FetchWeeklyChart() {
+    const response = await fetch(`${API}/stats/get-weekly-daily-chart`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok){
+        console.log(data);
+    }
+    else {
+        return undefined;
+    }
+}
+
+export async function FetchOrgEvents() {
+    const response = await fetch(`${API}/stats/get-events`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok) {
+        console.log(data);
+        return data;
+    }
+    else {
+        return undefined;
+    }
+
 }
 
 export const mockStats: EventStats[] = [

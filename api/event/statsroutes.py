@@ -2,7 +2,10 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import ( decode_token,)
 from jwt import ExpiredSignatureError
 import pytz
+import psycopg2
+import psycopg2.extras
 from datetime import datetime, timedelta
+from db.db_connect import get_db_connection
 
 from .statsservices import get_stats_list, get_stats, get_chart_data, get_daily_chart, get_weekly_daily_chart
 
@@ -97,3 +100,44 @@ def get_weekly_daily_chart_req():
         "message": "Weekly daily chart retrieved successfully",
         "chart_data": chart_data,
     }), 200
+    
+@stats_bp.route("/get-events", methods=["GET"])
+def get_org_events_req():
+    res = validate_token()
+    if res["code"] != 200:
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            idQuery = """
+                SELECT U.id
+                FROM users U
+                WHERE U.email = %s
+            """
+            cursor.execute(idQuery, (identity,))
+            user = cursor.fetchone()
+            
+            if not user:
+                return jsonify({"error": f'User not found'}), 404
+            
+            creator_id = user["id"]
+            
+            eventQuery = """
+                SELECT *
+                FROM events
+                WHERE creator_id = %s
+            """    
+            
+            cursor.execute(eventQuery, (creator_id,))
+            
+            events = cursor.fetchall()
+            
+            if not events:
+                return jsonify({"error": f'No event found'}) , 200
+            
+    return jsonify({
+        "events": events,
+        "message": "Events for the organizer fetched",
+    }), 200
+    

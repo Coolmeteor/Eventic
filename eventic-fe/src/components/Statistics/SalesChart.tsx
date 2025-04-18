@@ -2,7 +2,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useState } from 'react';
 import { CSSProperties } from 'react';
 import DefaultButton from '../DefaultButton';
-
+import {    ChartRequestBody, RequestDuration, RequestInterval,
+            FetchChart,
+            ChartData,
+} from '@/utils/statistics';
 const data = [
     { interval: '1月', sales: 120000 },
     { interval: '2月', sales: 135000 },
@@ -32,11 +35,12 @@ export default function SalesLineChart({
     organizerId,
     style,
 }: Props){
-    const [interval, setInterval] = useState("months");
-    const [duration, setDuration] = useState("oneYear");
+    const [interval, setInterval] = useState<RequestInterval>("month");
+    const [duration, setDuration] = useState<RequestDuration>("oneYear");
+    const [chartData, setChartData] = useState<ChartData[]>([]);
 
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setInterval(e.target.value);
+        setInterval(e.target.value as RequestInterval);
         console.log(e.target.value);
     }
 
@@ -44,16 +48,21 @@ export default function SalesLineChart({
         const duration = e.target.value;
         console.log(duration);
 
-        setDuration(duration);
+        setDuration(duration as RequestDuration);
         const interval = durations.find(d => d.value === duration)?.interval;
         if (interval){
-            setInterval(interval);
+            setInterval(interval as RequestInterval);
         }
         console.log(duration);
     }
 
-    const handleButtonClick = () => {
+    const handleButtonClick = async () => {
         // Fetch chart data
+        const fetchedChartData = await FetchChart({
+            interval: interval,
+            duration: duration,
+        } as ChartRequestBody)
+        setChartData(fetchedChartData);
         
     }
 
