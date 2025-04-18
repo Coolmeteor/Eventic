@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services import create_event, get_all_events, get_event, get_recommended_events, search_events, update_event, delete_event
+from .services import create_event, get_all_events, get_event, get_happening_soon_events, get_new_events, get_recommended_events, search_events, update_event, delete_event
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 
@@ -74,3 +74,33 @@ def get_recommendation_route(event_count):
         return jsonify(events), 200
     else:
         return jsonify({"error": "data error"}), 500
+    
+
+'''
+get recently posted events. Storted by date posted
+'''
+@event_bp.route("/new_postings", methods=["GET"])
+def get_new_event_route():
+    
+    events = get_new_events()
+
+    if isinstance(events, list): 
+        return jsonify(events), 200
+    else:
+        return jsonify({"error": "data error"}), 500
+    
+
+'''
+get events that are happening soon. 
+This basically start date or end date > current date
+'''
+@event_bp.route("/happening_soon", methods=["GET"])
+def get_happening_soon_route():
+    
+    events = get_happening_soon_events()
+
+    if isinstance(events, list): 
+        return jsonify(events), 200
+    else:
+        return jsonify({"error": "data error"}), 500
+    

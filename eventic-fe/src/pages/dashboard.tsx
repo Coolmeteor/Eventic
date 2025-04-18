@@ -14,6 +14,8 @@ export default function Dashboard() {
     const [events, setEvents] = useState<EventData[]>([]);
 
     const [yourEvents, setYourEvents] = useState<EventData[]>([])
+    const [newEvents, setNewrEvents] = useState<EventData[]>([])
+    const [happenSoonEvents, setHappenSoonEvents] = useState<EventData[]>(events.filter((event) => event.start_date > Date.now()).slice(0, 10))
 
 
 
@@ -26,7 +28,7 @@ export default function Dashboard() {
          * Get data from backend for the page to load.
          * This also sends the search parameters for database queries
          */
-    async function searchRequest() {
+    async function fetchYourEvents() {
         const fetchCount = 10
         setLoading(true)
         let fetchUrl = `${API}/event/recommendation/${fetchCount}`
@@ -59,6 +61,67 @@ export default function Dashboard() {
         }
     }
 
+    async function fetchtNewEvents() {
+
+        setLoading(true)
+        let fetchUrl = `${API}/event/new_postings`
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setNewrEvents(data) // expect an array of data
+
+
+
+            // use mock data instead
+            // setNewrEvents(mockEvents)
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+            setNewrEvents(mockEvents)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function fetchtHappenSoonEvents() {
+
+        setLoading(true)
+        let fetchUrl = `${API}/event/happening_soon`
+        try {
+            // use data from, api
+            console.log(`fetching event ${fetchUrl}`)
+            let response = await fetch(fetchUrl)
+
+            console.log(response)
+            if (!response.ok) throw new Error(`Failed to fetch event recommendation`)
+            console.log(response)
+
+            const data: EventData[] = await response.json()
+            setHappenSoonEvents(data) // expect an array of data
+
+
+
+            // use mock data instead
+            // setHappenSoonEvents(mockEvents)
+
+        } catch (error) {
+            setError((error as Error).message + ": " + (error as Error).name)
+            console.error("Error in search request:", error)
+            setHappenSoonEvents(mockEvents)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
 
 
     useEffect(() => {
@@ -67,7 +130,9 @@ export default function Dashboard() {
         const fetchEvent = async () => {
             try {
                 setLoading(true)
-                await searchRequest()
+                await fetchYourEvents()
+                await fetchtNewEvents()
+                await fetchtHappenSoonEvents()
             } catch (err) {
                 setError((err as Error).message)
             } finally {
@@ -91,9 +156,9 @@ export default function Dashboard() {
                 <div className="main-content">
 
                     <div className="left">
-                        <h2>Recently visited</h2>
+                        <h2>Recently posted</h2>
                         <HorizontalScrollList>
-                            {events.map((event) => (
+                            {newEvents.map((event) => (
                                 <li className="scroll-list">
                                     <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
                                         key={event.id} event={event} large={false} />
@@ -102,9 +167,9 @@ export default function Dashboard() {
                             }
                         </HorizontalScrollList>
 
-                        <h2>Comming soon</h2>
+                        <h2>Happening soon</h2>
                         <HorizontalScrollList>
-                            {events.map((event) => (
+                            {happenSoonEvents.map((event) => (
                                 <li className="scroll-list">
                                     <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
                                         key={event.id} event={event} large={false} />

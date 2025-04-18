@@ -87,6 +87,49 @@ def get_recommended_events(limit):
 
     return event_list
 
+'''
+Get most recently posted events
+'''
+def get_new_events():
+    limitedLimit = 7
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM events WHERE visibility = 'public' ORDER BY created_at DESC LIMIT " + str(limitedLimit))
+    events = cursor.fetchall()
+
+    event_list = []
+    for row in events:
+        event_list.append(dict(zip([desc[0] for desc in cursor.description], row)))
+
+    cursor.close()
+    conn.close()
+
+    return event_list
+
+'''
+Get events that start soon or is currently ongoing
+'''
+def get_happening_soon_events():
+    limitedLimit = 7
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM events WHERE visibility = 'public' AND (start_date > NOW() or end_date > NOW()) ORDER BY start_date ASC LIMIT " + str(limitedLimit))
+    events = cursor.fetchall()
+
+    event_list = []
+    for row in events:
+        event_list.append(dict(zip([desc[0] for desc in cursor.description], row)))
+
+    cursor.close()
+    conn.close()
+
+    return event_list
+
+
 def get_event(event_id):
     
     conn = get_db_connection()
