@@ -83,7 +83,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                     setLoading(true);
 
                     // load mock events
-                    if (enableMockEvents && eventId == "100" || eventId == "101" || eventId == "102") {
+                    if (enableMockEvents && (eventId == "100" || eventId == "101" || eventId == "102")) {
                         let event = mockEvents.filter((e) => e.id === parseInt(eventId))[0]
                         setEventData(event)
                         setImages(event.media)
