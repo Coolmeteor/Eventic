@@ -58,7 +58,7 @@ export default function Event() {
             try {
                 setLoading(true);
 
-                if (enableMockEvents && id == "100" || id == "101" || id == "102") {
+                if (enableMockEvents && (id == "100" || id == "101" || id == "102")) {
                     setEventData(mockEvents.filter((e) => e.id === parseInt(id))[0])
                     return
                 }
