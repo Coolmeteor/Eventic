@@ -41,7 +41,7 @@ export function TopNavbar({ showProfile }: Props) {
                     <nav>
                         <a href="/">Home</a>
                         <a href="/event">Browse Events</a>
-                        <a href="/about">About</a>
+                        {isLogin && <a href="/dashboard">My Content</a>}
                         <a href="/checkout">Cart</a>
                     </nav>
 
