@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DefaultButton from '../DefaultButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons';
 import { isAuthenticated } from '@/utils/auth-api';
 import { UserIcon } from './UserIcon';
 
@@ -30,18 +30,23 @@ export function TopNavbar({ showProfile }: Props) {
                     {/* <img src="globe.svg" alt="Eventic Logo" width={28} /> */}
                     <h1><a href="/">Eventic</a></h1>
 
-                    {/* <h1>SEARCH HERE</h1> */}
+                    <DefaultButton
+                        bgColor={['000000', '000000', '000000']}
+                        onClick={() => window.location.href = "/event"}>
+                        <FontAwesomeIcon icon={faSearch} />
+                    </DefaultButton>
+
                 </div>
                 <div className='horiz'>
                     <nav>
                         <a href="/">Home</a>
-                        <a href="/event">Events</a>
-                        <a href="/dashboard">Dashboard</a>
+                        <a href="/event">Browse Events</a>
+                        <a href="/about">About</a>
                         <a href="/checkout">Cart</a>
                     </nav>
 
 
-                    <UserIcon isLogin={isLogin}/>
+                    <UserIcon isLogin={isLogin} />
 
                     {/* {showProfile && !isLogin &&
                         <DefaultButton
