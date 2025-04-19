@@ -26,7 +26,6 @@ type Props = {
 }
 
 export default function EventTable({
-    organizerId,
     statsData,
     totalStats,
 }: Props){

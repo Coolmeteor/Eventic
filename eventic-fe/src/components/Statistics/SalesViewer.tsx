@@ -22,10 +22,13 @@ export default function SalesViewer({
     useEffect(() => {
         const loadStats = async () => {
             console.log("Start loading stats");
-            // const fetchData = FetchEventStats();
+            const fetchData = await FetchEventStats();
 
-            setStatsData(mockStats);
-            setTotalStats(mockTotalStats);
+            if ("stats_data" in fetchData && "total_stats" in fetchData) {
+                setStatsData(fetchData.stats_data as EventStats[]);
+                setTotalStats(fetchData.total_stats as EventStats);
+            }
+            
             setIsLoading(false);
         };
 

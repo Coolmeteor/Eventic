@@ -2,7 +2,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useEffect, useState } from 'react';
 import { CSSProperties } from 'react';
 import DefaultButton from '../DefaultButton';
-import { DoWLabels, dailyChartData, hourlyData } from '@/utils/statistics';
+import { ChartData, DoWLabels, FetchDailyChart } from '@/utils/statistics';
 import { LoadingMessage } from '../LoadingMessage';
 
 
@@ -14,26 +14,36 @@ type Props = {
 export default function DailyChart({
     organizerId,
 }: Props){
-    const [chartData, setChartData] = useState<dailyChartData[]>([]);
+    const [chartData, setChartData] = useState<ChartData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [retryCount, setRetryCount] = useState(0);
 
-    // Fetch data
     useEffect(() => {
         const loadData = async () => {
-            setChartData(hourlyData);
+            const fetchedData = await FetchDailyChart();
+            if (fetchedData && "chart_data" in fetchedData){
+                setChartData(fetchedData.chart_data as ChartData[])
+            }
 
             setIsLoading(false);
-        };
+        }
 
         loadData();
-    })
+    }, [retryCount]);
 
-    if(!hourlyData){
+
+    if (chartData.length === 0){
         if(isLoading){
-            return <LoadingMessage>Loading chart data</LoadingMessage>
+            return <LoadingMessage>Loading daily chart data</LoadingMessage>
         }
         else {
-            return;
+            if (retryCount < 3){
+                setTimeout(() => setRetryCount(retryCount + 1), 1000);
+                return <LoadingMessage>Try to reload...</LoadingMessage>
+            }
+            else {
+                
+            }
         }
     }
 
@@ -67,7 +77,12 @@ export default function DailyChart({
                         <Tooltip 
                             formatter={(value) => `$${value.toLocaleString()}`}
                         />
-                        <Line type="monotone" dataKey="sales" stroke="red" strokeWidth={2} />
+                        <Line 
+                            type="linear" 
+                            dataKey="sales" 
+                            stroke="red" 
+                            strokeWidth={2} 
+                        />
                     </LineChart>
                     </ResponsiveContainer>
                 </div>

@@ -93,6 +93,7 @@ export async function FetchEventStats(){
 
     if(response.ok){
         console.log(data);
+        return data;
     }
     else {
         return undefined;
@@ -103,7 +104,7 @@ export async function FetchChart(body: ChartRequestBody): Promise<ChartData[]> {
     const response = await fetch(`${API}/stats/get-chart`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "aaplication/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
 
@@ -128,6 +129,7 @@ export async function FetchDailyChart(){
 
     if (response.ok) {
         console.log(data);
+        return data;
     }
     else {
         return undefined;
@@ -135,7 +137,7 @@ export async function FetchDailyChart(){
 }
 
 export async function FetchWeeklyChart() {
-    const response = await fetch(`${API}/stats/get-weekly-daily-chart`, {
+    const response = await fetch(`${API}/stats/get-weekly-chart`, {
         method: "GET",
         credentials: "include",
     });
@@ -144,6 +146,7 @@ export async function FetchWeeklyChart() {
 
     if (response.ok){
         console.log(data);
+        return data;
     }
     else {
         return undefined;

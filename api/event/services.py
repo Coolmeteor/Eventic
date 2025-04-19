@@ -201,19 +201,27 @@ def get_creator_id(identity):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
             query = """
-                SELECT id
+                SELECT *
                 FROM users
                 WHERE email = %s
             """
             
             cursor.execute(query, (identity,))
-            creator_id = cursor.fetchone()["id"]
+            user = cursor.fetchone()
             
-            if not creator_id:
+            if not user:
                 return {
                     "error": "Organizer not found",
                     "code": 404
                 }
+                
+            if user["is_org"] == False:
+                return {
+                    "error": "This account is not organizer account",
+                    "code": 401,
+                }
+            
+            creator_id = user["id"]
             
             return {
                 "creator_id": creator_id,

@@ -3,7 +3,7 @@ from .services import (
     create_event, get_all_events, get_event, get_happening_soon_events, get_new_events, 
     get_recommended_events, search_events, update_event, delete_event,  get_creator_id
 )
-from .statsroutes import validate_token
+from .statsservices import validate_token
 
 event_bp = Blueprint("event", __name__)  # 这里不设 `url_prefix`，在 `app.py` 里配置
 
@@ -20,7 +20,7 @@ def create_event_route():
     # Fetch creator_id from access_token
     id = get_creator_id(identity)
     if(id["code"] != 200):
-        return jsonify(id), res["code"]
+        return jsonify(id), id["code"]
     creator_id = id["creator_id"]
     
     data = request.json

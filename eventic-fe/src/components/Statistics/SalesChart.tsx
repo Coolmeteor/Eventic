@@ -1,11 +1,12 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CSSProperties } from 'react';
 import DefaultButton from '../DefaultButton';
 import {    ChartRequestBody, RequestDuration, RequestInterval,
             FetchChart,
             ChartData,
 } from '@/utils/statistics';
+import { LoadingMessage } from '../LoadingMessage';
 const data = [
     { interval: '1月', sales: 120000 },
     { interval: '2月', sales: 135000 },
@@ -19,16 +20,16 @@ type Props = {
 };
 
 const intervals = [
-    { value: "days", label: "Days" },
-    { value: "weeks", label: "Weeks" },
-    { value: "months", label: "Months"}
+    { value: "day", label: "Day" },
+    { value: "week", label: "Week" },
+    { value: "month", label: "Month"}
 ];
 
 const durations = [
     { value: "threeWeeks", interval: intervals[0].value, label: "3 Weeks"},
     { value: "threeMonths", interval: intervals[1].value, label: "3 Months"},
     { value: "oneYear", interval: intervals[2].value, label: "1 Year"},
-    { value: "all", interval: intervals[2].value, label: "All"},
+    { value: "threeYears", interval: intervals[2].value, label: "3 Years"},
 ];
 
 export default function SalesLineChart({
@@ -38,6 +39,8 @@ export default function SalesLineChart({
     const [interval, setInterval] = useState<RequestInterval>("month");
     const [duration, setDuration] = useState<RequestDuration>("oneYear");
     const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [labelInterval, setLabelInterval] = useState(0);
 
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setInterval(e.target.value as RequestInterval);
@@ -62,9 +65,36 @@ export default function SalesLineChart({
             interval: interval,
             duration: duration,
         } as ChartRequestBody)
-        setChartData(fetchedChartData);
-        
+        if (fetchedChartData && "chart_data" in fetchedChartData){
+            setChartData(fetchedChartData.chart_data as ChartData[]);
+        }
+        else {
+            window.location.href = "/org/stats";
+        }
     }
+
+
+    useEffect(() => {
+        const loadData = async () => {
+            await handleButtonClick();
+            setIsLoading(false);
+        }
+
+        loadData();
+    }, []);
+
+    if (chartData.length <= 0){
+        if (isLoading){
+            <LoadingMessage>Loading chart</LoadingMessage>
+        }
+        else {
+
+        }
+    }
+
+    useMemo(() => {
+        setLabelInterval(Math.max(Math.ceil((chartData.length / 20) - 1), 0));
+    }, [chartData]);
 
     return (
         <>
@@ -73,7 +103,7 @@ export default function SalesLineChart({
                     <ResponsiveContainer width="100%" height="70%">
                     <LineChart 
                         className="chart" 
-                        data={data}
+                        data={chartData}
                         margin={{ top: 10, right: 40, bottom: 30, left: 40 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -84,7 +114,41 @@ export default function SalesLineChart({
                                 offset: -20,
                                 style: { fill: "black", fontSize: "1.5rem" }
                             }}
-                            dataKey="interval" 
+                            dataKey="interval"
+                            tickFormatter={(tick) => 
+                                new Date(tick).toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" })
+                            }
+
+                            tick={({ x, y, payload, index }) => {
+                                const date = new Date(payload.value);
+                                const day = date.getUTCDate();
+                                const isFirst = index === 0;
+                                const isLast = index === chartData.length - 1;
+                                const isMonthStart = day === 1;
+
+                                const withMonth = isFirst || isLast || isMonthStart;
+                                let label;
+
+                                label = date.toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    timeZone: "UTC"
+                                });
+                            
+                            
+                                return (
+                                    <text
+                                        x={x}
+                                        y={y + 15}
+                                        textAnchor="middle"
+                                        // fontWeight={withMonth ? "bold" : "normal"}
+                                        style={{ fontSize: 14 }}
+                                    >
+                                        {label}
+                                    </text>
+                                );
+                            }}
+                            interval={labelInterval}
                         />
                         <YAxis 
                             label={{
@@ -95,8 +159,21 @@ export default function SalesLineChart({
                                 style: { fill: "black", fontSize: "1.5rem" }
                             }}
                         />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="sales" stroke="red" strokeWidth={2} />
+                        <Tooltip 
+                            labelFormatter={(label) => new Date(label).toLocaleDateString("en-CA", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                timeZone: "UTC",
+                            })}
+                            formatter={(value) => [`$${value}`, "Sales"]}
+                        />
+                        <Line 
+                            type="linear" 
+                            dataKey="sales" 
+                            stroke="red" 
+                            strokeWidth={2} 
+                        />
                     </LineChart>
                     </ResponsiveContainer>
 

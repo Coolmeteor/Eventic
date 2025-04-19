@@ -1,8 +1,9 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CSSProperties } from 'react';
 import DefaultButton from '../DefaultButton';
-import { DoWLabels } from '@/utils/statistics';
+import { ChartData, DoWLabels, FetchWeeklyChart } from '@/utils/statistics';
+import { LoadingMessage } from '../LoadingMessage';
 
 const data = [
     { DoW: "Mon", sales: 1234.55},
@@ -16,6 +17,39 @@ const data = [
 
 
 export default function WeeklyChart(){
+    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [retryCount, setRetryCount] = useState(0);
+
+    useEffect(() => {
+        const loadData = async () => {
+            const fetchedData = await FetchWeeklyChart();
+            if (fetchedData && "chart_data" in fetchedData){
+                setChartData(fetchedData.chart_data as ChartData[])
+                console.log("Weekly data:", fetchedData.chart_data);
+            }
+
+            setIsLoading(false);
+        }
+
+        loadData();
+    }, [retryCount]);
+
+
+    if (chartData.length === 0){
+        if(isLoading){
+            return <LoadingMessage>Loading daily chart data</LoadingMessage>
+        }
+        else {
+            if (retryCount < 3){
+                setTimeout(() => setRetryCount(retryCount + 1), 1000);
+                return <LoadingMessage>Try to reload...</LoadingMessage>
+            }
+            else {
+                
+            }
+        }
+    }
 
     return (
         <>
@@ -26,7 +60,7 @@ export default function WeeklyChart(){
                     <ResponsiveContainer width="100%" height="100%">
                     <LineChart 
                         className="chart" 
-                        data={data}
+                        data={chartData}
                         margin={{ top: 10, right: 5, bottom: 30, left: -10 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -37,7 +71,7 @@ export default function WeeklyChart(){
                                 offset: -20,
                                 style: { fill: "black", fontSize: "1.5rem" }
                             }}
-                            dataKey="DoW"
+                            dataKey="dow"
                         />
                         <YAxis 
                             tickFormatter={(value) => `$${value.toLocaleString()}`}
@@ -46,7 +80,12 @@ export default function WeeklyChart(){
                             formatter={(value) => `$${value.toLocaleString()}`}
                         />
                         
-                        <Line type="monotone" dataKey="sales" stroke="red" strokeWidth={2} />
+                        <Line 
+                            type="linear" 
+                            dataKey="sales" 
+                            stroke="red" 
+                            strokeWidth={2} 
+                        />
                     </LineChart>
                     </ResponsiveContainer>
                 </div>

@@ -1,50 +1,71 @@
-import json
-import time
+from flask import jsonify, request
 from db.db_connect import get_db_connection 
-from datetime import datetime  
+from datetime import datetime, timedelta, timezone
+import psycopg2.extras
+from .services import get_creator_id
+from flask_jwt_extended import ( decode_token,)
+from jwt import ExpiredSignatureError
+from dateutil.relativedelta import relativedelta
 
+def validate_token():
+    """
+    Validate an access token in cookie
+    """
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        print("Token Error")
+        return {"error": "Missing access token", "code": 401}
+    try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        return {"identity": identity, "code": 200}
+        
+    
+    except ExpiredSignatureError as e:
+        return {"error": 'Signiture has expired', "code": 401}
+    except Exception as e:
+        return {"error": f'JWT Error: {str(e)}', "code": 401}
+    
+    
 '''
 Get stats list
 '''
-def get_stats_list(email):
+def get_stats_list(identity):
     limitedLimit = 20
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    query = """
-        SELECT 
-        e.id, e.name, s.sold_num, s.rem_num, e.max_participants as total_num, s.date, s.sales, s.profit 
-        FROM events e, eventstats s, users u
-        WHERE e.id=s.event_id 
-        AND e.creator_id = u.id
-        AND u.email=%s 
-        AND u.is_org=true
-        ORDER BY s.date DESC
-    """
     
-    cursor.execute(query, (email,))
+    # Fetch creator_id from access_token
+    id = get_creator_id(identity)
+    if(id["code"] != 200):
+        return jsonify(id), id["code"]
+    creator_id = id["creator_id"]
+    
 
-    events = cursor.fetchall()
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            query = """
+                SELECT 
+                    e.id,
+                    e.name,
+                    e.start_date AS date,
+                    e.max_participants AS total_num,
+                    e.max_participants - e.current_participants AS rem_num,
+                    COALESCE(SUM(p.quantity), 0) AS sold_num,
+                    COALESCE(SUM(p.total_price), 0) AS sales,
+                    COALESCE(SUM(p.total_price), 0) AS profit
+                FROM events e
+                LEFT JOIN tickets t ON e.id = t.event_id
+                LEFT JOIN purchases p ON t.id = p.ticket_id
+                WHERE e.creator_id = %s
+                GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
+                ORDER BY e.start_date DESC;
+            """
+            
+            cursor.execute(query, (creator_id,))
 
-    event_list = []
-    for row in events:
-        event = dict(zip([desc[0] for desc in cursor.description], row))
+            stats = cursor.fetchall()
 
-        # 保留两位小数
-        event["sales"] = round(float(event["sales"]), 2)
-        event["profit"] = round(float(event["profit"]), 2)
-
-        # 转换 date 为时间戳（秒）
-        if isinstance(event["date"], datetime):
-            event["date"] = int(event["date"].timestamp())
-
-        event_list.append(event)
-
-    cursor.close()
-    conn.close()
-
-    return event_list
+    return stats
 
 def get_stats(stats_list):
     sold_num = 0
@@ -69,83 +90,21 @@ def get_stats(stats_list):
     }
 
 def get_daily_chart(email):
-    stats = get_stats_list(email)
-
-    hourly_sales = {hour: [0, 0] for hour in range(24)}
-    # calculate sales
-    for event in stats:
-        hour = event['date'].hour
-        sales = float(event['sales'])
-        
-        # add sales 
-        hourly_sales[hour][0] += sales
-        hourly_sales[hour][1] += 1  # event count
-
-    chart_data = []
-    for hour in range(24):
-        chart_data.append({'hour': hour, 'sales': round(hourly_sales[hour][0], 2)})
-    return chart_data
-
-def get_weekly_daily_chart(email):
-    stats = get_stats_list(email)
-
-    dow_sales = {
-        'Mon': [0, 0],
-        'Tue': [0, 0],
-        'Wed': [0, 0],
-        'Thu': [0, 0],
-        'Fri': [0, 0],
-        'Sat': [0, 0],
-        'Sun': [0, 0]
-    }
-    for event in stats:
-        # weekly date name
-        dow = event['date'].strftime('%a')
-        sales = float(event['sales'])
-        
-        # add sales 
-        dow_sales[dow][0] += sales
-        dow_sales[dow][1] += 1
-
-    # 生成 chart_data 列表
-    chart_data = []
-    for dow, (total_sales, event_count) in dow_sales.items():
-        chart_data.append({
-            'dow': dow,
-            'sales': round(total_sales, 2)
-        })
-    return chart_data
-
-def get_chart_data(email, start_date, interval):
-    # create SQL query to get chart data
-    if start_date:
-        start_date_clause = f"AND date >= '{start_date.isoformat()}'"
-    else:
-        start_date_clause = ""
-
-    if interval == 'day':
-        interval_clause = "date_trunc('day', date)"
-    elif interval == 'week':
-        interval_clause = "date_trunc('week', date)"
-    elif interval == 'month':
-        interval_clause = "date_trunc('month', date)"
-
-    sql = f"""
-    SELECT 
-        EXTRACT(EPOCH FROM {interval_clause}) * 1000 AS date,  -- 转换为毫秒级时间戳
-        SUM(sales) AS total_sales
-    FROM 
-        eventstats s, events e, users u
-    WHERE 
-        e.id=s.event_id 
-        AND e.creator_id = u.id
-        AND u.email=%s 
-        AND u.is_org=true
-        {start_date_clause}
-    GROUP BY 
-        {interval_clause}
-    ORDER BY 
-        {interval_clause};
+    """
+    Compute hourly sales based on purchase time for organizer's events.
+    """
+    sql = """
+        SELECT
+            DATE_PART('hour', p.purchase_date) AS hour,
+            SUM(p.total_price) AS total_sales
+        FROM purchases p
+        JOIN tickets t ON p.ticket_id = t.id
+        JOIN events e ON t.event_id = e.id
+        JOIN users u ON e.creator_id = u.id
+        WHERE
+            u.email = %s AND u.is_org = true
+        GROUP BY hour
+        ORDER BY hour;
     """
 
     conn = get_db_connection()
@@ -155,11 +114,147 @@ def get_chart_data(email, start_date, interval):
     cursor.close()
     conn.close()
 
-    # format results into a list 
-    res = []
-    for row in rows:
-        # Convert the timestamp from milliseconds to a datetime object
-        res.append([datetime.fromtimestamp(float(row[0]) / 1000.0), float(row[1])])
+    hourly_sales = {hour: 0 for hour in range(24)}
 
-    chart_data = [{"date": int(row[0].timestamp()), "sales": round(row[1], 2)} for row in res]
+    for row in rows:
+        hour = int(row[0])  # DATE_PART returns float
+        sales = float(row[1])
+        hourly_sales[hour] = round(sales, 2)
+
+    chart_data = [{"hour": hour, "sales": hourly_sales[hour]} for hour in range(24)]
     return chart_data
+
+def get_weekly_chart(email):
+    """
+    Compute total sales grouped by day of week (Mon - Sun)
+    """
+    sql = """
+        SELECT 
+            TO_CHAR(p.purchase_date, 'Dy') AS dow,
+            SUM(p.total_price) AS total_sales
+        FROM purchases p
+        JOIN tickets t ON p.ticket_id = t.id
+        JOIN events e ON t.event_id = e.id
+        JOIN users u ON e.creator_id = u.id
+        WHERE u.email = %s AND u.is_org = true
+        GROUP BY dow
+    """
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(sql, (email,))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+
+    dow_sales = {
+        'Mon': 0.0, 'Tue': 0.0, 'Wed': 0.0,
+        'Thu': 0.0, 'Fri': 0.0, 'Sat': 0.0, 'Sun': 0.0
+    }
+
+    for row in rows:
+        dow = row[0].strip()  # e.g., 'Mon'
+        sales = float(row[1])
+        if dow in dow_sales:
+            dow_sales[dow] = round(sales, 2)
+
+    chart_data = [{'dow': dow, 'sales': dow_sales[dow]} for dow in dow_sales]
+    return chart_data
+
+def get_chart_data(email, start_date, interval):
+    # create SQL query to get chart data
+    if start_date:
+        start_date = truncate_to_unit(start_date.replace(tzinfo=None), interval)
+        print(f'Start date: {start_date}')
+        start_date_clause = f"AND p.purchase_date >= '{start_date.isoformat()}'"
+    else:
+        start_date_clause = ""
+
+    if interval == 'day':
+        interval_clause = "date_trunc('day', p.purchase_date)"
+    elif interval == 'week':
+        interval_clause = "date_trunc('week', p.purchase_date)"
+    elif interval == 'month':
+        interval_clause = "date_trunc('month', p.purchase_date)"
+        
+    print(interval_clause)
+
+    sql =f"""
+        SELECT 
+            EXTRACT(EPOCH FROM {interval_clause}) * 1000 AS date,
+            SUM(p.total_price) AS total_sales
+        FROM purchases p
+        JOIN tickets t ON p.ticket_id = t.id
+        JOIN events e ON t.event_id = e.id
+        JOIN users u ON e.creator_id = u.id
+        WHERE 
+            u.email = %s
+            AND u.is_org = true
+            {start_date_clause}
+        GROUP BY {interval_clause}
+        ORDER BY {interval_clause};
+    """
+
+
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(sql, (email,))
+            rows = cursor.fetchall()
+
+    chart_data = [{"interval": int(row[0]), "sales": round(float(row[1]), 2)} for row in rows]
+    
+    
+    if start_date:
+        start_date = truncate_to_unit(start_date.replace(tzinfo=None), interval)
+        chart_data = fill_missing_intervals(chart_data, start_date, interval)
+    return chart_data
+
+def fill_missing_intervals(chart_data, start_date, interval):
+    """
+        Fill the data with no sales in chart data
+    """
+    
+    
+    data_dict = {
+        truncate_to_unit(datetime.fromtimestamp(int(round(d["interval"])) / 1000, tz=timezone.utc), interval): d["sales"]
+        for d in chart_data
+    }
+    
+    filled = []
+    
+    end = truncate_to_unit(datetime.now().replace(tzinfo=timezone.utc), interval)
+    current = truncate_to_unit(start_date.replace(tzinfo=timezone.utc), interval)
+    
+    
+
+    
+    while current <= end:
+        timestamp = int(current.timestamp() * 1000)
+        
+        sales = data_dict.get(current, 0.0)
+        filled.append({"interval": timestamp, "sales": round(sales, 2)})
+        
+        
+        if interval == "day":
+            current += timedelta(days=1)
+        elif interval == "week":
+            current += timedelta(weeks=1)
+        elif interval == "month":
+            current += relativedelta(months=1)
+        else:
+            raise ValueError("Invalid interval")
+    
+    return filled
+
+def truncate_to_unit(dt, unit):
+        if unit == "day":
+            return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif unit == "week":
+            return (dt - timedelta(days=dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        elif unit == "month":
+            return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        else:
+            raise ValueError("Invalid interval")
