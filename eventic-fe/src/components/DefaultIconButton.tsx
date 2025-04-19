@@ -56,6 +56,23 @@ export default function DefaultIconButton({title, icons=faPaperclip, iconSize="3
                 display: block;
                 margin-bottom: 20px;
             }
+
+            .small {
+                width: 150px;
+                height: 80px;
+
+                min-width: 120px;
+                min-height: 75px;
+
+                border: 3px solid var(--color-onPrimary);
+                border-radius: 15px;
+
+                margin: 10px;
+        
+                padding: 10px;
+
+                font-size:16px;
+            }
             `}</style>
             
         </>

@@ -23,6 +23,10 @@ const goToUpcomingEvents = () => {
     return;
 }
 
+const goToHistory = () => {
+    return;
+}
+
 const goToPaymentMethod = () => {
     return;
 }
@@ -85,7 +89,6 @@ export const organizerList = [
     {text: "Event analytics", onClick:goToAnalitics},
 ]
 
-
 // Customer
 export const profileList = [
     {text: "Edit personal information", onClick:goToEdit},
@@ -99,3 +102,8 @@ export const ticketList = [
     {text: "Ordered tickets", onClick:goToOrders}
 ]
 
+
+export const dashboardIcons = [
+    {label: "History", onClick:goToHistory, icon:faCalendarAlt},
+    {label: "Ordered tickets", onClick:goToOrders, icon:faTicket},
+]

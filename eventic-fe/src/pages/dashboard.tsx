@@ -1,10 +1,13 @@
-import DefaultButton from "@/components/DefaultButton";
+import DefaultIconButton from "@/components/DefaultIconButton";
 import { EventCard } from "@/components/EventCard";
+import { LoadingMessage } from "@/components/LoadingMessage";
 import { HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
 import Section from "@/components/Section";
 import { API, mockEvents } from "@/constants";
 import { EventData } from "@/constants";
 import { fetchProfile, User } from "@/utils/profile-api";
+import { dashboardIcons, managementIcons } from "@/utils/profile-page-mng";
+import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 
 
@@ -24,6 +27,9 @@ export default function Dashboard() {
 
 
     const [loading, setLoading] = useState(false)
+    const [loading1, setLoading1] = useState(false)
+    const [loading2, setLoading2] = useState(false)
+    const [loading3, setLoading3] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
 
@@ -34,7 +40,7 @@ export default function Dashboard() {
          */
     async function fetchYourEvents() {
         const fetchCount = 10
-        setLoading(true)
+        setLoading3(true)
         let fetchUrl = `${API}/event/recommendation/${fetchCount}`
 
 
@@ -61,13 +67,13 @@ export default function Dashboard() {
             setError((error as Error).message + ": " + (error as Error).name)
             console.error("Error in search request:", error)
         } finally {
-            setLoading(false)
+            setLoading3(false)
         }
     }
 
     async function fetchtNewEvents() {
 
-        setLoading(true)
+        setLoading1(true)
         let fetchUrl = `${API}/event/new_postings`
         try {
             // use data from, api
@@ -91,15 +97,16 @@ export default function Dashboard() {
             console.error("Error in search request:", error)
             setNewrEvents(mockEvents)
         } finally {
-            setLoading(false)
+            setLoading1(false)
         }
     }
 
     async function fetchtHappenSoonEvents() {
 
-        setLoading(true)
+
         let fetchUrl = `${API}/event/happening_soon`
         try {
+            setLoading2(true)
             // use data from, api
             console.log(`fetching event ${fetchUrl}`)
             let response = await fetch(fetchUrl)
@@ -121,7 +128,7 @@ export default function Dashboard() {
             console.error("Error in search request:", error)
             setHappenSoonEvents(mockEvents)
         } finally {
-            setLoading(false)
+            setLoading2(false)
         }
     }
 
@@ -134,6 +141,8 @@ export default function Dashboard() {
         const fetchEvent = async () => {
             try {
                 setLoading(true)
+                setLoading2(true)
+                setLoading3(true)
                 // Fetch user info
                 const loadUser = async () => {
                     const userData = await fetchProfile();
@@ -151,7 +160,7 @@ export default function Dashboard() {
             } catch (err) {
                 setError((err as Error).message)
             } finally {
-                setLoading(false)
+                // setLoading(false)
             }
         };
 
@@ -161,9 +170,21 @@ export default function Dashboard() {
     if (!user)
         return <h1 style={{ fontSize: "4rem", display: "block", textAlign: "center" }}>Loading...</h1>
 
+    let avalibleIcons: {
+        label: string;
+        onClick: () => void;
+        icon: IconDefinition;
+    }[] = []
+    avalibleIcons = avalibleIcons.concat(dashboardIcons)
+    if (isOrganizer) {
+        avalibleIcons = avalibleIcons.concat(managementIcons.filter((item) => item.label != "Payment Method"))
+
+    } else {
+        avalibleIcons = avalibleIcons.concat(managementIcons.filter((item) => (item.label !== "Payment Method" && item.label !== "Create New Event" && item.label !== "Manage Events" && item.label !== "Analytics")))
+    }
     return (
         <>
-            <Section fullWidth={true} usePadding={false}>
+            <Section fullWidth={true} usePadding={true}>
                 <h1>Dashboard</h1>
 
                 {/* <div className="top-header">
@@ -173,33 +194,11 @@ export default function Dashboard() {
                 <div className="main-content">
 
                     <div className="left">
-                        <h2>Recently posted</h2>
-                        <HorizontalScrollList>
-                            {newEvents.map((event) => (
-                                <li className="scroll-list">
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                        key={event.id} event={event} large={false} />
-                                </li>
-                            ))
-                            }
-                        </HorizontalScrollList>
-
-                        <h2>Happening soon</h2>
-                        <HorizontalScrollList>
-                            {happenSoonEvents.map((event) => (
-                                <li className="scroll-list">
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
-                                        key={event.id} event={event} large={false} />
-                                </li>
-                            ))
-                            }
-                        </HorizontalScrollList>
-
-
 
                         {isOrganizer && <h2>Your events</h2>}
                         {isOrganizer &&
                             <HorizontalScrollList>
+                                {loading3 && <LoadingMessage>Loading</LoadingMessage>}
                                 {yourEvents.map((event) => (
                                     <li className="scroll-list">
                                         <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
@@ -210,7 +209,31 @@ export default function Dashboard() {
                             </HorizontalScrollList>
                         }
 
+                        <h2>Recently posted</h2>
+                        <HorizontalScrollList>
+                            {loading1 && <LoadingMessage>Loading</LoadingMessage>}
+                            {newEvents.map((event) => (
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
+                            ))
+                            }
+                        </HorizontalScrollList>
 
+                        <h2>Happening soon</h2>
+
+                        <HorizontalScrollList>
+                            {loading2 && <LoadingMessage>Loading</LoadingMessage>}
+
+                            {happenSoonEvents.map((event) => (
+                                <li className="scroll-list">
+                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                        key={event.id} event={event} large={false} />
+                                </li>
+                            ))
+                            }
+                        </HorizontalScrollList>
 
 
                         <div className="spacer"></div>
@@ -219,11 +242,12 @@ export default function Dashboard() {
 
                     <div className="rsb">
                         {/*  put some extra stuff here */}
-                        <div className="action-buttons">
-                            <DefaultButton textColor="var(--color-primary)" onClick={() => window.location.href = "/event/create"}>Create new</DefaultButton>
-                            <DefaultButton textColor="var(--color-primary)" onClick={() => window.location.href = "/event"}>Something else</DefaultButton>
+                        <h2>Control center</h2>
+                        <div className="cc-button">
+                            {avalibleIcons.map((item) => (
+                                <DefaultIconButton title={item.label} icons={item.icon} iconSize="20px" onClick={item.onClick} className="small"></DefaultIconButton>
+                            ))}
                         </div>
-
                         <div className="spacer"></div>
 
                     </div>
@@ -292,16 +316,18 @@ h2 {
     gap: 1em;
 
     overflow-x: hidden;
-    
+    width: 100%;
 }
 
 
 
 
 .rsb {
-    min-width: 400px;
+    // max-width: 400px;
+    max-width: 200px;
     display: flex;
     flex-direction: column;
+    align-content: center;
     background-color: var(--color-background-mid);
 
     padding: 1em;
@@ -325,7 +351,12 @@ h2 {
     font-size: var(--font-size-body-L);
 }
 
-
+.cc-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
 
 .action-buttons {
     display: flex;
