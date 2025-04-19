@@ -186,18 +186,60 @@ def search_events(data):
     """ search events """
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
-            sort_direction = "DESC" if data["ascending"] == False else "ASC"
+            conditions = [sql.SQL("name ILIKE {name}").format(name=sql.Literal('%' + data["name"] + '%'))]
+            if "priceMin" in data and data["priceMin"]:
+                conditions.append(sql.SQL("pricing >= {min_price}").format(min_price=sql.Literal(data["priceMin"])))
+            if "priceMax" in data and data["priceMax"]:
+                conditions.append(sql.SQL("pricing <= {max_price}").format(max_price=sql.Literal(data["priceMax"])))
+            if "category" in data and data["category"]:
+                conditions.append(sql.SQL("category = {cat}").format(cat=sql.Literal(data["category"])))
             
-            query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
-                a=sql.Literal('%'+data["name"]+'%'), 
-                b=sql.Identifier(data["sortType"]),
-                c=sql.SQL(sort_direction)
+            where_clause = sql.SQL(" AND ").join(conditions)
+            
+            sort_direction = "DESC" if data["ascending"] == False else "ASC"
+            sort_type = sort_types[data["sortType"]]
+            
+            query = sql.SQL(
+                "SELECT * FROM events WHERE {where} ORDER BY {sort_col} {direction}"
+            ).format(
+                    where=where_clause,
+                    sort_col=sql.Identifier(sort_type),
+                    direction=sql.SQL(sort_direction)
             )
+            
             cursor.execute(query)
+            
             rows = cursor.fetchall()
+            
             column_names = [desc[0] for desc in cursor.description]
+            
             return [convert_to_dict(row, column_names) for row in rows]
+            # price_min, price_max = 0, 0
+            # category = ''
+            
+            # if data["priceMax"] and "priceMax" in data:
+            #     price_max = data["priceMax"]
+            # if data["priceMin"] and "priceMin" in data:
+            #     price_min = data["priceMin"]
+            # if data["category"] and "category" in data:
+            #     category = data["category"]
+            
+            # query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
+            #     a=sql.Literal('%'+data["name"]+'%'), 
+            #     b=sql.Identifier(sortType),
+            #     c=sql.SQL(sort_direction)
+            # )
+            
+            # cursor.execute(query)
+            # rows = cursor.fetchall()
+            # column_names = [desc[0] for desc in cursor.description]
+            # return [convert_to_dict(row, column_names) for row in rows]
     
+sort_types = {
+    "name": "name",
+    "price": "pricing",
+    "date": "created_at",
+}
 def convert_to_dict(row, column_names):
     return {column_names[i]: row[i] for i in range(len(column_names))}
     
