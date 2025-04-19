@@ -185,17 +185,21 @@ def delete_event(event_id):
 def search_events(data):
     """ search events """
     with get_db_connection() as conn:
-        cursor = conn.cursor()
-        sort_direction = "DESC"
-        query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
-            a=sql.Literal('%'+data["name"]+'%'), 
-            b=sql.Identifier(data["order"]),
-            c=sql.SQL(sort_direction)
-        )
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        column_names = [desc[0] for desc in cursor.description]
-        return [convert_to_dict(row, column_names) for row in rows]
+        with conn.cursor() as cursor:
+            sort_direction = "DESC" if data["ascending"] == False else "ASC"
+            
+            query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
+                a=sql.Literal('%'+data["name"]+'%'), 
+                b=sql.Identifier(data["sortType"]),
+                c=sql.SQL(sort_direction)
+            )
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            column_names = [desc[0] for desc in cursor.description]
+            return [convert_to_dict(row, column_names) for row in rows]
+    
+def convert_to_dict(row, column_names):
+    return {column_names[i]: row[i] for i in range(len(column_names))}
     
 def get_creator_id(identity):
     with get_db_connection() as conn:

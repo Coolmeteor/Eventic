@@ -64,7 +64,7 @@ export default function Event() {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(searchParams),
-                    mode: "no-cors"
+                    // mode: "no-cors"
                 })
             } else {
                 response = await fetch(fetchUrl)
