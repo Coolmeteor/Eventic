@@ -7,7 +7,7 @@ import ProfileLayout from "@/components/Layouts/ProfileLayout";
 import RightContainer from "@/components/Profile/RightContainer";
 
 export default function OrgEvents(){
-    const [events, SetEvents] = useState<EventData[]>([]);
+    const [events, SetEvents] = useState<EventData[] | null>(null);
 
 
     useEffect(() => {
@@ -17,6 +17,8 @@ export default function OrgEvents(){
             if(events && "events" in events){
                 console.log(events);
                 SetEvents(events.events);
+            } else {
+                SetEvents([]);
             }
         };
 
@@ -24,8 +26,11 @@ export default function OrgEvents(){
     }, []);
 
 
-    if(events.length == 0){
+    if(events == null){
         return <LoadingMessage>Loading</LoadingMessage>
+    }
+    if(events.length == 0){
+        return <p>No events found</p>
     }
 
     return (
