@@ -214,26 +214,6 @@ def search_events(data):
             column_names = [desc[0] for desc in cursor.description]
             
             return [convert_to_dict(row, column_names) for row in rows]
-            # price_min, price_max = 0, 0
-            # category = ''
-            
-            # if data["priceMax"] and "priceMax" in data:
-            #     price_max = data["priceMax"]
-            # if data["priceMin"] and "priceMin" in data:
-            #     price_min = data["priceMin"]
-            # if data["category"] and "category" in data:
-            #     category = data["category"]
-            
-            # query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
-            #     a=sql.Literal('%'+data["name"]+'%'), 
-            #     b=sql.Identifier(sortType),
-            #     c=sql.SQL(sort_direction)
-            # )
-            
-            # cursor.execute(query)
-            # rows = cursor.fetchall()
-            # column_names = [desc[0] for desc in cursor.description]
-            # return [convert_to_dict(row, column_names) for row in rows]
     
 sort_types = {
     "name": "name",
