@@ -75,6 +75,7 @@ export default function Event() {
 
             const data: EventData[] = await response.json()
             setEventData(data) // expect an array of data
+            setError(""); // Delete error message
 
 
             // use mock data instead
@@ -311,9 +312,9 @@ export default function Event() {
                                                 type="radio"
                                                 name="category"
                                                 value={category}
-                                                checked={eventData.length > 0 && eventData[0].category === category}
-                                                onChange={(e) => {
-
+                                                checked={searchParams.category === category}
+                                                onChange={() => {
+                                                    setSearchParams({ ...searchParams, category: category })
                                                 }
                                                 }
                                                 className="radio-input"
