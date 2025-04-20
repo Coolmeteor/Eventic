@@ -10,10 +10,16 @@ export interface User {
     user_name: string;
     email: string;
     phone: string;
-    data_of_birth: string;
+    date_of_birth: string;
     sex: string;
     is_org: boolean;
     avator: string;
+}
+
+export type Gender = "Male" | "Female" | "Other";
+export const genderValues: Gender[] = ["Male", "Female", "Other"];
+export function isValidGender(value: string): value is Gender {
+    return genderValues.some((g) => g === value);
 }
 
 interface SuccessResponse {
@@ -103,7 +109,9 @@ export async function changeRequest(
     }
 
     const data = await convertResponse(response);
+    setTimeout(() => {setErrorText("")}, 2000);
 
+    
     if(response.ok){
         console.log(data.message);
         setErrorText(data.message);

@@ -25,11 +25,31 @@ export default function Stats(){
 
     if(!user){
         if(loadingUser){
-            return <LoadingMessage>Loading user</LoadingMessage>;
+            return (
+                <>
+                    <LoadingMessage><p>Loading user</p></LoadingMessage>
+                    <style jsx>{`
+                    p {
+                        font-size: 2rem;
+                        margin: 2rem;
+                    }
+                    `}</style>
+                </>
+            )
         }
         else {
             setTimeout(() => { window.location.href = "/login"; }, 2000);
-            return <LoadingMessage>Redirecting to login page</LoadingMessage>;
+            return (
+                <>
+                    <LoadingMessage><p>Redirecting to login page</p></LoadingMessage>
+                    <style jsx>{`
+                    p {
+                        font-size: 2rem;
+                        margin: 2rem;
+                    }
+                    `}</style>
+                </>
+            );
         }
     }
 

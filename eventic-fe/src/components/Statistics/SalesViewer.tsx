@@ -53,40 +53,52 @@ export default function SalesViewer({
 
     return (
         <div className="viewer-container">
-            <h1 style={{fontSize: "var(--font-size-body-XXL)", fontWeight: 'bold'}}>Your Event Statistics</h1>
-            <div className="section">
-                <h2 className="label">&bull; Top Event by Sales</h2>
-                <TopEvents statsData={statsData}/>
-            </div>
-            <div className='section'>
-                <h2 className="label">&bull; Sales Chart</h2>
-                <div className="chart-container">
-                    <SalesChart 
-                        organizerId={organizerId}
-                    />
-                </div>
-            </div>
-            
-
-            <div className='section'>
-                <h2 className="label">&bull; Event Sales Table</h2>
-                <div className='table-container'>
-                    <EventTable statsData={statsData} totalStats={totalStats}/>
-                </div>
-            </div>
-            
-
-            <div className='section'>
-                <h2 className="label">&bull; Weekly & Daily chart</h2>
-                <div className="week-day-container">
-                    <div className='week-chart'>
-                        <WeeklyChart/>
+            {isLoading ? (
+                <LoadingMessage><p>Loading data</p></LoadingMessage>
+            ) : !totalStats || !statsData ? (
+                <LoadingMessage>
+                    <p>Failed to load data</p>
+                    <p>Reloading data</p>
+                </LoadingMessage>
+            ) : (
+                <>
+                    <h1 style={{fontSize: "var(--font-size-body-XXL)", fontWeight: 'bold'}}>Your Event Statistics</h1>
+                    <div className="section">
+                        <h2 className="label">&bull; Top Event by Sales</h2>
+                        <TopEvents statsData={statsData}/>
                     </div>
-                    <div className='day-chart'>
-                        <DailyChart/>
+                    <div className='section'>
+                        <h2 className="label">&bull; Sales Chart</h2>
+                        <div className="chart-container">
+                            <SalesChart 
+                                organizerId={organizerId}
+                            />
+                        </div>
                     </div>
-                </div>
-            </div>
+                    
+
+                    <div className='section'>
+                        <h2 className="label">&bull; Event Sales Table</h2>
+                        <div className='table-container'>
+                            <EventTable statsData={statsData} totalStats={totalStats}/>
+                        </div>
+                    </div>
+                    
+
+                    <div className='section'>
+                        <h2 className="label">&bull; Weekly & Daily chart</h2>
+                        <div className="week-day-container">
+                            <div className='week-chart'>
+                                <WeeklyChart/>
+                            </div>
+                            <div className='day-chart'>
+                                <DailyChart/>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+            
             
             
             
@@ -121,6 +133,11 @@ export default function SalesViewer({
             .label {
                 font-size: 2rem;
                 margin: 1rem;
+            }
+
+            p {
+                font-size: 2rem;
+                margin: 2rem;
             }
             `}</style>
         </div>

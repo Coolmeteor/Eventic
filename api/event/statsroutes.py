@@ -93,6 +93,9 @@ def get_weekly_daily_chart_req():
     
 @stats_bp.route("/get-events", methods=["GET"])
 def get_org_events_req():
+    """
+        Get all organizers event for stats purpose
+    """
     res = validate_token()
     if res["code"] != 200:
         return jsonify(res), res["code"]
@@ -131,3 +134,67 @@ def get_org_events_req():
         "message": "Events for the organizer fetched",
     }), 200
     
+@stats_bp.route("/get-upcoming-events", methods=["GET"])
+def get_org_upcoming_req():
+    """
+        Get all upcoming events(i.e. held within 1 month) by an organizer
+    """
+    res = validate_token()
+    if res["code"] != 200:
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            query = """
+                SELECT *
+                FROM events e
+                JOIN users u ON u.id = e.creator_id
+                WHERE u.email = %s
+                    AND e.start_date >= CURRENT_DATE
+                    AND e.start_date < CURRENT_DATE + INTERVAL '1 month';
+            """
+            
+            cursor.execute(query, (identity,))
+            
+            events = cursor.fetchall()
+            
+            if not events:
+                return jsonify({"error": f'No upcoming events found'}), 200
+            
+    return jsonify({
+        "events": events,
+        "message": "Upcoming events for the organizer fetched successfully",
+    }), 200
+    
+@stats_bp.route("/get-previous-events", methods=["GET"])
+def get_org_previous_req():
+    """
+        Get all previous events by an organizer
+    """
+    res = validate_token()
+    if res["code"] != 200:
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            query = """
+                SELECT *
+                FROM events e
+                JOIN users u ON u.id = e.creator_id
+                WHERE u.email = %s
+                    AND e.start_date < CURRENT_DATE;
+            """
+            
+            cursor.execute(query, (identity,))
+            
+            events = cursor.fetchall()
+            
+            if not events:
+                return jsonify({"error": f'No past events found'}), 200
+            
+    return jsonify({
+        "events": events,
+        "message": "Previous events for the organizer fetched successfully",
+    }), 200

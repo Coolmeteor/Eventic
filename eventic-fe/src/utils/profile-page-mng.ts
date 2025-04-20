@@ -36,11 +36,11 @@ const goToManageEvent = () => {
 }
 
 const goToOrgUpcoming = () => {
-    return;
+    window.location.href = "/org/upcoming";
 }
 
 const goToOrgPrevEvent = () => {
-    return;
+    window.location.href = "/org/previous";
 }
 
 const goToCreateEvent = () => {

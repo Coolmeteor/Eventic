@@ -153,8 +153,27 @@ export async function FetchWeeklyChart() {
     }
 }
 
-export async function FetchOrgEvents() {
-    const response = await fetch(`${API}/stats/get-events`, {
+export type OrgEventFetchParam = "all" | "upcoming" | "previous";
+
+export async function FetchOrgEvents(fetchParam: OrgEventFetchParam) {
+    const fetchBaseURL = `${API}/stats/`;
+    let endpoint;
+    switch(fetchParam){
+        case "all":
+            endpoint = "get-events";
+            break;
+        case "upcoming":
+            endpoint = "get-upcoming-events";
+            break;
+        case "previous":
+            endpoint = "get-previous-events";
+            break;
+        default:
+            console.error("FetchOrgEvents() param is invalid.");
+            break;
+    }
+
+    const response = await fetch(`${fetchBaseURL}${endpoint}`, {
         method: "GET",
         credentials: "include",
     });

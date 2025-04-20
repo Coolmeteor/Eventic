@@ -130,6 +130,106 @@ def change_name():
         return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Username update error: {str(e)}"}), 500
+    
+@profile_bp.route("/change-sex", methods=["PATCH"])
+def change_sex():
+    data = request.get_json()
+    new_sex = data.get("sex")
+    
+    if not new_sex:
+        return jsonify({"error": "New gender is needed"}), 400
+    
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
+    
+    try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
+        
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if user["sex"] == new_sex:
+                    return ({"error": f"New username cannot be the same as the current username"}), 400
+                
+                update_query = """
+                    UPDATE users
+                    SET sex = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_sex, identity))
+                conn.commit()
+                
+                # Re-fetch altered user
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                
+                
+        return jsonify({
+            "message": "Gender is updated",
+            "user": user
+        }), 200
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
+    except Exception as e:
+        return jsonify({"error": f"Gender update error: {str(e)}"}), 500
+    
+@profile_bp.route("/change-dob", methods=["PATCH"])
+def change_dob():
+    data = request.get_json()
+    new_dob = data.get("date_of_birth")
+    
+    if not new_dob:
+        return jsonify({"error": "New date of birth is needed"}), 400
+    
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
+    
+    try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
+        
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if user["date_of_birth"] == new_dob:
+                    return ({"error": f"New username cannot be the same as the current username"}), 400
+                
+                update_query = """
+                    UPDATE users
+                    SET date_of_birth = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_dob, identity))
+                conn.commit()
+                
+                # Re-fetch altered user
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                
+                
+        return jsonify({
+            "message": "Date of birth is updated",
+            "user": user
+        }), 200
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
+    except Exception as e:
+        return jsonify({"error": f"Date of birth update error: {str(e)}"}), 500
 
 # Change the password
 @profile_bp.route("/change-password", methods=["PATCH"])

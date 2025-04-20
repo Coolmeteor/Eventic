@@ -1,25 +1,32 @@
 import { useEffect, useState } from "react";
 import { EventCard } from "@/components/EventCard";
 import { EventData } from "@/constants";
-import { FetchOrgEvents } from "@/utils/statistics";
+import { FetchOrgEvents, OrgEventFetchParam } from "@/utils/statistics";
 import { LoadingMessage } from "@/components/LoadingMessage";
 import ProfileLayout from "@/components/Layouts/ProfileLayout";
 import RightContainer from "@/components/Profile/RightContainer";
 
-export default function OrgEvents(){
+type Props = {
+    fetchParam: OrgEventFetchParam;
+}
+export default function OrgEvents({
+    fetchParam="all",
+}: Props){
     const [events, SetEvents] = useState<EventData[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [messageContent, setMessageContent] = useState<React.ReactNode | null>(null);
 
 
     useEffect(() => {
         const loadData = async () => {
-            const events = await FetchOrgEvents();
+            const events = await FetchOrgEvents(fetchParam);
 
             if(events && "events" in events){
                 console.log(events);
                 SetEvents(events.events);
-            } else {
-                SetEvents([]);
             }
+            
+            setIsLoading(false);
         };
 
         loadData();
@@ -27,24 +34,35 @@ export default function OrgEvents(){
 
 
     if(events == null){
-        return <LoadingMessage>Loading</LoadingMessage>
-    }
-    if(events.length == 0){
-        return <p>No events found</p>
+        if (!isLoading) {
+            setTimeout(() => { window.location.href = "/org" }, 2000);
+            return;
+        }
     }
 
     return (
         <RightContainer pageName="Your events">
             <div className="event-container">
                 <h2>Your events</h2>
-                <div className="event-list">
-
-                    {events.map((event) => (
-                        <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
-                            key={event.id} event={event} large={false} />
-                    ))
-                    }
-                </div>
+                {isLoading ? (
+                    <LoadingMessage>
+                        <p>Loading</p>
+                    </LoadingMessage>
+                ) : events == null ? (
+                    <LoadingMessage>
+                        <p>Redirecting to home</p>
+                    </LoadingMessage>
+                ) : events?.length ? (
+                    <div className="event-list">
+                        {events.map((event) => (
+                            <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                key={event.id} event={event} large={false} />
+                        ))
+                        }
+                    </div>
+                ) : (
+                    <p>No events found</p>
+                )}
             </div>
 
             <style jsx>{`
@@ -69,6 +87,11 @@ export default function OrgEvents(){
                 align-items: top;
                 width: 100%;
                 padding: 1em;
+            }
+
+            p {
+                font-size: 2rem;
+                margin: 2rem;
             }
             `}</style>
             
