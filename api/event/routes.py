@@ -71,14 +71,14 @@ def delete_event_route(event_id):
         return jsonify({"message": "delete "}), 200
     return jsonify({"error": "cant find"}), 404
 
-@event_bp.route("/search", methods=["GET"])
+@event_bp.route("/search", methods=["POST"])
 def search():
     """ filter events """
     data = request.json
     if 'name' not in data:
         data['name'] = ''
-    if 'order' not in data:
-        data['order'] = 'created_at'
+    if 'sortType' not in data:
+        data['sortType'] = 'created_at'
 
     return jsonify(search_events(data)), 200
 
