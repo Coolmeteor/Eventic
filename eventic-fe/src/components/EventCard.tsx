@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendar, faLocationArrow, faSquarePersonConfined, } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faDollar, faLocationArrow, faSquarePersonConfined, } from '@fortawesome/free-solid-svg-icons'
 import {  EventData } from '@/constants'
 import DefaultButton from './DefaultButton'
 
@@ -45,6 +45,11 @@ export function EventCard({ large = false, event, btn }: Props) {
                             <p>{new Date(event.start_date).toLocaleDateString()} — {new Date(event.start_date).toLocaleDateString()}</p>
 
                         </div>
+                        <div className="date-text">
+                            <FontAwesomeIcon icon={faDollar} />
+                            <p>{event.pricing}</p>
+                        </div>
+                        <div className='spacer'></div>
 
 
                         <p className='event-desc'>{event.description}</p>
@@ -62,6 +67,9 @@ export function EventCard({ large = false, event, btn }: Props) {
 
             <style jsx>
                 {`
+                .spacer {
+                 height: 8px;
+                }
                 .icon {
                     {/* width: 60px;
                     height: 40px; */}
@@ -97,7 +105,7 @@ export function EventCard({ large = false, event, btn }: Props) {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    padding: 20px 20px 10px 20px;
+                    padding: 12px 20px 10px 20px;
 
                     width: 100%;
                     height: 50%;
@@ -189,7 +197,7 @@ export function EventCard({ large = false, event, btn }: Props) {
                     display: flex;
                     flex-direction: row;
                 
-                    padding: 1em 1em 1em 0.5em;
+                    padding: 0.2em 0.5em 0.2em 0.5em;
 
                     align-self: start;
                 }
