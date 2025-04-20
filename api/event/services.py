@@ -197,7 +197,11 @@ def search_events(data):
             where_clause = sql.SQL(" AND ").join(conditions)
             
             sort_direction = "DESC" if data["ascending"] == False else "ASC"
-            sort_type = sort_types[data["sortType"]]
+            sort_type_Filter = data["sortType"]
+            if sort_type_Filter == "proximity":
+                sort_type = "name"
+            else:
+                sort_type = sort_types[data["sortType"]]
             
             query = sql.SQL(
                 "SELECT * FROM events WHERE {where} ORDER BY {sort_col} {direction}"
