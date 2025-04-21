@@ -51,7 +51,7 @@ export default function DoBChangeFormBox({
                             <input
                                 type="date"
                                 name="dob"
-                                value={birthdate}
+                                value={birthdate && new Date(birthdate).toISOString().split("T")[0]}
                                 onChange={(e) => setBirthdate(e.target.value)}
                             />
                         </label>
