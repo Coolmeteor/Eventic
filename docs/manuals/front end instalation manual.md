@@ -14,9 +14,10 @@ Eventic is build with React and Next, and this requires NodeJS and such dependen
 
 For `.env` file:
 ```
-NEXT_PUBLIC_API_HOST=127.0.0.1
-NEXT_PUBLIC_API_PORT=5000
-NEXT_PUBLIC_DEV_MODE=false
+NEXT_PUBLIC_API_HOST=127.0.0.1          # api host ip address or domain 
+NEXT_PUBLIC_API_PORT=5000               # api host port 
+NEXT_PUBLIC_DEV_MODE=false              # enable event id display
+NEXT_PUBLIC_ENABLE_MOCK_EVENTS=true     # enable mock events replacing events with id 100-102
 ```
 NOTE: This configures the specifies the url for the backend server only. To configure the web server's IP and port, see "Changing server host IP address and port" below.
 
