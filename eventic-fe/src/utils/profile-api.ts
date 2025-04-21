@@ -160,7 +160,7 @@ export async function fetchOrders(){
 }
 
 export async function fetchUpcomingOrders(){
-    let response = await fetch(`${API}/profile/upcoming-tickets`, {
+    let response = await fetch(`${API}/profile/upcomoing-tickets`, {
         "method": "GET",
         "credentials": "include",
     });

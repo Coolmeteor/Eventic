@@ -159,6 +159,9 @@ def update_event(event_id, data):
     """ 更新事件 """
     with get_db_connection() as conn:
         cursor = conn.cursor()
+        
+        start_dt = datetime.fromtimestamp(data["start_date"] / 1000)
+        end_dt = datetime.fromtimestamp(data["end_date"] / 1000)
         cursor.execute("""
             UPDATE events
             SET name = %s, description = %s, media = %s, tags = %s, category = %s, start_date = %s,
@@ -166,10 +169,10 @@ def update_event(event_id, data):
                 visibility = %s, max_participants = %s, pricing = %s, updated_at = %s
             WHERE id = %s
         """, (
-            data["name"], data["description"], json.dumps(data["media"]), json.dumps(data["tags"]),
-            data["category"], data["start_date"], data["end_date"], data["location_string"],
+            data["name"], data["description"], data["media"], data["tags"],
+            data["category"], start_dt, end_dt, data["location_string"],
             data["location_long"], data["location_lat"], data["visibility"],
-            data["max_participants"], data["pricing"], int(time.time()), event_id
+            data["max_participants"], data["pricing"], datetime.now(), event_id
         ))
         conn.commit()
         return cursor.rowcount > 0

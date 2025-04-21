@@ -2,15 +2,26 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from db.db_connect import get_db_connection
 import psycopg2.extras
+from .services import *
 
 payment_bp = Blueprint("payment", __name__)
 
 # Save payment function, exposed as an API endpoint
-@payment_bp.route("/save-payment", methods=["POST"])
-@jwt_required()
+@payment_bp.route("/create-payment", methods=["POST"])
 def save_payment_route():
     data = request.get_json()
-    user_id = data.get("user_id")
+    
+    res = validate_token()
+    if(res["code"] != 200):
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    # Fetch user_id from access_token
+    id = get_user_id(identity)
+    if(id["code"] != 200):
+        return jsonify(id), id["code"]
+    user_id = id["user_id"]
+    
     ticket_id = data.get("ticket_id")
     
     if not user_id or not ticket_id:
@@ -19,8 +30,8 @@ def save_payment_route():
     try:
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                sql = 'INSERT INTO payments (user_id, ticket_id, status) VALUES (%s, %s, %s) RETURNING id'
-                cursor.execute(sql, (user_id, ticket_id, 'registered'))
+                sql = 'INSERT INTO payments (user_id, ticket_id) VALUES (%s, %s) RETURNING id'
+                cursor.execute(sql, (user_id, ticket_id))
                 last_row_id = cursor.fetchone()["id"]
                 conn.commit()
 

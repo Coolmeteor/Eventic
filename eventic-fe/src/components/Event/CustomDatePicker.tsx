@@ -6,12 +6,16 @@ import dynamic from 'next/dynamic';
 
 
 type Props = {
+    initialStartDate?: number,
+    initialEndDate?: number,
     setDate: (dates: [number, number]) => void
 }
 
 
 export function CustomDatePicker({
-    setDate
+    initialStartDate,
+    initialEndDate,
+    setDate,
 }: Props) {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
@@ -36,6 +40,16 @@ export function CustomDatePicker({
             setDate([startDate.getTime(), date.getTime()]);
         }
     }
+
+    useEffect( () => {
+        if(initialStartDate){
+            setStartDate(new Date(initialStartDate));
+        }
+
+        if (initialEndDate) {
+            setEndDate(new Date(initialEndDate));
+        }
+    }, [initialStartDate, initialEndDate])
 
     const today = new Date();
 

@@ -56,7 +56,7 @@ def get_event_route(event_id):
     else:
         return jsonify({"error": "not found"}), 404
     
-@event_bp.route("/events/<int:event_id>", methods=["PUT"])
+@event_bp.route("/update/<int:event_id>", methods=["PUT"])
 def update_event_route(event_id):
     """ 更新事件 """
     data = request.json

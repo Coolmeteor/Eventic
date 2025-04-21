@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Gallery from "./Gallery";
 import GalleryImage from "./GalleryImage";
 
@@ -52,6 +52,12 @@ export default function MediaUploadBox({ images, setImages }: ImageDropBoxProps)
 
         event.target.value = ""; // i want to say many curse words about this.
     };
+
+    useEffect(() => {
+        if (images == undefined || !images){
+            setImages([]);
+        }
+    }, [])
 
     return (
         <>

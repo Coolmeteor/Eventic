@@ -16,7 +16,6 @@ export default function OrgEvents({
 }: Props){
     const [events, SetEvents] = useState<EventData[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [messageContent, setMessageContent] = useState<React.ReactNode | null>(null);
     const [isOrg, setIsOrg] = useState(true);
 
     // Check permission status
@@ -107,13 +106,14 @@ export default function OrgEvents({
             .event-list {
                 display: flex;
                 flex-direction: row;
-                // flex-wrap: scroll;
+                flex-wrap: wrap;
                 
-                gap: 1em;
-                justify-content: left;
-                align-items: top;
+                gap: 2em;
+                justify-content: space-evenly;
+                align-items: flex-start;
                 width: 100%;
                 padding: 1em;
+                border: 3px solid black;
             }
 
             .error-text {

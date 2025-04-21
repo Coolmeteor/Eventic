@@ -49,10 +49,10 @@ def get_stats_list(identity):
                     e.name,
                     e.start_date AS date,
                     e.max_participants AS total_num,
-                    e.max_participants - e.current_participants AS rem_num,
+                    e.max_participants - COALESCE(SUM(p.quantity), 0) AS rem_num,
                     COALESCE(SUM(p.quantity), 0) AS sold_num,
                     COALESCE(SUM(p.total_price), 0) AS sales,
-                    COALESCE(SUM(p.total_price), 0) AS profit
+                    ROUND(COALESCE(SUM(p.total_price), 0) * 0.9, 2) AS profit
                 FROM events e
                 LEFT JOIN tickets t ON e.id = t.event_id
                 LEFT JOIN purchases p ON t.id = p.ticket_id
@@ -166,7 +166,6 @@ def get_chart_data(email, start_date, interval):
     # create SQL query to get chart data
     if start_date:
         start_date = truncate_to_unit(start_date.replace(tzinfo=None), interval)
-        print(f'Start date: {start_date}')
         start_date_clause = f"AND p.purchase_date >= '{start_date.isoformat()}'"
     else:
         start_date_clause = ""
@@ -178,7 +177,6 @@ def get_chart_data(email, start_date, interval):
     elif interval == 'month':
         interval_clause = "date_trunc('month', p.purchase_date)"
         
-    print(interval_clause)
 
     sql =f"""
         SELECT 
