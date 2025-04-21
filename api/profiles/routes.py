@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 from jwt import ExpiredSignatureError
 import psycopg2.extras
 from db.db_connect import get_db_connection
-from .services import get_orders_by_token
+from .services import get_orders_by_token, get_upcoming_orders_by_token
 from exceptions import UserIdNotFoundFromTokenError
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
@@ -454,6 +454,25 @@ def get_orders():
     # Get purchases using user id
     try:
         data = get_orders_by_token(access_token)
+    except UserIdNotFoundFromTokenError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f'Internal Error: {str(e)}'}), 500
+    
+    return jsonify(data), 200
+
+@profile_bp.route("/upcomoing-tickets", methods=["GET"])
+def get_upcoming_req():
+    try:
+        verify_jwt_in_request()
+    except NoAuthorizationError:
+        return jsonify({"error": 'Invalid access_token'}), 401
+    
+    access_token = request.cookies.get("access_token")
+    
+    # Get purchases using user id
+    try:
+        data = get_upcoming_orders_by_token(access_token)
     except UserIdNotFoundFromTokenError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:

@@ -1,11 +1,11 @@
 import ProfileLayout from "@/components/Layouts/ProfileLayout"
 import RightContainer from "@/components/Profile/RightContainer";
 import { useEffect, useState } from "react";
-import { User, fetchProfile, fetchOrders } from "@/utils/profile-api";
+import { User, fetchProfile, fetchUpcomingOrders } from "@/utils/profile-api";
 import { Ticket, Purchase } from "@/utils/tickest_purchases";
 import OrderCard from "@/components/Profile/Order/OrderCard";
 
-export default function Orders(){
+export default function UpcomingOrders(){
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [purchases, setPurchases] = useState<Purchase[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -20,7 +20,7 @@ export default function Orders(){
             }
         });
 
-        fetchOrders()
+        fetchUpcomingOrders()
         .then((data) => {
             if(data && "tickets" in data && "purchases" in data){
                 setTickets(data.tickets);
@@ -44,11 +44,11 @@ export default function Orders(){
 
     return (
         <>
-            <RightContainer pageName="Your Orders">
+            <RightContainer pageName="Your Upcoming Tickets">
                 <div className="order-container">
-                    <h1 className="listLabel">Ordered Tickets</h1>
+                    <h1 className="listLabel">Upcoming Tickets</h1>
                     { !isLoading && purchases.length==0? (
-                        <h1 className="no-order-text">You have no orders.</h1>
+                        <h1 className="no-order-text">You have no upcoming tickets.</h1>
                     ) : (
                         <div className="order-list">
                             {tickets.map((ticket, index) => {
@@ -91,6 +91,6 @@ export default function Orders(){
     );
 }
 
-Orders.getLayout = function getLayout(page: React.ReactNode){
+UpcomingOrders.getLayout = function getLayout(page: React.ReactNode){
     return <ProfileLayout>{page}</ProfileLayout>
 }

@@ -5,6 +5,8 @@ import { FetchOrgEvents, OrgEventFetchParam } from "@/utils/statistics";
 import { LoadingMessage } from "@/components/LoadingMessage";
 import ProfileLayout from "@/components/Layouts/ProfileLayout";
 import RightContainer from "@/components/Profile/RightContainer";
+import { fetchProfile } from "@/utils/profile-api";
+import { Forbidden } from "@/components/Forbidden";
 
 type Props = {
     fetchParam: OrgEventFetchParam;
@@ -15,6 +17,20 @@ export default function OrgEvents({
     const [events, SetEvents] = useState<EventData[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [messageContent, setMessageContent] = useState<React.ReactNode | null>(null);
+    const [isOrg, setIsOrg] = useState(true);
+
+    // Check permission status
+    useEffect(() => {
+        fetchProfile()
+                .then((userData) => {
+                    if(userData && "user" in userData){
+                        setIsOrg(userData.user.is_org);
+                    }
+                    else {
+                        window.location.href = '/';
+                    }
+                });
+    }, [])
 
 
     useEffect(() => {
@@ -35,8 +51,7 @@ export default function OrgEvents({
 
     if(events == null){
         if (!isLoading) {
-            setTimeout(() => { window.location.href = "/org" }, 2000);
-            return;
+            setTimeout(() => { window.location.href = "/" }, 2000);
         }
     }
 
@@ -44,14 +59,26 @@ export default function OrgEvents({
         <RightContainer pageName="Your events">
             <div className="event-container">
                 <h2>Your events</h2>
-                {isLoading ? (
-                    <LoadingMessage>
-                        <p>Loading</p>
-                    </LoadingMessage>
+                {!isOrg ? (
+                    <div className='error-text'>
+                        <Forbidden/>
+                        <LoadingMessage>
+                            Redirecting to home
+                        </LoadingMessage>
+                    </div>
+                ) : isLoading ? (
+                    <div className='error-text'>
+                        <LoadingMessage>
+                            Loading
+                        </LoadingMessage>
+                    </div>
                 ) : events == null ? (
-                    <LoadingMessage>
-                        <p>Redirecting to home</p>
-                    </LoadingMessage>
+                    <div className='error-text'>
+                        <LoadingMessage>
+                            Redirecting to home
+                        </LoadingMessage>
+                    </div>
+                    
                 ) : events?.length ? (
                     <div className="event-list">
                         {events.map((event) => (
@@ -87,6 +114,13 @@ export default function OrgEvents({
                 align-items: top;
                 width: 100%;
                 padding: 1em;
+            }
+
+            .error-text {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
 
             p {
