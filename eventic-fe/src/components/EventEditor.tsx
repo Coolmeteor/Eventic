@@ -66,7 +66,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                     visibility: "private",
                     max_participants: 0,
-                    currentParticipants: 0,
+                    current_participants: 0,
                     pricing: 0,
 
                     creator_id: 1,

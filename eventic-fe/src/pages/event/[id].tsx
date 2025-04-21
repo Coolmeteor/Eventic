@@ -161,7 +161,7 @@ export default function Event() {
                                     <h2>Ticket Details</h2>
                                     <p>Price: ${eventData.pricing}</p>
                                     <p>Max Participants: {eventData.max_participants}</p>
-                                    <p>Current Participants: {eventData.currentParticipants}</p>
+                                    <p>Current Participants: {eventData.current_participants}</p>
                                 </div>
 
                                 <div className="organizer-detail">

@@ -56,12 +56,12 @@ def get_stats_list(identity):
                 FROM events e
                 LEFT JOIN tickets t ON e.id = t.event_id
                 LEFT JOIN purchases p ON t.id = p.ticket_id
-                WHERE e.creator_id = %s
+                WHERE e.creator_id = %s AND t.is_valid = %s
                 GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
                 ORDER BY e.start_date DESC;
             """
             
-            cursor.execute(query, (creator_id,))
+            cursor.execute(query, (creator_id, True,))
 
             stats = cursor.fetchall()
 

@@ -131,7 +131,7 @@ def validate():
     '''
         Validate QR
         - Example url 
-        ${API}/ticket/validate?qr={qr_value}
+        ${API}/ticket/validate?qr={qr_value}&event_id={event_id}
         - Example request body
         {
             method: "GET",
@@ -140,25 +140,40 @@ def validate():
         
     '''
     read_qr = request.args.get("qr")
+    event_id = request.args.get("event_id")
+    
+    if event_id is None:
+        return jsonify({"error": "Missing event_id"}), 400
+    try:
+        event_id = int(event_id)
+    except ValueError:
+        return jsonify({"error": "Invalid event_id"}), 400
     
     try:
         with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 query = """
-                    SELECT tickets.id
+                    SELECT *
                     FROM tickets
                 """
                 cursor.execute(query)
-                tickets_id = cursor.fetchall()
+                tickets = cursor.fetchall()
                 
-                for id in tickets_id:
+                for ticket in tickets:
                     # Generate hashed id to validate
-                    valid_hashed_id = hashlib.sha256(str(id[0]).encode()).hexdigest()
+                    valid_hashed_id = hashlib.sha256(str(ticket["id"]).encode()).hexdigest()
                     short_valid_hashed = valid_hashed_id[:10]
+                    print(f'Valid: {short_valid_hashed}, read: {read_qr}')
                     if short_valid_hashed == read_qr:
-                        return jsonify({
-                            "message": "Ticket is valid",
-                        }) , 200
+                        print(f'Event id: {ticket["event_id"]}, Input: {event_id}')
+                        if event_id == ticket["event_id"]:
+                            return jsonify({
+                                "message": "Ticket is valid",
+                            }) , 200
+                        else:
+                            return jsonify({
+                                "error": "This ticket is not for chosen event",
+                            }), 403
                 # If there is no matching ticket id
                 return jsonify({
                     "message": "Ticket is invalid",

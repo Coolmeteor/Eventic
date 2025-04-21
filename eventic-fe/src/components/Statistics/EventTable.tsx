@@ -110,7 +110,8 @@ export default function EventTable({
                     </tr>
                 </thead>
                 <tbody className="table-body">
-                    {sortedData.map((data) => (
+                    {sortedData.map((data, index) => (
+                        index < 10 &&   // Show only 10 events stats
                         <tr>
                             {labels.map(({ key }) => (
                                 <td 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { EventCard } from "@/components/EventCard";
 import { EventData } from "@/constants";
 import { FetchOrgEvents, OrgEventFetchParam } from "@/utils/statistics";
@@ -17,6 +17,9 @@ export default function OrgEvents({
     const [events, SetEvents] = useState<EventData[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isOrg, setIsOrg] = useState(true);
+
+    
+
 
     // Check permission status
     useEffect(() => {
@@ -54,6 +57,43 @@ export default function OrgEvents({
         }
     }
 
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 10;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentEvents = events?.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = events ? Math.ceil(events.length / itemsPerPage) : 0;
+    
+    
+    const pageButtons = useMemo(() => {
+        const maxVisibleButtons = 5;
+        const buttons: (number | string)[] = [];
+
+        const half = Math.floor(maxVisibleButtons / 2);
+        let start = Math.max(currentPage - half, 1);
+        let end = Math.min(start + maxVisibleButtons - 1, totalPages);
+
+        if (end - start + 1 < maxVisibleButtons) {
+            start = Math.max(end - maxVisibleButtons + 1, 1);
+        }
+
+        if (start > 1) {
+            buttons.push(1);
+            if (start > 2) buttons.push("...");
+        }
+
+        for (let i = start; i <= end; i++) {
+            buttons.push(i);
+        }
+
+        if (end < totalPages) {
+            if (end < totalPages - 1) buttons.push("...");
+            buttons.push(totalPages);
+        }
+        
+        return buttons;
+    }, [currentPage, events?.length]);
+
     return (
         <RightContainer pageName="Your events">
             <div className="event-container">
@@ -78,13 +118,44 @@ export default function OrgEvents({
                         </LoadingMessage>
                     </div>
                     
-                ) : events?.length ? (
-                    <div className="event-list">
-                        {events.map((event) => (
-                            <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
-                                key={event.id} event={event} large={false} />
-                        ))
-                        }
+                ) : events?.length && currentEvents?.length ? (
+                    <div>
+                        <div className="pagination">
+                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(1)}>
+                                &laquo;
+                            </button>
+                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+                                &lt;
+                            </button>
+
+                            {pageButtons.map((btn, index) => (
+                                typeof btn === "number" ? (
+                                <button
+                                    key={index}
+                                    className={currentPage === btn ? "active" : ""}
+                                    onClick={() => setCurrentPage(btn)}
+                                >
+                                    {btn}
+                                </button>
+                                ) : (
+                                <span key={index} className="ellipsis">...</span>
+                                )
+                            ))}
+
+                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+                                &gt;
+                            </button>
+                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(totalPages)}>
+                                &raquo;
+                            </button>
+                        </div>
+                        <div className="event-list">
+                            {currentEvents.map((event) => (
+                                <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                    key={event.id} event={event} large={false} />
+                            ))
+                            }
+                        </div>
                     </div>
                 ) : (
                     <p>No events found</p>
@@ -113,7 +184,6 @@ export default function OrgEvents({
                 align-items: flex-start;
                 width: 100%;
                 padding: 1em;
-                border: 3px solid black;
             }
 
             .error-text {
@@ -126,6 +196,29 @@ export default function OrgEvents({
             p {
                 font-size: 2rem;
                 margin: 2rem;
+            }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                margin: 1rem;
+            }
+            .pagination button {
+                font-size: 1rem;
+                padding: 0.4rem 0.8rem;
+                border: none;
+                border-radius: 5px;
+                background-color: #ddd;
+                cursor: pointer;
+            }
+            .pagination button.active {
+                background-color: #0070f3;
+                color: white;
+            }
+            .pagination button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
             `}</style>
             

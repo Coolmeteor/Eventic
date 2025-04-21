@@ -120,6 +120,7 @@ def get_org_events_req():
                 SELECT *
                 FROM events
                 WHERE creator_id = %s
+                ORDER BY start_date ASC;
             """    
             
             cursor.execute(eventQuery, (creator_id,))
@@ -147,12 +148,13 @@ def get_org_upcoming_req():
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
             query = """
-                SELECT *
+                SELECT e.*
                 FROM events e
                 JOIN users u ON u.id = e.creator_id
                 WHERE u.email = %s
                     AND e.start_date >= CURRENT_DATE
-                    AND e.start_date < CURRENT_DATE + INTERVAL '1 month';
+                    AND e.start_date < CURRENT_DATE + INTERVAL '1 month'
+                ORDER BY e.start_date ASC;
             """
             
             cursor.execute(query, (identity,))
@@ -180,11 +182,12 @@ def get_org_previous_req():
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
             query = """
-                SELECT *
+                SELECT e.*
                 FROM events e
                 JOIN users u ON u.id = e.creator_id
                 WHERE u.email = %s
-                    AND e.start_date < CURRENT_DATE;
+                    AND e.start_date < CURRENT_DATE
+                ORDER BY e.start_date ASC;
             """
             
             cursor.execute(query, (identity,))

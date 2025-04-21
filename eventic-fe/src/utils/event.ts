@@ -75,3 +75,62 @@ export async function fetchTicketEvent(ticket_id: number){
         return;
     }
 }
+
+export async function fetchAddCart(event_id: number, quantity: number, unit_price: number) {
+    const fetchUrl = `${API}/payment/cart/add`
+    const fecthBody = {
+        "event_id": event_id,
+        "quantity": quantity,
+        "unit_price": unit_price,
+    }
+
+    const response = await fetch(fetchUrl, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fecthBody),
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok){
+        console.log(data.message);
+    }
+    else {
+        console.log(data.error | data.msg | data);
+    }
+}
+
+export async function fetchDeleteCart() {
+    const response = await fetch(`${API}/payment/cart/delete`,{
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok){
+        console.log(data.message);
+        return true;
+    } else {
+        console.log(data.error | data.msg | data);
+        return false;
+    }
+}
+
+export async function fetchCartItems() {
+    const response = await fetch(`${API}/payment/cart`,{
+        method: "GET",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok){
+        console.log(data.message);
+        return data;
+    } else {
+        console.log(data.error | data.msg | data);
+        return undefined;
+    }
+}

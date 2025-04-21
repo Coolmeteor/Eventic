@@ -55,7 +55,7 @@ export type EventData = {
 
     visibility: string; // private, public
     max_participants: number;
-    currentParticipants: number;
+    current_participants: number;
     pricing: number;
 
     creator_id: number;
@@ -88,7 +88,7 @@ export const mockEvents: EventData[] = [
 
         visibility: "public",
         max_participants: 500,
-        currentParticipants: 320,
+        current_participants: 320,
         pricing: 99.99,
 
         creator_id: 1,
@@ -114,7 +114,7 @@ export const mockEvents: EventData[] = [
 
         visibility: "public",
         max_participants: 300,
-        currentParticipants: 250,
+        current_participants: 250,
         pricing: 49.99,
 
         creator_id: 1,
@@ -140,7 +140,7 @@ export const mockEvents: EventData[] = [
 
         visibility: "private",
         max_participants: 100,
-        currentParticipants: 75,
+        current_participants: 75,
         pricing: 0,
 
         creator_id: 1,

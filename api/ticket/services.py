@@ -1,10 +1,8 @@
 from flask import jsonify, request
 from db.db_connect import get_db_connection 
-from datetime import datetime, timedelta, timezone
 import psycopg2.extras
 from flask_jwt_extended import ( decode_token,)
 from jwt import ExpiredSignatureError
-from dateutil.relativedelta import relativedelta
 
 def validate_token():
     """

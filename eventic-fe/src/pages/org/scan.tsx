@@ -1,0 +1,134 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { API, EventData } from '@/constants';
+import { FetchOrgEvents } from '@/utils/statistics';
+import { LoadingMessage } from '@/components/LoadingMessage';
+
+
+export default function ScanPage(){
+    const [message, SetMessage] = useState("");
+    const eventIdRef = useRef<number>(-1);
+    const [events, setEvents] = useState<EventData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selected, setSelected] = useState("");
+
+    const validation_request = async (text: string, id: number) => {
+        const response = await fetch(`${API}/ticket/validate?qr=${text}&event_id=${id}`);
+        if(response.ok) {
+            console.log("QR is valid");
+            SetMessage("Valid ticket.");
+        }
+        else {
+            console.error(response);
+            SetMessage("This is INVALID ticket.");
+        }
+    }
+
+    useEffect(() => {
+        const loadData = async () => {
+            const events = await FetchOrgEvents("upcoming");
+
+            if(events && "events" in events){
+                setEvents(events.events);
+            }
+
+            
+            setIsLoading(false);
+        };
+
+        loadData();
+    }, []);
+
+    useEffect(() => {
+        const scanner = new Html5QrcodeScanner(
+            "qr-reader", 
+            {
+                fps: 10,
+                qrbox: 250
+            },
+            false
+        );
+
+        scanner.render(
+            (decodedText) => {
+            console.log("QR is read successfully", decodedText);
+            validation_request(decodedText, eventIdRef.current);
+            },
+            (error) => {
+            console.warn("Scanning error:", error);
+            }
+        );
+
+        return () => {
+            scanner.clear().catch(error => console.error("Failed to stop camera:", error));
+        };
+    }, []);
+
+    return (
+        <div className='scan-container'>
+            <h2 className="select-label">Select Event to Scan tickets</h2>
+            {isLoading ? (
+                <LoadingMessage>Loading</LoadingMessage>
+            ) : (
+                <select 
+                    value={selected} 
+                    onChange={(e) => {
+                        const index = Number(e.target.value);
+                        eventIdRef.current = events[index].id;
+                        setSelected(e.target.value);
+                        console.log("Set Event Id = ", events[index].id);
+                        console.log(eventIdRef.current);
+                    }}
+                    className='select-box'
+                >
+                    <option value="">Please select</option>
+                    {events.map((event, index) => (
+                    <option key={index} value={index.toString()}>
+                        {event.name}
+                    </option>
+                    ))}
+                </select>
+            )}
+            
+            <div className="scan-box">
+                <h1 className="text-xl font-bold mb-4">Scan QR</h1>
+                <div id="qr-reader" style={{ width: "300px", height: "300px"}}></div>
+                <p>{message}</p>
+            </div>
+            <style jsx>{`
+            p {
+                font-size: var(--font-size-body-L);
+            }
+
+            .scan-box {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 1rem;
+            }
+
+            .select-label {
+                font-size: 2rem;
+                margin: 1rem;
+            }
+
+            .select-box {
+                font-size: 1.5rem;
+                margin:0.5rem;
+            }
+
+            .scan-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 1rem;
+                font-size: 1rem;
+            }
+
+            `}</style>
+        </div>
+    
+    );
+}

@@ -4,7 +4,8 @@
 import { 
     faChartLine, faUserAlt, faShieldAlt, 
     faPlusCircle, faRunning, faCalendarAlt, faTicket,
-    faIdCard
+    faIdCard,
+    faQrcode
 } from '@fortawesome/free-solid-svg-icons';
 
 const goToEdit = () => {
@@ -47,6 +48,10 @@ const goToCreateEvent = () => {
     window.location.href = "/event/create";
 }
 
+const goToScanPage = () => {
+    window.location.href = "/org/scan";
+}
+
 const goToAnalitics = () => {
     window.location.href = "/org/stats";
 }
@@ -75,6 +80,7 @@ export const managementIcons = [
     {label: "Create New Events", onClick:goToCreateEvent, icon: faPlusCircle},
     // {label: "Payment Method", onClick:goToPaymentMethod, icon: faIdCard},
     {label: "Analytics", onClick:goToAnalitics, icon: faChartLine},
+    {label: "Scan Tickets", onclick:goToScanPage, icon: faQrcode}
 ]
 
 export const orgAccountIcons = [
@@ -89,6 +95,7 @@ export const organizerList = [
     {text: "Upcoming events", onClick:goToOrgUpcoming},
     {text: "Previous events", onClick:goToOrgPrevEvent},
     {text: "Event analytics", onClick:goToAnalitics},
+    {text: "Go to ticket scan page", onClick:goToScanPage},
 ]
 
 // Customer

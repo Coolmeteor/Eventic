@@ -146,7 +146,24 @@ def get_event(event_id):
 
     if event:
         event_dict = dict(zip(column_names, event))
-
+        
+        # Overwrite current_participants
+        query = """
+            SELECT 
+                COALESCE(SUM(p.quantity), 0) AS current_participants
+            FROM events e
+            LEFT JOIN tickets t ON e.id = t.event_id
+            LEFT JOIN purchases p ON t.id = p.ticket_id
+            WHERE e.id = %s
+            GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
+        """
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute(query, (event_id,))
+                cur_par_row = cursor.fetchone()
+                
+                if cur_par_row:
+                    event_dict["current_participants"] = cur_par_row["current_participants"]
         
         for field in ["start_date", "end_date", "created_at", "updated_at"]:
             if isinstance(event_dict.get(field), datetime):

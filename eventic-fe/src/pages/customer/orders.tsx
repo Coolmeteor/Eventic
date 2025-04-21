@@ -18,7 +18,6 @@ export default function Orders(){
     const currentTickets = tickets.slice(indexOfFirstItem, indexOfLastItem);
     const currentPurchases = purchases.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(tickets.length / itemsPerPage);
-    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
     const [user, setUser] = useState<User>();
     
     

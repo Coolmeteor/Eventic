@@ -101,7 +101,7 @@ def get_upcoming_orders_by_user_id(user_id, cursor):
         WHERE p.user_id = %s
             AND e.start_date >= CURRENT_DATE
             AND e.start_date <= CURRENT_DATE + INTERVAL '1 month'
-        ORDER BY p.purchase_date DESC;
+        ORDER BY e.start_date ASC;
     """
     
     cursor.execute(query, (user_id,))
