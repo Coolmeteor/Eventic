@@ -9,7 +9,7 @@ import { API, enableMockEvents, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { extractEventCardData } from "@/utils/format";
-import { EventItemProps } from "@/utils/event";
+import { EventItemProps, fetchAddCart } from "@/utils/event";
 
 export default function Event() {
     const router = useRouter();
@@ -21,6 +21,7 @@ export default function Event() {
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [addCartText, setAddCartText] = useState<string | null>(null);
 
 
     /**
@@ -51,6 +52,18 @@ export default function Event() {
         }
     }
 
+    const handleButtonClick = async () => {
+        const isAdded = await fetchAddCart(eventData?.id as number, 1, eventData?.pricing as number);
+        if (isAdded){
+            setAddCartText("Added to your cart");
+            setTimeout(() => setAddCartText(null), 3000);
+        }
+        else {
+            setAddCartText("Failed to add. Reloading page...");
+            setTimeout(() => window.location.href = `/event/${id}`, 1000);
+        }
+    }
+
     useEffect(() => {
         if (!id) return;
 
@@ -75,6 +88,7 @@ export default function Event() {
                 console.log(response)
                 if (!response.ok) throw new Error("Failed to fetch event")
                 const data: EventData = (await response.json())
+                console.log("Data:", data);
                 setEventData(data)
 
                 // use mock data instead
@@ -162,6 +176,19 @@ export default function Event() {
                                     <p>Price: ${eventData.pricing}</p>
                                     <p>Max Participants: {eventData.max_participants}</p>
                                     <p>Current Participants: {eventData.current_participants}</p>
+                                </div>
+
+                                <div className="add-cart-container">
+                                    {addCartText &&
+                                    <h2 className="cart-text">{addCartText}</h2>
+                                    }
+                                    <button 
+                                        className="apply-button"
+                                        onClick={handleButtonClick}
+                                        disabled={new Date(eventData.start_date) < new Date()}
+                                    >
+                                        Add to cart
+                                    </button>
                                 </div>
 
                                 <div className="organizer-detail">
@@ -322,6 +349,41 @@ export default function Event() {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
+                }
+
+                .add-cart-container {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+
+                    margin: 1rem;
+                    font-size: var(--font-size-body-L);
+                }
+
+                .cart-text {
+                    font-size: 1.5rem;
+                }
+
+                .apply-button {
+                    padding: 0.5rem;
+                    width: 15rem;
+                    background-color: var(--color-primary);
+                    color: black;
+                    border: none;
+                    border-radius: 10px;
+                    transition: .1s;
+                }
+
+                .apply-button:hover {
+                    background-color: var(--color-primary-dark);
+                }
+
+                .apply-button:disabled {
+                    background-color: #999999;
+                    cursor: not-allowed;
                 }
 
             `}</style>

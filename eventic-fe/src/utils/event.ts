@@ -95,9 +95,11 @@ export async function fetchAddCart(event_id: number, quantity: number, unit_pric
 
     if (response.ok){
         console.log(data.message);
+        return true;
     }
     else {
         console.log(data.error | data.msg | data);
+        return false;
     }
 }
 
@@ -132,5 +134,23 @@ export async function fetchCartItems() {
     } else {
         console.log(data.error | data.msg | data);
         return undefined;
+    }
+}
+
+export async function fetchCartPurchase() {
+    const response = await fetch(`${API}/payment/cart/purchase`, {
+        method: "PATCH",
+        credentials: "include",
+    });
+
+    const data = await convertResponse(response);
+
+    if (response.ok){
+        console.log(data.message);
+        return true;
+    }
+    else {
+        console.log(data.error | data.msg | data);
+        return false;
     }
 }

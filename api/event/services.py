@@ -154,12 +154,12 @@ def get_event(event_id):
             FROM events e
             LEFT JOIN tickets t ON e.id = t.event_id
             LEFT JOIN purchases p ON t.id = p.ticket_id
-            WHERE e.id = %s
+            WHERE e.id = %s AND t.is_valid = %s
             GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
         """
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                cursor.execute(query, (event_id,))
+                cursor.execute(query, (event_id, True,))
                 cur_par_row = cursor.fetchone()
                 
                 if cur_par_row:

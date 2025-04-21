@@ -275,7 +275,7 @@ def add_cart_item():
         """
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                cursor.execute(ticket_query, (event_id, True, ))
+                cursor.execute(ticket_query, (event_id, False, ))
                 ticket = cursor.fetchone()
                 
                 if not ticket:
@@ -298,19 +298,20 @@ def add_cart_item():
         # add cart payment
         purchase_id = purchase["id"]
         add_cart_query = """
-            INSERT INTO payments (purchase_id, status, paid_amount)
-            VALUES (%s, %s, %s)
+            INSERT INTO payments (purchase_id, payment_method, status, paid_amount, user_id)
+            VALUES (%s, %s, %s, %s, %s)
         """
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                cursor.execute(add_cart_query, (purchase_id, 'cart', total_price,))
-                purchase = cursor.fetchone()
+                cursor.execute(add_cart_query, (purchase_id, 'None', 'cart', total_price, user_id,))
+        
+        return jsonify({"message": "Item added to cart"}), 200
     except Exception as e:
         return jsonify({"error": f'Internal error {str(e)}'}), 500
     
 
 # --- Remove unpurchased ticket from cart ---
-@payment_bp.route("/cart/delete/", methods=["DELETE"])
+@payment_bp.route("/cart/delete", methods=["DELETE"])
 def delete_cart_item():
     res = validate_token()
     if(res["code"] != 200):
@@ -367,20 +368,52 @@ def delete_cart_item():
 
 # --- Purchase all items in cart for current user ---
 @payment_bp.route("/cart/purchase", methods=["PATCH"])
-@jwt_required()
 def purchase_cart():
-    current_user = get_jwt_identity()
+    res = validate_token()
+    if(res["code"] != 200):
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    # Fetch user_id from access_token
+    id = get_user_id(identity)
+    if(id["code"] != 200):
+        return jsonify(id), id["code"]
+    user_id = id["user_id"]
+    
+    
     try:
         with get_db_connection() as conn:
-            cursor = conn.cursor()
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            payment_query = """
+                UPDATE payments pay
+                SET status = 'purchased'
+                FROM purchases p
+                WHERE pay.user_id = %s AND pay.status = 'cart' AND p.id = pay.purchase_id
+                RETURNING p.ticket_id;
+            """
             cursor.execute(
-                "UPDATE payments SET status = 'purchased' WHERE user_id = %s AND status = 'cart'", 
-                (current_user,)
+                payment_query, 
+                (user_id,)
             )
-            updated_rows = cursor.rowcount
-            if updated_rows == 0:
+            updated_tickets = cursor.fetchall()
+            
+            if not updated_tickets:
                 return jsonify({"message": "No cart items to purchase"}), 404
             conn.commit()
-            return jsonify({"message": f"{updated_rows} cart items purchased"}), 200
+            
+            ticket_ids = [row["ticket_id"] for row in updated_tickets]
+            
+            
+            query = """
+                UPDATE tickets
+                SET is_valid = true
+                WHERE id = ANY(%s)
+            """
+            cursor.execute(query, (ticket_ids,))
+            
+            conn.commit()
+            
+            
+            return jsonify({"message": f"{len(updated_tickets)} cart items purchased"}), 200
     except Exception as e:
         return jsonify({"error": f"Error purchasing cart items: {str(e)}"}), 500
