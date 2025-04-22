@@ -108,6 +108,13 @@ def gen_qr(ticket_id):
             
             result = cursor.fetchone()
             
+            cursor.execute(
+                "SELECT * FROM tickets WHERE id = %s",
+                (ticket_id,)
+            )
+            
+            ticket = cursor.fetchone()
+            
             if not result:
                 return jsonify({"error": f'Ticket is invalid or missing.'}), 404
             
@@ -119,8 +126,10 @@ def gen_qr(ticket_id):
     # Make hashed id
     hashed_id = hashlib.sha256(str(ticket_id).encode()).hexdigest()
     short_hashed = hashed_id[:10]
+    extra_hash = hashlib.sha256(str(ticket["event_id"]).encode()).hexdigest()
+    extra_short_hash = extra_hash[:10]
     
-    qr = qrcode.make(short_hashed)
+    qr = qrcode.make(short_hashed + extra_short_hash)
     img_io = io.BytesIO()
     qr.save(img_io, "PNG")
     img_io.seek(0)
@@ -164,7 +173,12 @@ def validate():
                     # Generate hashed id to validate
                     valid_hashed_id = hashlib.sha256(str(ticket["id"]).encode()).hexdigest()
                     short_valid_hashed = valid_hashed_id[:10]
-                    if short_valid_hashed == read_qr:
+                    extra_hash = hashlib.sha256(str(ticket["event_id"]).encode()).hexdigest()
+                    extra_short_hash = extra_hash[:10]
+                    
+                    hash = short_valid_hashed + extra_short_hash
+                    
+                    if hash == read_qr:
                         if event_id == ticket["event_id"]:
                             
                             cursor.execute(
