@@ -73,7 +73,7 @@ export default function Dashboard() {
 
     async function fetchtNewEvents() {
 
-       
+
         let fetchUrl = `${API}/event/new_postings`
         try {
 
@@ -143,7 +143,7 @@ export default function Dashboard() {
         const fetchEvent = async () => {
             try {
                 setLoading(true)
-              
+
                 // Fetch user info
                 const loadUser = async () => {
                     const userData = await fetchProfile();
@@ -207,7 +207,7 @@ export default function Dashboard() {
                                 {loading3 && <LoadingMessage>Loading</LoadingMessage>}
                                 {yourEvents.map((event) => (
                                     <li className="scroll-list">
-                                        <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                        <EventCard btn={{ href: `/event/edit/${event.id}`, text: "Edit" }}
                                             key={event.id} event={event} large={false} />
                                     </li>
                                 ))
@@ -220,7 +220,7 @@ export default function Dashboard() {
                             {loading1 && <LoadingMessage>Loading</LoadingMessage>}
                             {newEvents.map((event) => (
                                 <li className="scroll-list">
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                    <EventCard btn={{ href: `/event/${event.id}`, text: "View more" }}
                                         key={event.id} event={event} large={false} />
                                 </li>
                             ))
@@ -234,7 +234,7 @@ export default function Dashboard() {
 
                             {happenSoonEvents.map((event) => (
                                 <li className="scroll-list">
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                    <EventCard btn={{ href: `/event/${event.id}`, text: "View more" }}
                                         key={event.id} event={event} large={false} />
                                 </li>
                             ))

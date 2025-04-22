@@ -9,7 +9,8 @@ type Props = {
     large: boolean,
     event: EventData,
     btn?: {
-        click: () => void | undefined,
+        // click: () => void | undefined,
+        href?: string | undefined,
         text?: string | undefined,
     }
 }
@@ -56,8 +57,7 @@ export function EventCard({ large = false, event, btn }: Props) {
 
                     </div>
                     {btn &&
-                        <DefaultButton textColor='var(--color-onPrimary)' bgColor={['000000', '000000', '000000']} onClick={btn.click}>{btn.text}</DefaultButton>
-
+                        <DefaultButton textColor='var(--color-onPrimary)' bgColor={['000000', '000000', '000000']} link={true} href={btn.href}>{btn.text}</DefaultButton>
                     }
                 </div>
 

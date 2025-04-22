@@ -12,26 +12,26 @@ type Props = {
     fetchParam: OrgEventFetchParam;
 }
 export default function OrgEvents({
-    fetchParam="all",
-}: Props){
+    fetchParam = "all",
+}: Props) {
     const [events, SetEvents] = useState<EventData[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isOrg, setIsOrg] = useState(true);
 
-    
+
 
 
     // Check permission status
     useEffect(() => {
         fetchProfile()
-                .then((userData) => {
-                    if(userData && "user" in userData){
-                        setIsOrg(userData.user.is_org);
-                    }
-                    else {
-                        window.location.href = '/';
-                    }
-                });
+            .then((userData) => {
+                if (userData && "user" in userData) {
+                    setIsOrg(userData.user.is_org);
+                }
+                else {
+                    window.location.href = '/';
+                }
+            });
     }, [])
 
 
@@ -39,11 +39,11 @@ export default function OrgEvents({
         const loadData = async () => {
             const events = await FetchOrgEvents(fetchParam);
 
-            if(events && "events" in events){
+            if (events && "events" in events) {
                 console.log(events);
                 SetEvents(events.events);
             }
-            
+
             setIsLoading(false);
         };
 
@@ -51,7 +51,7 @@ export default function OrgEvents({
     }, []);
 
 
-    if(events == null){
+    if (events == null) {
         if (!isLoading) {
             setTimeout(() => { window.location.href = "/" }, 2000);
         }
@@ -63,8 +63,8 @@ export default function OrgEvents({
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentEvents = events?.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = events ? Math.ceil(events.length / itemsPerPage) : 0;
-    
-    
+
+
     const pageButtons = useMemo(() => {
         const maxVisibleButtons = 5;
         const buttons: (number | string)[] = [];
@@ -90,7 +90,7 @@ export default function OrgEvents({
             if (end < totalPages - 1) buttons.push("...");
             buttons.push(totalPages);
         }
-        
+
         return buttons;
     }, [currentPage, events?.length]);
 
@@ -100,7 +100,7 @@ export default function OrgEvents({
                 <h2>Your events</h2>
                 {!isOrg ? (
                     <div className='error-text'>
-                        <Forbidden/>
+                        <Forbidden />
                         <LoadingMessage>
                             Redirecting to home
                         </LoadingMessage>
@@ -117,7 +117,7 @@ export default function OrgEvents({
                             Redirecting to home
                         </LoadingMessage>
                     </div>
-                    
+
                 ) : events?.length && currentEvents?.length ? (
                     <div>
                         <div className="pagination">
@@ -130,15 +130,15 @@ export default function OrgEvents({
 
                             {pageButtons.map((btn, index) => (
                                 typeof btn === "number" ? (
-                                <button
-                                    key={index}
-                                    className={currentPage === btn ? "active" : ""}
-                                    onClick={() => setCurrentPage(btn)}
-                                >
-                                    {btn}
-                                </button>
+                                    <button
+                                        key={index}
+                                        className={currentPage === btn ? "active" : ""}
+                                        onClick={() => setCurrentPage(btn)}
+                                    >
+                                        {btn}
+                                    </button>
                                 ) : (
-                                <span key={index} className="ellipsis">...</span>
+                                    <span key={index} className="ellipsis">...</span>
                                 )
                             ))}
 
@@ -151,7 +151,7 @@ export default function OrgEvents({
                         </div>
                         <div className="event-list">
                             {currentEvents.map((event) => (
-                                <EventCard btn={{ click: () => { window.location.href = `/event/edit/${event.id}`; }, text: "Edit" }}
+                                <EventCard btn={{ href: `/event/edit/${event.id}`, text: "Edit" }}
                                     key={event.id} event={event} large={false} />
                             ))
                             }
@@ -221,9 +221,9 @@ export default function OrgEvents({
                 cursor: not-allowed;
             }
             `}</style>
-            
-        
-        
+
+
+
         </RightContainer>
     )
 }
