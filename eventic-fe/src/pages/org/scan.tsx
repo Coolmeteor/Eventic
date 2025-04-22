@@ -5,6 +5,7 @@ import { FetchOrgEvents } from '@/utils/statistics';
 import { LoadingMessage } from '@/components/LoadingMessage';
 import { fetchProfile } from '@/utils/profile-api';
 import { Forbidden } from '@/components/Forbidden';
+import { convertResponse } from '@/utils/auth-api';
 
 
 export default function ScanPage(){
@@ -17,9 +18,13 @@ export default function ScanPage(){
 
     const validation_request = async (text: string, id: number) => {
         const response = await fetch(`${API}/ticket/validate?qr=${text}&event_id=${id}`);
+        
+        const data = await convertResponse(response);
+
         if(response.ok) {
+            if(data && "quantity" in data)
             console.log("QR is valid");
-            SetMessage("Valid ticket.");
+            SetMessage(`Valid ticket for ${data.quantity} cutsomer(s).`);
         }
         else {
             console.error(response);
@@ -34,9 +39,11 @@ export default function ScanPage(){
             if(events && "events" in events){
                 if (events.events.length == 0) {
                     setTimeout(() => window.location.href = "/profile", 2000);
-                    return;
                 }
                 setEvents(events.events);
+            }
+            else {
+                setTimeout(() => window.location.href = "/profile", 2000);
             }
 
             
@@ -47,6 +54,8 @@ export default function ScanPage(){
     }, []);
 
     useEffect(() => {
+        if (!selected || eventIdRef.current === -1) return;
+
         const scanner = new Html5QrcodeScanner(
             "qr-reader", 
             {
@@ -58,18 +67,18 @@ export default function ScanPage(){
 
         scanner.render(
             (decodedText) => {
-            console.log("QR is read successfully", decodedText);
-            validation_request(decodedText, eventIdRef.current);
+                console.log("QR is read successfully", decodedText);
+                validation_request(decodedText, eventIdRef.current);
             },
             (error) => {
-            console.warn("Scanning error:", error);
+                console.warn("Scanning error:", error);
             }
         );
 
         return () => {
             scanner.clear().catch(error => console.error("Failed to stop camera:", error));
         };
-    }, []);
+    }, [selected]);
 
     useEffect(() => {
         fetchProfile()
@@ -111,8 +120,6 @@ export default function ScanPage(){
                             const index = Number(e.target.value);
                             eventIdRef.current = events[index].id;
                             setSelected(e.target.value);
-                            console.log("Set Event Id = ", events[index].id);
-                            console.log(eventIdRef.current);
                         }}
                         className='select-box'
                     >
@@ -158,6 +165,11 @@ export default function ScanPage(){
             .select-box {
                 font-size: 1.5rem;
                 margin:0.5rem;
+            }
+
+            .scan-box p {
+                font-size: 2rem;
+                margin: 1rem;
             }
 
             .scan-container {

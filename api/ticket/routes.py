@@ -166,8 +166,18 @@ def validate():
                     short_valid_hashed = valid_hashed_id[:10]
                     if short_valid_hashed == read_qr:
                         if event_id == ticket["event_id"]:
+                            
+                            cursor.execute(
+                                "SELECT quantity FROM purchases WHERE ticket_id=%s",
+                                (ticket["id"],)
+                            )
+                            result = cursor.fetchone()
+                            quantity = result["quantity"] if result else None
+                            
+                            
                             return jsonify({
                                 "message": "Ticket is valid",
+                                "quantity": quantity
                             }) , 200
                         else:
                             return jsonify({
@@ -175,7 +185,7 @@ def validate():
                             }), 403
                 # If there is no matching ticket id
                 return jsonify({
-                    "message": "Ticket is invalid",
+                    "message": "Ticket is invalid.",
                 }), 404
     except Exception as e:
         return jsonify({"error": f"Internal error: {str(e)}"}), 500
