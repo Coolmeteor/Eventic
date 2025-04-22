@@ -14,7 +14,7 @@ export type SearchParams = {
     ascending: boolean,
     category: string,
     tags: string[],
-    sortType: "name" | "date" | "price" | "proximity",
+    sortType: "name" | "date" | "price" | "proximity" | "",
     priceMin: number | undefined,
     priceMax: number | undefined
 }
@@ -24,7 +24,7 @@ const defaultSearchParams: SearchParams = {
     ascending: true,
     category: "",
     tags: [],
-    sortType: "name",
+    sortType: "",
     priceMin: undefined,
     priceMax: undefined
 }
