@@ -3,6 +3,7 @@ import Section from "@/components/Section";
 import {  EventData, mockEvents } from "@/constants";
 import { EventCard,  } from "@/components/EventCard";
 import {  HorizontalScrollList } from "@/components/ScrollerLists/HorizontalScroll";
+import { fetchCartItems, fetchCartPurchase, fetchDeleteCart } from "@/utils/event";
 
 
 
@@ -19,28 +20,63 @@ export default function Checkout() {
 
     const formRef = useRef<HTMLFormElement>(null);
 
+    const submitPayment = async () => {
+        //// Currently payment info is not used to purchase.
+        // if (!(formRef.current && formRef.current.checkValidity())) {
+        //     setError("Please fill in all form fields");
+        //     setProcessing(false);
+        //     return
+        // }
+
+
+        setProcessing(true);
+        const isPurchased = await fetchCartPurchase();
+
+        if (isPurchased){
+            setProcessing(false);
+            
+            // navigate to ordered tickets
+            window.location.href = "/customer/orders";
+        }
+        else {
+            setProcessing(false);
+            setError("Failed to purchase. Reloading page...");
+            // setTimeout(() => window.location.href = "/checkout", 2000);
+        }
+    }
     
-    function submitPayment() {
-        // Simulate payment processing
-        return new Promise((resolve) => {
-            setError(null);
-            setProcessing(true);
+    // function submitPayment() {
+        
+    //     // Simulate payment processing
+    //     return new Promise((resolve) => {
+    //         setError(null);
+    //         setProcessing(true);
 
-            if (!(formRef.current && formRef.current.checkValidity())) {
-                setError("Please fill in all form fields");
-                setProcessing(false);
-                return
-            }
+    //         if (!(formRef.current && formRef.current.checkValidity())) {
+    //             setError("Please fill in all form fields");
+    //             setProcessing(false);
+    //             return
+    //         }
 
 
-            setTimeout(() => {
-                resolve(true);
-                setProcessing(false);
-               
-                // navigate to ordered tickets
-                window.location.href = "/customer/orders";
-            }, 2000);
-        });
+    //         setTimeout(() => {
+    //             resolve(true);
+    //             setProcessing(false);
+                
+    //             // navigate to ordered tickets
+    //             window.location.href = "/customer/orders";
+    //         }, 2000);
+    //     });
+    // }
+
+    const deleteCart = async () => {
+        const isDeleted = await fetchDeleteCart();
+        if (isDeleted) {
+            window.location.href = "/checkout";
+        }
+        else {
+            setError("Failed to delete cart items");
+        }
     }
 
     useEffect(() => {
@@ -56,19 +92,36 @@ export default function Checkout() {
                 // const data: EventData = (await response.json())[0]
                 // setEventData(data)
 
+
+                const data = await fetchCartItems();
+                if (data && "cart_events" in data && "quantities" in data) {
+                    const qnties = data.quantities;
+                    const events = data.cart_events as EventData[];
+                    let fetchedEventData: { qnty: number, event: EventData }[] = [];
+                    events.forEach((event, index) => {
+                        const quantity = qnties[index];
+                        fetchedEventData.push({
+                            qnty: quantity,
+                            event: event,
+                        });
+                    });
+
+                    setEventData(fetchedEventData);
+                }
+
                 // use mock data instead
                 // deduplicate, and sum same events for quantity
-                let result: { qnty: number, event: EventData }[] = []
-                mockEvents.forEach((event) => {
-                    if (result.find((e) => e.event.id === event.id)) {
-                        result.find((e) => e.event.id === event.id)!.qnty++
-                        return
-                    } else {
-                        result.push({ qnty: 1, event: event })
-                    }
-                })
+                // let result: { qnty: number, event: EventData }[] = []
+                // mockEvents.forEach((event) => {
+                //     if (result.find((e) => e.event.id === event.id)) {
+                //         result.find((e) => e.event.id === event.id)!.qnty++
+                //         return
+                //     } else {
+                //         result.push({ qnty: 1, event: event })
+                //     }
+                // })
 
-                setEventData(result)
+                // setEventData(result)
 
             } catch (err) {
                 setError((err as Error).message)
@@ -202,28 +255,33 @@ export default function Checkout() {
 
                             <div className="rsb">
                                 <div className="cart-detail">
-                                    <h2>Your cart</h2>
+                                    <div className="label-and-button">
+                                        <p className="cart-label">Your cart</p>
+                                        <button className="delete-btn" onClick={deleteCart} disabled={ eventData.length === 0 }>
+                                            Delete cart items
+                                        </button>
+                                    </div>
                                     {eventData.map((event) => (
                                         <div className="summary-item" key={event.event.id}>
                                             <p>{event.event.name}</p>
-                                            <p>{event.qnty} x ${event.event.pricing.toFixed(2)}</p>
+                                            <p>{event.qnty} x ${Number(event.event.pricing).toFixed(2)}</p>
                                         </div>
                                     ))}
                                     <hr />
 
                                     <div className="summary-item">
                                         <p>Subtotal</p>
-                                        <p>${eventData.reduce((partialSum, a) => partialSum + a.event.pricing, 0).toFixed(2)}</p>
+                                        <p>${(eventData.reduce((partialSum, a) => partialSum + a.event.pricing * a.qnty, 0)).toFixed(2)}</p>
                                     </div>
 
                                     <div className="summary-item">
                                         <p>HST</p>
-                                        <p>${(eventData.reduce((partialSum, a) => partialSum + a.event.pricing, 0) * TAX_RATE).toFixed(2)}</p>
+                                        <p>${(eventData.reduce((partialSum, a) => partialSum + a.event.pricing * a.qnty, 0) * TAX_RATE).toFixed(2)}</p>
                                     </div>
 
                                     <div className="summary-item">
                                         <p className="total">Total</p>
-                                        <p className="total">${(eventData.reduce((partialSum, a) => partialSum + a.event.pricing, 0) * (1 + TAX_RATE)).toFixed(2)}</p>
+                                        <p className="total">${(eventData.reduce((partialSum, a) => partialSum + a.event.pricing * a.qnty, 0) * (1 + TAX_RATE)).toFixed(2)}</p>
                                     </div>
 
                                 </div>
@@ -299,6 +357,38 @@ h1 {
     padding: 0.4em;
     padding-left: 0;
     font-size: var(--font-size-header-XS);
+}
+
+
+.label-and-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart-label {
+    padding: 0.4em;
+    padding-left: 0;
+    font-size: var(--font-size-header-XS);
+}
+
+.delete-btn {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    background-color: var(--color-btn-primary);
+    border: none;
+    border-radius: 8px;
+    transition: .1s;
+}
+    
+.delete-btn:hover {
+    background-color: var(--color-btn-hover);
+}
+
+.delete-btn:disabled {
+    background-color: #999999;
+    cursor: not-allowed;
 }
 
 

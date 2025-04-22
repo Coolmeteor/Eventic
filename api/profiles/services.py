@@ -34,11 +34,11 @@ def get_orders_by_user_id(user_id, cursor):
             t.*
         FROM purchases p
         JOIN tickets t ON p.ticket_id = t.id
-        WHERE p.user_id = %s
+        WHERE p.user_id = %s AND t.is_valid = %s
         ORDER BY p.purchase_date DESC;
     """
     
-    cursor.execute(query, (user_id,))
+    cursor.execute(query, (user_id, True,))
     
     results = cursor.fetchall()
     
@@ -98,13 +98,13 @@ def get_upcoming_orders_by_user_id(user_id, cursor):
         FROM purchases p
         JOIN tickets t ON p.ticket_id = t.id
         JOIN events e ON t.event_id = e.id
-        WHERE p.user_id = %s
+        WHERE p.user_id = %s AND t.is_valid = %s
             AND e.start_date >= CURRENT_DATE
             AND e.start_date <= CURRENT_DATE + INTERVAL '1 month'
         ORDER BY e.start_date ASC;
     """
     
-    cursor.execute(query, (user_id,))
+    cursor.execute(query, (user_id, True,))
     
     results = cursor.fetchall()
     
