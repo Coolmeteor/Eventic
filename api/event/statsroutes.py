@@ -28,6 +28,25 @@ def get_stats_list_req():
         "total_stats": total_stats
     }), 200
     
+@stats_bp.route("/get-stats-duration", methods=["POST"])
+def get_stats_for_duration():
+    res = validate_token()
+    if(res["code"] != 200):
+        return jsonify(res), res["code"]
+    identity = res["identity"]
+    
+    data = request.json
+    duration = data.get('duration', 'all')
+    
+    stats_list = get_stats_list(identity, duration)
+    total_stats = get_stats(stats_list)
+    
+    return jsonify({
+        "message": "Stats list retrieved successfully",
+        "stats_data": stats_list,
+        "total_stats": total_stats
+    }), 200
+    
     
 @stats_bp.route("/get-chart", methods=["POST"])
 def get_chart_req():
@@ -64,28 +83,35 @@ def get_chart_req():
         "chart_data": chart_data,
     }), 200
 
-@stats_bp.route("/get-daily-chart", methods=["GET"])
+@stats_bp.route("/get-daily-chart", methods=["POST"])
 def get_daily_chart_req():
     
     res = validate_token()
     if(res["code"] != 200):
         return jsonify(res), res["code"]
     identity = res["identity"]
+    
+    data = request.json
+    sort_type = data.get('sort_type', 'purchase_date')
 
-    chart_data = get_daily_chart(identity)
+    chart_data = get_daily_chart(identity, sort_type=sort_type)
+    
     return jsonify({
         "message": "Daily chart retrieved successfully",
         "chart_data": chart_data,
     }), 200
 
-@stats_bp.route("/get-weekly-chart", methods=["GET"])
+@stats_bp.route("/get-weekly-chart", methods=["POST"])
 def get_weekly_daily_chart_req():
     res = validate_token()
     if(res["code"] != 200):
         return jsonify(res), res["code"]
     identity = res["identity"]
+    
+    data = request.json
+    sort_type = data.get('sort_type', 'purchase_date')
 
-    chart_data = get_weekly_chart(identity)
+    chart_data = get_weekly_chart(identity, sort_type=sort_type)
     return jsonify({
         "message": "Weekly daily chart retrieved successfully",
         "chart_data": chart_data,

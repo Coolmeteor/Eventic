@@ -17,6 +17,7 @@ export default function OrgEvents({
     const [events, SetEvents] = useState<EventData[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isOrg, setIsOrg] = useState(true);
+    const [title, setTitle] = useState("");
 
 
 
@@ -34,6 +35,9 @@ export default function OrgEvents({
             });
     }, [])
 
+    const capitalizeFirstLetter = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 
     useEffect(() => {
         const loadData = async () => {
@@ -47,7 +51,10 @@ export default function OrgEvents({
             setIsLoading(false);
         };
 
+        setTitle(`Your ${capitalizeFirstLetter(fetchParam)} Events`);
+
         loadData();
+        
     }, []);
 
 
@@ -95,9 +102,9 @@ export default function OrgEvents({
     }, [currentPage, events?.length]);
 
     return (
-        <RightContainer pageName="Your events">
+        <RightContainer pageName={title}>
             <div className="event-container">
-                <h2>Your events</h2>
+                <h2>{title}</h2>
                 {!isOrg ? (
                     <div className='error-text'>
                         <Forbidden />

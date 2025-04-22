@@ -69,8 +69,26 @@ export type dailyChartData = {
 export const sortStatsData = (data: EventStats[], sortConfig: SortConfig) => {
     const sortedData = [...data].sort((a, b) => {
         if(!sortConfig.key) return 0;
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+        let aVal = a[sortConfig.key];
+        let bVal = b[sortConfig.key];
+
+        
+        // Sort Date sting as date
+        const aDate = new Date(aVal);
+        const bDate = new Date(bVal);
+        const isDates = !isNaN(aDate.getTime()) && !isNaN(bDate.getTime());
+        if (isDates) {
+            if (aDate < bDate) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aDate > bDate) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        }
+        
+        // Sort number string as number
+        const isNumeric = !isNaN(Number(aVal)) && !isNaN(Number(bVal));
+        if (isNumeric) {
+            aVal = Number(aVal);
+            bVal = Number(bVal);
+        }
 
         if(aVal < bVal)
             return sortConfig.direction === 'asc' ? -1 : 1;
@@ -83,11 +101,27 @@ export const sortStatsData = (data: EventStats[], sortConfig: SortConfig) => {
     return sortedData;
 }
 
-export async function FetchEventStats(){
-    const response = await fetch(`${API}/stats/get-stats-list`, {
-        method: "GET",
-        credentials: "include",
-    });
+export async function FetchEventStats(duration="all"){
+    let fetchURL;
+    let response;
+    if (duration == "all"){
+        fetchURL = `${API}/stats/get-stats-list`;
+
+        response = await fetch(fetchURL, {
+            method: "GET",
+            credentials: "include",
+        });
+    }
+    else {
+        fetchURL = `${API}/stats/get-stats-duration`;
+
+        response = await fetch(fetchURL, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ duration: duration }),
+        });
+    }
 
     const data = await convertResponse(response);
 
@@ -119,10 +153,14 @@ export async function FetchChart(body: ChartRequestBody): Promise<ChartData[]> {
     }
 }
 
-export async function FetchDailyChart(){
+export type SortType = "purchase_date" | "start_date";
+
+export async function FetchDailyChart(sortType: SortType = "purchase_date"){
     const response = await fetch(`${API}/stats/get-daily-chart`, {
-        method: "GET",
+        method: "POST",
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({sort_type: sortType}),
     });
 
     const data = await convertResponse(response);
@@ -136,10 +174,12 @@ export async function FetchDailyChart(){
     }
 }
 
-export async function FetchWeeklyChart() {
+export async function FetchWeeklyChart(sortType: SortType = "purchase_date") {
     const response = await fetch(`${API}/stats/get-weekly-chart`, {
-        method: "GET",
+        method: "POST",
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({sort_type: sortType}),
     });
 
     const data = await convertResponse(response);

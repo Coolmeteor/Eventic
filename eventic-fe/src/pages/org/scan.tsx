@@ -3,6 +3,8 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { API, EventData } from '@/constants';
 import { FetchOrgEvents } from '@/utils/statistics';
 import { LoadingMessage } from '@/components/LoadingMessage';
+import { fetchProfile } from '@/utils/profile-api';
+import { Forbidden } from '@/components/Forbidden';
 
 
 export default function ScanPage(){
@@ -11,6 +13,7 @@ export default function ScanPage(){
     const [events, setEvents] = useState<EventData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selected, setSelected] = useState("");
+    const [isOrg, setIsOrg] = useState(true);
 
     const validation_request = async (text: string, id: number) => {
         const response = await fetch(`${API}/ticket/validate?qr=${text}&event_id=${id}`);
@@ -29,6 +32,10 @@ export default function ScanPage(){
             const events = await FetchOrgEvents("upcoming");
 
             if(events && "events" in events){
+                if (events.events.length == 0) {
+                    setTimeout(() => window.location.href = "/profile", 2000);
+                    return;
+                }
                 setEvents(events.events);
             }
 
@@ -64,37 +71,72 @@ export default function ScanPage(){
         };
     }, []);
 
+    useEffect(() => {
+        fetchProfile()
+            .then((userData) => {
+                if (userData && "user" in userData) {
+                    setIsOrg(userData.user.is_org);
+                    if (!userData.user.is_org) {
+                        setTimeout(() => window.location.href = "/profile", 2000);
+                    }
+                }
+                else {
+                    window.location.href = '/';
+                }
+            });
+    })
+
+    if (!isLoading && !isOrg) {
+        return (
+            <div className="flex flex-col justify-center items-center">
+                <Forbidden/>
+                <LoadingMessage>
+                    Redirecting to home
+                </LoadingMessage>
+            </div>
+        )
+    } 
+
     return (
+        
         <div className='scan-container'>
             <h2 className="select-label">Select Event to Scan tickets</h2>
             {isLoading ? (
                 <LoadingMessage>Loading</LoadingMessage>
+            ) : events.length != 0 ? (
+                <>
+                    <select 
+                        value={selected} 
+                        onChange={(e) => {
+                            const index = Number(e.target.value);
+                            eventIdRef.current = events[index].id;
+                            setSelected(e.target.value);
+                            console.log("Set Event Id = ", events[index].id);
+                            console.log(eventIdRef.current);
+                        }}
+                        className='select-box'
+                    >
+                        <option value="">Please select</option>
+                        {events.map((event, index) => (
+                        <option key={index} value={index.toString()}>
+                            {event.name}
+                        </option>
+                        ))}
+                    </select>
+                </>
             ) : (
-                <select 
-                    value={selected} 
-                    onChange={(e) => {
-                        const index = Number(e.target.value);
-                        eventIdRef.current = events[index].id;
-                        setSelected(e.target.value);
-                        console.log("Set Event Id = ", events[index].id);
-                        console.log(eventIdRef.current);
-                    }}
-                    className='select-box'
-                >
-                    <option value="">Please select</option>
-                    {events.map((event, index) => (
-                    <option key={index} value={index.toString()}>
-                        {event.name}
-                    </option>
-                    ))}
-                </select>
+                <LoadingMessage>
+                    You have no events to scan ticket. 
+                    Redirecting to profile page
+                </LoadingMessage>
             )}
-            
             <div className="scan-box">
                 <h1 className="text-xl font-bold mb-4">Scan QR</h1>
                 <div id="qr-reader" style={{ width: "300px", height: "300px"}}></div>
                 <p>{message}</p>
             </div>
+            
+            
             <style jsx>{`
             p {
                 font-size: var(--font-size-body-L);

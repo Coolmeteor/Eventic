@@ -2,7 +2,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useEffect, useState } from 'react';
 import { CSSProperties } from 'react';
 import DefaultButton from '../DefaultButton';
-import { ChartData, DoWLabels, FetchWeeklyChart } from '@/utils/statistics';
+import { ChartData, DoWLabels, FetchWeeklyChart, SortType } from '@/utils/statistics';
 import { LoadingMessage } from '../LoadingMessage';
 
 const data = [
@@ -15,11 +15,17 @@ const data = [
     { DoW: "Sun", sales: 760.10 },
 ]
 
+const sortTypes = [
+    { value: "purchase_date", label: "Purchased Date"},
+    { value: "start_date", label: "Event Start Date"},
+];
+
 
 export default function WeeklyChart(){
     const [chartData, setChartData] = useState<ChartData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [retryCount, setRetryCount] = useState(0);
+    const [sortType, setSortType] = useState("purchase_date");
 
     useEffect(() => {
         const loadData = async () => {
@@ -34,6 +40,14 @@ export default function WeeklyChart(){
 
         loadData();
     }, [retryCount]);
+
+    const handleSortTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortType(e.target.value);
+        const fetchedStatsData = await FetchWeeklyChart(e.target.value as SortType);
+        if (fetchedStatsData && "chart_data" in fetchedStatsData) {
+            setChartData(fetchedStatsData.chart_data as ChartData[]);
+        }
+    };
 
 
     if (chartData.length === 0){
@@ -55,7 +69,20 @@ export default function WeeklyChart(){
         <>
             <div className='container'>
                 <h2 className='chart-label'>Weekly</h2>
-
+                <div className="sort-container">
+                    <label className="sort-label">Select data by:</label>
+                    <select
+                        value={sortType}
+                        onChange={handleSortTypeChange}
+                        className="select-box"
+                    >
+                        {
+                            sortTypes.map((item) => (
+                                <option value={item.value}>{item.label}</option>
+                            ))
+                        }
+                    </select>
+                </div>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height="100%">
                     <LineChart 
@@ -115,6 +142,20 @@ export default function WeeklyChart(){
                 border-radius: 20px;
             }
             
+            .sort-container {
+                display: flex;
+                flex-diretion: row;
+                margin: 1rem;
+                gap: 8px;
+            }
+
+            .sort-label {
+                font-size: 1.2rem;
+            }
+
+            .select-box {
+                font-size: 1.2rem;
+            }
             `}</style>
         </>
     )

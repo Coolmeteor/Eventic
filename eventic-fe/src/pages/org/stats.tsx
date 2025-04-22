@@ -56,11 +56,10 @@ export default function Stats(){
     if(!user.is_org){
         setTimeout(() => { window.location.href = "/"; }, 2000);
         return (
-            <div>
+            <div className="flex flex-col justify-center items-center">
                 <Forbidden/>
                 <LoadingMessage>
-                    <p>You are not an organizer</p>
-                    <a>Redirecting to home</a>
+                    Redirecting to home
                 </LoadingMessage>
             </div>
         )
@@ -84,6 +83,13 @@ export default function Stats(){
             .sales-container {
                 width: 100%;
                 height: 100%;
+            }
+
+            .forbidden-text {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
             `}</style>
         </RightContainer>

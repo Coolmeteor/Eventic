@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
 from db.db_connect import get_db_connection
+import traceback
 
 
 
@@ -163,9 +164,7 @@ def validate():
                     # Generate hashed id to validate
                     valid_hashed_id = hashlib.sha256(str(ticket["id"]).encode()).hexdigest()
                     short_valid_hashed = valid_hashed_id[:10]
-                    print(f'Valid: {short_valid_hashed}, read: {read_qr}')
                     if short_valid_hashed == read_qr:
-                        print(f'Event id: {ticket["event_id"]}, Input: {event_id}')
                         if event_id == ticket["event_id"]:
                             return jsonify({
                                 "message": "Ticket is valid",
