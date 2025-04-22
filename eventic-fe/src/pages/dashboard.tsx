@@ -39,7 +39,7 @@ export default function Dashboard() {
          * This also sends the search parameters for database queries
          */
     async function fetchYourEvents() {
-        const fetchCount = 10
+        const fetchCount = 7
         setLoading3(true)
         let fetchUrl = `${API}/event/recommendation/${fetchCount}`
 
@@ -73,9 +73,11 @@ export default function Dashboard() {
 
     async function fetchtNewEvents() {
 
-        setLoading1(true)
+       
         let fetchUrl = `${API}/event/new_postings`
         try {
+
+            setLoading1(true)
             // use data from, api
             console.log(`fetching event ${fetchUrl}`)
             let response = await fetch(fetchUrl)
@@ -141,8 +143,7 @@ export default function Dashboard() {
         const fetchEvent = async () => {
             try {
                 setLoading(true)
-                setLoading2(true)
-                setLoading3(true)
+              
                 // Fetch user info
                 const loadUser = async () => {
                     const userData = await fetchProfile();
@@ -154,9 +155,14 @@ export default function Dashboard() {
                 }
 
                 loadUser();
-                await fetchYourEvents()
-                await fetchtNewEvents()
-                await fetchtHappenSoonEvents()
+                setLoading(false)
+
+                setLoading1(true)
+                setLoading2(true)
+                setLoading3(true)
+                fetchYourEvents()
+                fetchtNewEvents()
+                fetchtHappenSoonEvents()
             } catch (err) {
                 setError((err as Error).message)
             } finally {

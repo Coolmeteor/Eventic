@@ -63,7 +63,7 @@ def get_all_events():
 '''
 Get personalized event recommendations
 
-NOTE: Currently this just gets 5 events and there is no algorithm
+NOTE: Currently this just gets random events and there is no algorithm
 '''
 def get_recommended_events(limit):
     limitedLimit = 20
@@ -75,7 +75,7 @@ def get_recommended_events(limit):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM events LIMIT " + str(limitedLimit))
+    cursor.execute("SELECT * FROM events WHERE visibility = 'public' ORDER BY RANDOM() LIMIT " + str(limitedLimit))
     events = cursor.fetchall()
 
     event_list = []
