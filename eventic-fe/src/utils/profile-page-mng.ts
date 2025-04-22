@@ -5,7 +5,8 @@ import {
     faChartLine, faUserAlt, faShieldAlt, 
     faPlusCircle, faRunning, faCalendarAlt, faTicket,
     faIdCard,
-    faQrcode
+    faQrcode,
+    IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 
 const goToEdit = () => {
@@ -74,13 +75,17 @@ export const userAccountIcons = [
 ]
 
 // Event Organizer
-export const managementIcons = [
+export const managementIcons: {
+    label: string;
+    onClick: () => void;
+    icon: IconDefinition;
+}[] = [
     {label: "Manage Events", onClick:goToManageEvent, icon: faCalendarAlt},
     {label: "Upcoming Events", onClick:goToOrgUpcoming, icon: faRunning},
     {label: "Create New Events", onClick:goToCreateEvent, icon: faPlusCircle},
     // {label: "Payment Method", onClick:goToPaymentMethod, icon: faIdCard},
     {label: "Analytics", onClick:goToAnalitics, icon: faChartLine},
-    {label: "Scan Tickets", onclick:goToScanPage, icon: faQrcode}
+    {label: "Scan Tickets", onClick:goToScanPage, icon: faQrcode}
 ]
 
 export const orgAccountIcons = [
