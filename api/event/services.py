@@ -218,7 +218,7 @@ def search_events(data):
             
             sort_direction = "DESC" if data["ascending"] == False else "ASC"
             sort_type_Filter = data["sortType"]
-            if sort_type_Filter == "proximity":
+            if sort_type_Filter == "proximity" or sort_type_Filter == None or sort_type_Filter == "":
                 sort_type = "name"
             else:
                 sort_type = sort_types[data["sortType"]]
