@@ -70,6 +70,23 @@ export async function fetchProfile(): Promise<{user: User} | void> {
     }
 };
 
+export async function fetchUserInfo(id: Number): Promise<{user: User} | void> {
+    let response = await fetch(`${API}/profile/userinfo/${id}`, {
+        method: "GET",
+        credentials: "include",
+    });    
+
+    const userData = await convertResponse(response);
+
+    if(response.ok){
+        console.log(userData.message);
+        return userData;
+    } else {
+        console.log(userData.error || userData.msg);
+        return;
+    }
+};
+
 export async function changeRequest(
     resetText: () => void,
     fetchPath: string,
