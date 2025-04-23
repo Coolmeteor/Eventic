@@ -1,5 +1,6 @@
-import DefaultInputForm from "@/components/DefaultInputForm";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Gender, genderValues, isValidGender } from "@/utils/profile-api";
+
 
 
 type Props = {
@@ -10,17 +11,26 @@ type Props = {
     children?: React.ReactNode;
 }
 
-export default function ChangeFormBox({
+export default function SexChangeFormBox({
     currentValue,
     errorText,
     onSubmit,
     title,
     children=""
 }: Props){
-    const [inputValue, setInputValue] = useState<string>("");
-    if(!currentValue){
-        currentValue = "Not registered";
-    }
+    const [text, setText] = useState("");
+    const [selectedGender, setSelectedGender] = useState<Gender | "">("");
+
+    useEffect(() => {
+        if(!currentValue || !isValidGender(currentValue)){
+            setText("Not registered");
+        }
+        else {
+            setText(currentValue);
+            setSelectedGender(currentValue as Gender);
+        }
+    }, [currentValue])
+    
 
     return (
         <>
@@ -31,12 +41,28 @@ export default function ChangeFormBox({
                     e.preventDefault();
                     const form = e.currentTarget;
                     onSubmit(
-                        (form.elements.namedItem('input') as HTMLInputElement).value
+                        selectedGender
                     );
-                    setInputValue("");
                 }}>
-                    <p>&bull; Current {title.toLowerCase()}: <span>{currentValue}</span></p>
-                    <DefaultInputForm name="input" className="input" value={inputValue} onChange={(e) =>setInputValue(e.target.value)} id="username" type="text" placeholder={`New ${title}`}/>
+                    <p>&bull; Current {title.toLowerCase()}: <span>{text}</span></p>
+                    <div className='radio-container'>
+                        {genderValues.map((gender) => (
+                            <label key={gender} className="radio-label">
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value={gender}
+                                    checked={selectedGender === gender}
+                                    onChange={() => setSelectedGender(gender)}
+                                    className="radio-input"
+                                />
+                                {gender}
+                            </label>
+                        ))}
+                    </div>
+                    
+
+
                     <p style={{color: "red"}}>{errorText}</p>
                     <p>
                         <button type="submit">Change {title.toLowerCase()}</button>
@@ -73,7 +99,25 @@ export default function ChangeFormBox({
                     font-weight: bold;
                 }
 
+                .radio-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+
+                    margin: 0 0 0 1rem;
+                }
+
+                .radio-label {
+                    display: flex;
+                    margin: 0.2rem 1rem 0.2rem 1rem;
+                    gap: 8px;
+                    font-size: var(--font-size-body-M);
+                }
+
+                .radio-input {
                 
+                }
+
 
                 .formBox button {
                     padding: 0.5rem;

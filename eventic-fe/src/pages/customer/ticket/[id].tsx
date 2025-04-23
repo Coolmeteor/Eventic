@@ -110,17 +110,7 @@ export default function ticket() {
                             <div className="rsb">
                                 <div className="ticket-detail">
                                     <h2>Ticket Details</h2>
-                                    <p>Price: {eventData.pricing}</p>
-                                    <p>Max Participants: {eventData.max_participants}</p>
-                                    <p>Current Participants: {eventData.current_participants}</p>
-                                </div>
-
-                                <div className="organizer-detail">
-                                    <h2>Organizer</h2>
-                                    <p>{eventData.creator_id}</p>
-                                    <div className="organizer-icon">
-                                        <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
-                                    </div>
+                                    <p className="price">Price: ${eventData.pricing}</p>
                                 </div>
                             </div>
                         </div>
@@ -293,6 +283,11 @@ export default function ticket() {
                     height: 250px;
                     margin-right: 3em;
                     background-color: pink;
+                }
+
+                .price {
+                    font-size: 2rem !important;
+                    font-weight: bold;
                 }
             `}</style>
         </Section>

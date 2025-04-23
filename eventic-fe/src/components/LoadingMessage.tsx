@@ -23,6 +23,13 @@ export function LoadingMessage({
     return (
         <>
             <p>{children}{".".repeat(dotCount)}</p>
+
+            <style jsx>{`
+            p {
+                font-size: 2rem;
+            }
+            
+            `}</style>
         </>
     );
 }

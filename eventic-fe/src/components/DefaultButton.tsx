@@ -1,6 +1,8 @@
 import React from "react";
 
 type Props = {
+	link?: boolean;
+	href?: string;
 	bgColor?: [string, string, string];
 	textColor?: string;
 	fontSize?: string;
@@ -24,6 +26,8 @@ type Props = {
  * @returns
  */
 export default function DefaultButton({
+	link = false,
+	href = "",
 	bgColor = ["var(--color-btn-primary)", "var(--color-btn-hover)", "var(--color-btn-click)"],
 	textColor = "#FFFFFF",
 	fontSize = "var(--font-size-body-L)",
@@ -35,9 +39,18 @@ export default function DefaultButton({
 
 	return (
 		<>
-			<button className={`defaultStyle ${className}`} onClick={onClick}>
-				{children}
-			</button>
+			{link &&
+				<button className={`defaultStyle ${className}`} onClick={onClick}>
+					<a href={href}>
+						{children}
+					</a>
+				</button>
+			}
+			{!link &&
+				<button className={`defaultStyle ${className}`} onClick={onClick}>
+					{children}
+				</button>
+			}
 
 			<style jsx>
 				{`

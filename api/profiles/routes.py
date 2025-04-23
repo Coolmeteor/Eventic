@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 from jwt import ExpiredSignatureError
 import psycopg2.extras
 from db.db_connect import get_db_connection
-from .services import get_orders_by_token
+from .services import get_orders_by_token, get_upcoming_orders_by_token
 from exceptions import UserIdNotFoundFromTokenError
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
@@ -80,6 +80,29 @@ def get_profile():
     else:
         return jsonify({"error": "User not found"}), 404
 
+
+@profile_bp.route("/userinfo/<int:user_id>", methods=["GET"])
+def get_userinfo(user_id):    
+    try:
+        print(user_id)
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("SELECT * FROM users WHERE id = " + str(user_id))
+
+                user = cursor.fetchone()
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f' Error: {str(e)}'}), 500
+    
+    if user:
+        return jsonify({
+            "message": "User info returned",
+            "user": user
+            }), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+
 # Change the user_name
 @profile_bp.route("/change-username", methods=["PATCH"])
 def change_name():
@@ -130,6 +153,106 @@ def change_name():
         return jsonify({"error": f'Signiture has expired'}), 401
     except Exception as e:
         return jsonify({"error": f"Username update error: {str(e)}"}), 500
+    
+@profile_bp.route("/change-sex", methods=["PATCH"])
+def change_sex():
+    data = request.get_json()
+    new_sex = data.get("sex")
+    
+    if not new_sex:
+        return jsonify({"error": "New gender is needed"}), 400
+    
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
+    
+    try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
+        
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if user["sex"] == new_sex:
+                    return ({"error": f"New username cannot be the same as the current username"}), 400
+                
+                update_query = """
+                    UPDATE users
+                    SET sex = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_sex, identity))
+                conn.commit()
+                
+                # Re-fetch altered user
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                
+                
+        return jsonify({
+            "message": "Gender is updated",
+            "user": user
+        }), 200
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
+    except Exception as e:
+        return jsonify({"error": f"Gender update error: {str(e)}"}), 500
+    
+@profile_bp.route("/change-dob", methods=["PATCH"])
+def change_dob():
+    data = request.get_json()
+    new_dob = data.get("date_of_birth")
+    
+    if not new_dob:
+        return jsonify({"error": "New date of birth is needed"}), 400
+    
+    access_token = request.cookies.get("access_token")
+    
+    if not access_token:
+        return jsonify({"error": "Missing access token"}), 401
+    
+    try:
+        decoded_token = decode_token(access_token)
+        identity = decoded_token["sub"]
+        
+        
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                
+                cursor.execute("SELECT * FROM users WHERE email = %s", (identity,))
+                user = cursor.fetchone()
+                
+                if user["date_of_birth"] == new_dob:
+                    return ({"error": f"New username cannot be the same as the current username"}), 400
+                
+                update_query = """
+                    UPDATE users
+                    SET date_of_birth = %s
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (new_dob, identity))
+                conn.commit()
+                
+                # Re-fetch altered user
+                cursor.execute("SELECT * FROM users WHERE email = %s FOR UPDATE", (identity,))
+                user = cursor.fetchone()
+                
+                
+        return jsonify({
+            "message": "Date of birth is updated",
+            "user": user
+        }), 200
+    
+    except ExpiredSignatureError as e:
+        return jsonify({"error": f'Signiture has expired'}), 401
+    except Exception as e:
+        return jsonify({"error": f"Date of birth update error: {str(e)}"}), 500
 
 # Change the password
 @profile_bp.route("/change-password", methods=["PATCH"])
@@ -354,6 +477,25 @@ def get_orders():
     # Get purchases using user id
     try:
         data = get_orders_by_token(access_token)
+    except UserIdNotFoundFromTokenError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f'Internal Error: {str(e)}'}), 500
+    
+    return jsonify(data), 200
+
+@profile_bp.route("/upcomoing-tickets", methods=["GET"])
+def get_upcoming_req():
+    try:
+        verify_jwt_in_request()
+    except NoAuthorizationError:
+        return jsonify({"error": 'Invalid access_token'}), 401
+    
+    access_token = request.cookies.get("access_token")
+    
+    # Get purchases using user id
+    try:
+        data = get_upcoming_orders_by_token(access_token)
     except UserIdNotFoundFromTokenError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:

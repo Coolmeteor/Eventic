@@ -57,8 +57,12 @@ export default function ProfileLayout({
                                     <DashboardList list={profileList}></DashboardList>
                                 </div>
                                 <div className="box">
-                                    <span>Your Events</span>
+                                    <span>Event Management</span>
                                     <DashboardList list={organizerList}></DashboardList>
+                                </div>
+                                <div className="box">
+                                    <span>Your orders</span>
+                                    <DashboardList list={ticketList}></DashboardList>
                                 </div>
                             </div>
                         </div>

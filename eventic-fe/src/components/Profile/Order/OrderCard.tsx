@@ -78,7 +78,7 @@ export default function OrderCard({
                 <div className="separator">
                     <div className="left-box">
                         <div className="img-container">
-                            <img src={event.media[0]}/>
+                            <img className="img-main" src={event.media[0]}/>
                         </div>
                         <div className="description-container">
                             <h2 className="label">
@@ -251,6 +251,7 @@ export default function OrderCard({
                 width: 200px;
                 height: 200px;
                 border-radius: ${border_radius};
+                object-fit: cover;
             }
             `}</style>
         </>

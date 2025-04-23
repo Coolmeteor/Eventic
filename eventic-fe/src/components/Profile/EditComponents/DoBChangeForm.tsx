@@ -1,5 +1,6 @@
-import DefaultInputForm from "@/components/DefaultInputForm";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Gender, genderValues, isValidGender } from "@/utils/profile-api";
+
 
 
 type Props = {
@@ -10,17 +11,26 @@ type Props = {
     children?: React.ReactNode;
 }
 
-export default function ChangeFormBox({
+export default function DoBChangeFormBox({
     currentValue,
     errorText,
     onSubmit,
     title,
     children=""
 }: Props){
-    const [inputValue, setInputValue] = useState<string>("");
-    if(!currentValue){
-        currentValue = "Not registered";
-    }
+    const [text, setText] = useState("");
+    const [birthdate, setBirthdate] = useState("");
+
+    useEffect(() => {
+        if(!currentValue){
+            setText("Not registered");
+        }
+        else {
+            setText(new Date(currentValue).toISOString().split("T")[0]);
+            setBirthdate(currentValue);
+        }
+    }, [currentValue])
+    
 
     return (
         <>
@@ -31,12 +41,24 @@ export default function ChangeFormBox({
                     e.preventDefault();
                     const form = e.currentTarget;
                     onSubmit(
-                        (form.elements.namedItem('input') as HTMLInputElement).value
+                        (form.elements.namedItem("dob") as HTMLInputElement).value
                     );
-                    setInputValue("");
+                    console.log((form.elements.namedItem("dob") as HTMLInputElement).value);
                 }}>
-                    <p>&bull; Current {title.toLowerCase()}: <span>{currentValue}</span></p>
-                    <DefaultInputForm name="input" className="input" value={inputValue} onChange={(e) =>setInputValue(e.target.value)} id="username" type="text" placeholder={`New ${title}`}/>
+                    <p>&bull; Current {title.toLowerCase()}: <span>{text}</span></p>
+                    <div className='calender-container'>
+                        <label>
+                            <input
+                                type="date"
+                                name="dob"
+                                value={birthdate && new Date(birthdate).toISOString().split("T")[0]}
+                                onChange={(e) => setBirthdate(e.target.value)}
+                            />
+                        </label>
+                    </div>
+                    
+
+
                     <p style={{color: "red"}}>{errorText}</p>
                     <p>
                         <button type="submit">Change {title.toLowerCase()}</button>
@@ -73,7 +95,11 @@ export default function ChangeFormBox({
                     font-weight: bold;
                 }
 
-                
+                .calender-container {
+                    margin: 2rem;
+                    font-size: var(--font-size-body-L);s
+                }
+
 
                 .formBox button {
                     padding: 0.5rem;

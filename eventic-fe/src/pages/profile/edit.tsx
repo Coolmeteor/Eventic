@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchProfile, changeRequest, User } from '@/utils/profile-api';
+import { fetchProfile, changeRequest, User, Gender, isValidGender } from '@/utils/profile-api';
 import { convertResponse } from '@/utils/auth-api';
 
 
@@ -8,11 +8,15 @@ import RightContainer from '@/components/Profile/RightContainer';
 import ChangeFormBox from '@/components/Profile/EditComponents/ChangeFormBox';
 import ChangeAvatorBox from '@/components/Profile/EditComponents/ChangeAvatorBox';
 import { API } from '@/constants'
+import SexChangeFormBox from '@/components/Profile/EditComponents/SexChangeForm';
+import DoBChangeFormBox from '@/components/Profile/EditComponents/DoBChangeForm';
 
 
 
 export default function ProfileEdit(){
     const [nameErrorText, setNameErrorText] = useState<string>("");
+    const [sexErrorText, setSexErrorText] = useState("");
+    const [dobErrorText, setDobErrorText] = useState("");
 
 
     function resetErrorText(){
@@ -41,6 +45,49 @@ export default function ProfileEdit(){
             },
             JSON.stringify({user_name: new_username}),
             setNameErrorText
+        );
+
+        if(data && "user" in data){
+            setUser(data.user);
+        }
+    }
+
+    const changeSex = async (new_sex: string) => {
+        if (!isValidGender(new_sex)){
+            setSexErrorText("The input gender is not selected");
+            console.log("The input gender is invalid by error");
+        }
+        console.log("New sex:", new_sex);
+
+        
+        const data = await changeRequest(
+            resetErrorText,
+            `${API}/profile/change-sex`,
+            "PATCH",
+            {
+                "Content-Type": "application/json"
+            },
+            JSON.stringify({sex: new_sex}),
+            setSexErrorText
+        );
+
+        if(data && "user" in data){
+            setUser(data.user);
+        }
+    }
+
+    const changeDob = async (new_dob: string) => {
+        console.log("New dob:", new_dob);
+
+        const data = await changeRequest(
+            resetErrorText,
+            `${API}/profile/change-dob`,
+            "PATCH",
+            {
+                "Content-Type": "application/json"
+            },
+            JSON.stringify({date_of_birth: new_dob}),
+            setDobErrorText
         );
 
         if(data && "user" in data){
@@ -111,6 +158,20 @@ export default function ProfileEdit(){
                             onSubmit={changeUsername}
                             title="Username"
                         />
+                        <SexChangeFormBox
+                            currentValue={user.sex as Gender}
+                            errorText={sexErrorText}
+                            onSubmit={changeSex}
+                            title="Gender"
+                        />
+                        <DoBChangeFormBox
+                            currentValue={user.date_of_birth}
+                            errorText={dobErrorText}
+                            onSubmit={changeDob}
+                            title="Birth Data"
+                        />
+
+                        
                         {/* <ChangeAvatorBox
                             title="Avator"
                             currentUrl={avatorUrl}

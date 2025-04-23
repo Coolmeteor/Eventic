@@ -63,7 +63,7 @@ def get_all_events():
 '''
 Get personalized event recommendations
 
-NOTE: Currently this just gets 5 events and there is no algorithm
+NOTE: Currently this just gets random events and there is no algorithm
 '''
 def get_recommended_events(limit):
     limitedLimit = 20
@@ -75,7 +75,7 @@ def get_recommended_events(limit):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM events LIMIT " + str(limitedLimit))
+    cursor.execute("SELECT * FROM events WHERE visibility = 'public' ORDER BY RANDOM() LIMIT " + str(limitedLimit))
     events = cursor.fetchall()
 
     event_list = []
@@ -146,7 +146,24 @@ def get_event(event_id):
 
     if event:
         event_dict = dict(zip(column_names, event))
-
+        
+        # Overwrite current_participants
+        query = """
+            SELECT 
+                COALESCE(SUM(p.quantity), 0) AS current_participants
+            FROM events e
+            LEFT JOIN tickets t ON e.id = t.event_id
+            LEFT JOIN purchases p ON t.id = p.ticket_id
+            WHERE e.id = %s AND t.is_valid = %s
+            GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
+        """
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute(query, (event_id, True,))
+                cur_par_row = cursor.fetchone()
+                
+                if cur_par_row:
+                    event_dict["current_participants"] = cur_par_row["current_participants"]
         
         for field in ["start_date", "end_date", "created_at", "updated_at"]:
             if isinstance(event_dict.get(field), datetime):
@@ -159,6 +176,9 @@ def update_event(event_id, data):
     """ 更新事件 """
     with get_db_connection() as conn:
         cursor = conn.cursor()
+        
+        start_dt = datetime.fromtimestamp(data["start_date"] / 1000)
+        end_dt = datetime.fromtimestamp(data["end_date"] / 1000)
         cursor.execute("""
             UPDATE events
             SET name = %s, description = %s, media = %s, tags = %s, category = %s, start_date = %s,
@@ -166,10 +186,10 @@ def update_event(event_id, data):
                 visibility = %s, max_participants = %s, pricing = %s, updated_at = %s
             WHERE id = %s
         """, (
-            data["name"], data["description"], json.dumps(data["media"]), json.dumps(data["tags"]),
-            data["category"], data["start_date"], data["end_date"], data["location_string"],
+            data["name"], data["description"], data["media"], data["tags"],
+            data["category"], start_dt, end_dt, data["location_string"],
             data["location_long"], data["location_lat"], data["visibility"],
-            data["max_participants"], data["pricing"], int(time.time()), event_id
+            data["max_participants"], data["pricing"], datetime.now(), event_id
         ))
         conn.commit()
         return cursor.rowcount > 0
@@ -185,17 +205,47 @@ def delete_event(event_id):
 def search_events(data):
     """ search events """
     with get_db_connection() as conn:
-        cursor = conn.cursor()
-        sort_direction = "DESC"
-        query = sql.SQL("SELECT * FROM events WHERE name Like {a} ORDER BY {b} {c}").format(
-            a=sql.Literal('%'+data["name"]+'%'), 
-            b=sql.Identifier(data["order"]),
-            c=sql.SQL(sort_direction)
-        )
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        column_names = [desc[0] for desc in cursor.description]
-        return [convert_to_dict(row, column_names) for row in rows]
+        with conn.cursor() as cursor:
+            conditions = [sql.SQL("name ILIKE {name}").format(name=sql.Literal('%' + data["name"] + '%'))]
+            if "priceMin" in data and data["priceMin"]:
+                conditions.append(sql.SQL("pricing >= {min_price}").format(min_price=sql.Literal(data["priceMin"])))
+            if "priceMax" in data and data["priceMax"]:
+                conditions.append(sql.SQL("pricing <= {max_price}").format(max_price=sql.Literal(data["priceMax"])))
+            if "category" in data and data["category"]:
+                conditions.append(sql.SQL("category = {cat}").format(cat=sql.Literal(data["category"])))
+            
+            where_clause = sql.SQL(" AND ").join(conditions)
+            
+            sort_direction = "DESC" if data["ascending"] == False else "ASC"
+            sort_type_Filter = data["sortType"]
+            if sort_type_Filter == "proximity" or sort_type_Filter == None or sort_type_Filter == "":
+                sort_type = "name"
+            else:
+                sort_type = sort_types[data["sortType"]]
+            
+            query = sql.SQL(
+                "SELECT * FROM events WHERE {where} ORDER BY {sort_col} {direction}"
+            ).format(
+                    where=where_clause,
+                    sort_col=sql.Identifier(sort_type),
+                    direction=sql.SQL(sort_direction)
+            )
+            
+            cursor.execute(query)
+            
+            rows = cursor.fetchall()
+            
+            column_names = [desc[0] for desc in cursor.description]
+            
+            return [convert_to_dict(row, column_names) for row in rows]
+    
+sort_types = {
+    "name": "name",
+    "price": "pricing",
+    "date": "created_at",
+}
+def convert_to_dict(row, column_names):
+    return {column_names[i]: row[i] for i in range(len(column_names))}
     
 def get_creator_id(identity):
     with get_db_connection() as conn:

@@ -31,7 +31,7 @@ def validate_token():
 '''
 Get stats list
 '''
-def get_stats_list(identity):
+def get_stats_list(identity, duration="all"):
     limitedLimit = 20
     
     # Fetch creator_id from access_token
@@ -40,6 +40,18 @@ def get_stats_list(identity):
         return jsonify(id), id["code"]
     creator_id = id["creator_id"]
     
+    # Separate by durations
+    now = datetime.now()
+    start_date = None
+
+    if duration == "oneweek":
+        start_date = now - timedelta(weeks=1)
+    elif duration == "onemonth":
+        start_date = now - relativedelta(months=1)
+    elif duration == "threemonths":
+        start_date = now - relativedelta(months=3)
+    elif duration == "oneyear":
+        start_date = now - relativedelta(years=1)
 
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
@@ -49,19 +61,30 @@ def get_stats_list(identity):
                     e.name,
                     e.start_date AS date,
                     e.max_participants AS total_num,
-                    e.max_participants - e.current_participants AS rem_num,
+                    e.max_participants - COALESCE(SUM(p.quantity), 0) AS rem_num,
                     COALESCE(SUM(p.quantity), 0) AS sold_num,
                     COALESCE(SUM(p.total_price), 0) AS sales,
-                    COALESCE(SUM(p.total_price), 0) AS profit
+                    ROUND(COALESCE(SUM(p.total_price), 0) * 0.9, 2) AS profit
                 FROM events e
                 LEFT JOIN tickets t ON e.id = t.event_id
                 LEFT JOIN purchases p ON t.id = p.ticket_id
-                WHERE e.creator_id = %s
+                WHERE e.creator_id = %s AND t.is_valid = %s
+                
+            """
+            
+            params = [creator_id, True]
+            # Add where clause for duration limitation
+            if start_date:
+                query += " AND p.purchase_date >= %s"
+                params.append(start_date)
+                
+            query += """
                 GROUP BY e.id, e.name, e.start_date, e.max_participants, e.current_participants
                 ORDER BY e.start_date DESC;
             """
             
-            cursor.execute(query, (creator_id,))
+            
+            cursor.execute(query, params)
 
             stats = cursor.fetchall()
 
@@ -89,13 +112,19 @@ def get_stats(stats_list):
         "profit": round(float(profit), 2)
     }
 
-def get_daily_chart(email):
+def get_daily_chart(email, sort_type="purchase_date"):
     """
     Compute hourly sales based on purchase time for organizer's events.
     """
-    sql = """
+    if sort_type not in ["purchase_date", "start_date"]:
+        raise ValueError("sort_type must be either 'purcahse_date' or 'start_date'")
+    
+    date_column = "p.purchase_date" if sort_type == "purchase_date" else "e.start_date"
+    
+    
+    sql = f"""
         SELECT
-            DATE_PART('hour', p.purchase_date) AS hour,
+            DATE_PART('hour', {date_column}) AS hour,
             SUM(p.total_price) AS total_sales
         FROM purchases p
         JOIN tickets t ON p.ticket_id = t.id
@@ -124,13 +153,18 @@ def get_daily_chart(email):
     chart_data = [{"hour": hour, "sales": hourly_sales[hour]} for hour in range(24)]
     return chart_data
 
-def get_weekly_chart(email):
+def get_weekly_chart(email, sort_type="purchase_date"):
     """
     Compute total sales grouped by day of week (Mon - Sun)
     """
-    sql = """
+    if sort_type not in ["purchase_date", "start_date"]:
+        raise ValueError("sort_type must be either 'purcahse_date' or 'start_date'")
+    
+    date_column = "p.purchase_date" if sort_type == "purchase_date" else "e.start_date"
+    
+    sql = f"""
         SELECT 
-            TO_CHAR(p.purchase_date, 'Dy') AS dow,
+            TO_CHAR({date_column}, 'Dy') AS dow,
             SUM(p.total_price) AS total_sales
         FROM purchases p
         JOIN tickets t ON p.ticket_id = t.id
@@ -166,7 +200,6 @@ def get_chart_data(email, start_date, interval):
     # create SQL query to get chart data
     if start_date:
         start_date = truncate_to_unit(start_date.replace(tzinfo=None), interval)
-        print(f'Start date: {start_date}')
         start_date_clause = f"AND p.purchase_date >= '{start_date.isoformat()}'"
     else:
         start_date_clause = ""
@@ -178,7 +211,6 @@ def get_chart_data(email, start_date, interval):
     elif interval == 'month':
         interval_clause = "date_trunc('month', p.purchase_date)"
         
-    print(interval_clause)
 
     sql =f"""
         SELECT 

@@ -25,22 +25,41 @@ export default function Stats(){
 
     if(!user){
         if(loadingUser){
-            return <LoadingMessage>Loading user</LoadingMessage>;
+            return (
+                <>
+                    <LoadingMessage><p>Loading user</p></LoadingMessage>
+                    <style jsx>{`
+                    p {
+                        font-size: 2rem;
+                        margin: 2rem;
+                    }
+                    `}</style>
+                </>
+            )
         }
         else {
             setTimeout(() => { window.location.href = "/login"; }, 2000);
-            return <LoadingMessage>Redirecting to login page</LoadingMessage>;
+            return (
+                <>
+                    <LoadingMessage><p>Redirecting to login page</p></LoadingMessage>
+                    <style jsx>{`
+                    p {
+                        font-size: 2rem;
+                        margin: 2rem;
+                    }
+                    `}</style>
+                </>
+            );
         }
     }
 
     if(!user.is_org){
         setTimeout(() => { window.location.href = "/"; }, 2000);
         return (
-            <div>
+            <div className="flex flex-col justify-center items-center">
                 <Forbidden/>
                 <LoadingMessage>
-                    <p>You are not an organizer</p>
-                    <a>Redirecting to home</a>
+                    Redirecting to home
                 </LoadingMessage>
             </div>
         )
@@ -64,6 +83,13 @@ export default function Stats(){
             .sales-container {
                 width: 100%;
                 height: 100%;
+            }
+
+            .forbidden-text {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
             `}</style>
         </RightContainer>

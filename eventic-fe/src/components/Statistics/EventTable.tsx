@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { currencyKey, dateKey, EventStats, SortConfig, SortKey, sortKeys, sortStatsData } from "@/utils/statistics";
+import { currencyKey, dateKey, EventStats, FetchEventStats, SortConfig, SortKey, sortKeys, sortStatsData } from "@/utils/statistics";
 import { LoadingMessage } from "../LoadingMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortUp, faSortDown, faSort, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -19,6 +19,14 @@ const iconMap = Object.fromEntries(
     sortKeys.map((key) => [key, faSort])
 ) as Record<SortKey, IconDefinition>; 
 
+const durations = [
+    { value: "oneweek", label: "This week"},
+    { value: "onemonth", label: "1 Month"},
+    { value: "threemonths", label: "3 Months"},
+    { value: "oneyear", label: "1 Year"},
+    { value: "all", label: "All" },
+];
+
 type Props = {
     organizerId?: number;
     statsData: EventStats[];
@@ -32,6 +40,9 @@ export default function EventTable({
     const [isLoading, setIsLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'asc' });
     const [sortedData, setSortedData] = useState<EventStats[]>([]);
+    const [currentStats, setCurrentStats] = useState<EventStats[]>([]);
+    const [currentTotal, setCurrentTotal] = useState<EventStats>();
+    const [duration, setDuration] = useState("all");
 
     // Handle sorting button
     const handleSortButton = (key: SortKey) => {
@@ -52,11 +63,11 @@ export default function EventTable({
             console.log("Change sort key", key);
         }
 
-        // Applt the temporary sortConfig
+        // Apply the temporary sortConfig
         setSortConfig(tempSortConfig);
 
         // Sort data
-        setSortedData(sortStatsData(statsData, tempSortConfig));
+        setSortedData(sortStatsData(currentStats, tempSortConfig));
 
         // Change icons
         Object.entries(iconMap).forEach(([key, icon]) => {
@@ -78,14 +89,28 @@ export default function EventTable({
     useEffect(() => {
         const loadStats = async () => {
             setSortedData(statsData);
+            setCurrentStats(statsData);
+            setCurrentTotal(totalStats);
             setIsLoading(false);
         };
 
         loadStats();
     }, []);
 
+    const handleDurationChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setDuration(e.target.value);
 
-    if(!totalStats || !sortedData) {
+        
+        const fetchedStatsData = await FetchEventStats(e.target.value);
+        if ("stats_data" in fetchedStatsData && "total_stats" in fetchedStatsData) {
+            setCurrentStats(fetchedStatsData.stats_data as EventStats[]);
+            setSortedData(sortStatsData(fetchedStatsData.stats_data as EventStats[], sortConfig));
+            setCurrentTotal(fetchedStatsData.total_stats as EventStats);
+        }
+    };
+
+
+    if(!currentTotal || !sortedData) {
         if(isLoading){
             return <LoadingMessage>Loading event stats</LoadingMessage>;
         }
@@ -96,6 +121,20 @@ export default function EventTable({
 
     return (
         <div className="table-container">
+            <div className="duration-container">
+                <label className="duration-label">Change Duration:</label>
+                <select
+                    value={duration}
+                    onChange={handleDurationChange}
+                    className="select-box"
+                >
+                    {
+                        durations.map((item) => (
+                            <option value={item.value}>{item.label}</option>
+                        ))
+                    }
+                </select>
+            </div>
             <table className="sales-table">
                 <thead className="table-head">
                     <tr>
@@ -110,7 +149,8 @@ export default function EventTable({
                     </tr>
                 </thead>
                 <tbody className="table-body">
-                    {sortedData.map((data) => (
+                    {sortedData.map((data, index) => (
+                        index < 10 &&   // Show only 10 events stats
                         <tr>
                             {labels.map(({ key }) => (
                                 <td 
@@ -140,10 +180,10 @@ export default function EventTable({
                                     textAlign: currencyKey.includes(key) ? 'right' : 'left'
                             }}>
                                 {currencyKey.includes(key)
-                                    ? formatCurrency(totalStats[key] as number)
+                                    ? formatCurrency(currentTotal[key] as number)
                                     : dateKey.includes(key)
                                         ? '-'
-                                        : totalStats[key]
+                                        : currentTotal[key]
                                 }
                             </td>
                         ))}
@@ -219,6 +259,22 @@ export default function EventTable({
                 border-top: 3px double black;
             }
             
+            .duration-container {
+                display: flex;
+                flex-diretion: row;
+                margin: 1rem;
+                gap: 8px;
+            }
+
+            .duration-label {
+                font-size: 1.2rem;
+            }
+
+            .select-box {
+                font-size: 1.2rem;
+            }
+
+
             `}</style>
         </div>
     )

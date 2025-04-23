@@ -14,7 +14,7 @@ export type SearchParams = {
     ascending: boolean,
     category: string,
     tags: string[],
-    sortType: "name" | "date" | "price" | "proximity",
+    sortType: "name" | "date" | "price" | "proximity" | "",
     priceMin: number | undefined,
     priceMax: number | undefined
 }
@@ -43,7 +43,7 @@ export default function Event() {
      * This also sends the search parameters for database queries
      */
     async function searchRequest() {
-        const fetchCount = 10
+        const fetchCount = 20
         setLoading(true)
         let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
         let fetchUrl = `${API}/event/recommendation/${fetchCount}`
@@ -64,7 +64,6 @@ export default function Event() {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(searchParams),
-                    mode: "no-cors"
                 })
             } else {
                 response = await fetch(fetchUrl)
@@ -75,6 +74,7 @@ export default function Event() {
 
             const data: EventData[] = await response.json()
             setEventData(data) // expect an array of data
+            setError(""); // Delete error message
 
 
             // use mock data instead
@@ -262,7 +262,7 @@ export default function Event() {
 
                             <div className="event-list">
                                 {eventData.length > 0 && eventData.map((event) => (
-                                    <EventCard btn={{ click: () => { window.location.href = `/event/${event.id}`; }, text: "View more" }}
+                                    <EventCard btn={{ href: `/event/${event.id}`, text: "View more" }}
                                         key={event.id} event={event} large={false} />
                                 ))
                                 }
@@ -311,9 +311,9 @@ export default function Event() {
                                                 type="radio"
                                                 name="category"
                                                 value={category}
-                                                checked={eventData.length > 0 && eventData[0].category === category}
-                                                onChange={(e) => {
-
+                                                checked={searchParams.category === category}
+                                                onChange={() => {
+                                                    setSearchParams({ ...searchParams, category: category })
                                                 }
                                                 }
                                                 className="radio-input"

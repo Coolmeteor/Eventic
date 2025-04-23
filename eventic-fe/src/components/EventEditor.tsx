@@ -66,7 +66,7 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
                     visibility: "private",
                     max_participants: 0,
-                    currentParticipants: 0,
+                    current_participants: 0,
                     pricing: 0,
 
                     creator_id: 1,
@@ -176,11 +176,13 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
 
         try {
             let fetchUrl = `${API}/event/create`
+            let fetchMethod = 'POST';
             if (!isCreate) {
                 fetchUrl = `${API}/event/update/${eventId}`
+                fetchMethod = 'PUT'
             }
             const response = await fetch(fetchUrl, {
-                method: "POST",
+                method: fetchMethod,
                 credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
@@ -248,6 +250,8 @@ export default function EventEditor({ eventId = undefined }: { eventId?: string 
                                             end_date: end
                                         })
                                     }}
+                                    initialStartDate={eventData?.start_date}
+                                    initialEndDate={eventData?.end_date}
                                 />
                                 <div className="spacer" />
 

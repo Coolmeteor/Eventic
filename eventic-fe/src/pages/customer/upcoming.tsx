@@ -1,14 +1,16 @@
 import ProfileLayout from "@/components/Layouts/ProfileLayout"
 import RightContainer from "@/components/Profile/RightContainer";
 import { useEffect, useState, useMemo } from "react";
-import { User, fetchProfile, fetchOrders } from "@/utils/profile-api";
+import { User, fetchProfile, fetchUpcomingOrders } from "@/utils/profile-api";
 import { Ticket, Purchase } from "@/utils/tickest_purchases";
 import OrderCard from "@/components/Profile/Order/OrderCard";
 
-export default function Orders(){
+export default function UpcomingOrders(){
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [purchases, setPurchases] = useState<Purchase[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const [user, setUser] = useState<User>();
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
@@ -18,7 +20,6 @@ export default function Orders(){
     const currentTickets = tickets.slice(indexOfFirstItem, indexOfLastItem);
     const currentPurchases = purchases.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(tickets.length / itemsPerPage);
-    const [user, setUser] = useState<User>();
     
     
     const pageButtons = useMemo(() => {
@@ -51,6 +52,7 @@ export default function Orders(){
     }, [currentPage, tickets.length]);
 
 
+
     useEffect(()=>{
         fetchProfile()
         .then((user) => {
@@ -59,7 +61,7 @@ export default function Orders(){
             }
         });
 
-        fetchOrders()
+        fetchUpcomingOrders()
         .then((data) => {
             if(data && "tickets" in data && "purchases" in data){
                 setTickets(data.tickets);
@@ -83,11 +85,11 @@ export default function Orders(){
 
     return (
         <>
-            <RightContainer pageName="Your Orders">
+            <RightContainer pageName="Your Upcoming Tickets">
                 <div className="order-container">
-                    <h1 className="listLabel">Ordered Tickets</h1>
+                    <h1 className="listLabel">Upcoming Tickets</h1>
                     { !isLoading && purchases.length==0? (
-                        <h1 className="no-order-text">You have no orders.</h1>
+                        <h1 className="no-order-text">You have no upcoming tickets.</h1>
                     ) : (
                         <>
                             <div className="pagination">
@@ -164,6 +166,7 @@ export default function Orders(){
                     gap: 0.5rem;
                     margin: 1rem;
                 }
+
                 .pagination button {
                     font-size: 1rem;
                     padding: 0.4rem 0.8rem;
@@ -172,10 +175,12 @@ export default function Orders(){
                     background-color: #ddd;
                     cursor: pointer;
                 }
+
                 .pagination button.active {
                     background-color: #0070f3;
                     color: white;
                 }
+                    
                 .pagination button:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
@@ -185,6 +190,6 @@ export default function Orders(){
     );
 }
 
-Orders.getLayout = function getLayout(page: React.ReactNode){
+UpcomingOrders.getLayout = function getLayout(page: React.ReactNode){
     return <ProfileLayout>{page}</ProfileLayout>
 }

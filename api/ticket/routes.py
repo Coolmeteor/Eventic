@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 from flask_jwt_extended.exceptions import NoAuthorizationError
 
 from db.db_connect import get_db_connection
+import traceback
 
 
 
@@ -107,6 +108,13 @@ def gen_qr(ticket_id):
             
             result = cursor.fetchone()
             
+            cursor.execute(
+                "SELECT * FROM tickets WHERE id = %s",
+                (ticket_id,)
+            )
+            
+            ticket = cursor.fetchone()
+            
             if not result:
                 return jsonify({"error": f'Ticket is invalid or missing.'}), 404
             
@@ -118,8 +126,10 @@ def gen_qr(ticket_id):
     # Make hashed id
     hashed_id = hashlib.sha256(str(ticket_id).encode()).hexdigest()
     short_hashed = hashed_id[:10]
+    extra_hash = hashlib.sha256(str(ticket["event_id"]).encode()).hexdigest()
+    extra_short_hash = extra_hash[:10]
     
-    qr = qrcode.make(short_hashed)
+    qr = qrcode.make(short_hashed + extra_short_hash)
     img_io = io.BytesIO()
     qr.save(img_io, "PNG")
     img_io.seek(0)
@@ -131,7 +141,7 @@ def validate():
     '''
         Validate QR
         - Example url 
-        ${API}/ticket/validate?qr={qr_value}
+        ${API}/ticket/validate?qr={qr_value}&event_id={event_id}
         - Example request body
         {
             method: "GET",
@@ -140,28 +150,56 @@ def validate():
         
     '''
     read_qr = request.args.get("qr")
+    event_id = request.args.get("event_id")
+    
+    if event_id is None:
+        return jsonify({"error": "Missing event_id"}), 400
+    try:
+        event_id = int(event_id)
+    except ValueError:
+        return jsonify({"error": "Invalid event_id"}), 400
     
     try:
         with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 query = """
-                    SELECT tickets.id
+                    SELECT *
                     FROM tickets
                 """
                 cursor.execute(query)
-                tickets_id = cursor.fetchall()
+                tickets = cursor.fetchall()
                 
-                for id in tickets_id:
+                for ticket in tickets:
                     # Generate hashed id to validate
-                    valid_hashed_id = hashlib.sha256(str(id[0]).encode()).hexdigest()
+                    valid_hashed_id = hashlib.sha256(str(ticket["id"]).encode()).hexdigest()
                     short_valid_hashed = valid_hashed_id[:10]
-                    if short_valid_hashed == read_qr:
-                        return jsonify({
-                            "message": "Ticket is valid",
-                        }) , 200
+                    extra_hash = hashlib.sha256(str(ticket["event_id"]).encode()).hexdigest()
+                    extra_short_hash = extra_hash[:10]
+                    
+                    hash = short_valid_hashed + extra_short_hash
+                    
+                    if hash == read_qr:
+                        if event_id == ticket["event_id"]:
+                            
+                            cursor.execute(
+                                "SELECT quantity FROM purchases WHERE ticket_id=%s",
+                                (ticket["id"],)
+                            )
+                            result = cursor.fetchone()
+                            quantity = result["quantity"] if result else None
+                            
+                            
+                            return jsonify({
+                                "message": "Ticket is valid",
+                                "quantity": quantity
+                            }) , 200
+                        else:
+                            return jsonify({
+                                "error": "This ticket is not for chosen event",
+                            }), 403
                 # If there is no matching ticket id
                 return jsonify({
-                    "message": "Ticket is invalid",
+                    "message": "Ticket is invalid.",
                 }), 404
     except Exception as e:
         return jsonify({"error": f"Internal error: {str(e)}"}), 500

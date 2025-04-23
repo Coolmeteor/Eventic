@@ -102,7 +102,7 @@ export default function Homepage() {
 
                 </div>
                 <div className="browse-button-container">
-                    <DefaultButton className="home-browse-button" onClick={() => window.location.href = "/event"}>Start Browsing Events</DefaultButton>
+                    <DefaultButton className="home-browse-button" link={true} href = {"/event"}>Start Browsing Events</DefaultButton>
                 </div>
                 <HorizontalScroll textWithIcons={eventCategoriesWithIcons} />
                 <HorizontalEventList

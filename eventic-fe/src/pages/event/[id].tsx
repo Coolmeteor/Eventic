@@ -9,18 +9,21 @@ import { API, enableMockEvents, EventData, mockEvents } from "@/constants";
 import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { extractEventCardData } from "@/utils/format";
-import { EventItemProps } from "@/utils/event";
+import { EventItemProps, fetchAddCart } from "@/utils/event";
+import { fetchProfile, fetchUserInfo, User } from "@/utils/profile-api";
 
 export default function Event() {
     const router = useRouter();
     const { id } = router.query
 
+    const [user, setUser] = useState<User>()
 
     const [eventData, setEventData] = useState<EventData | null>(null)
     const [quickPicksData, setQuickPicksData] = useState<EventItemProps[]>([])
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [addCartText, setAddCartText] = useState<string | null>(null);
 
 
     /**
@@ -51,6 +54,18 @@ export default function Event() {
         }
     }
 
+    const handleButtonClick = async () => {
+        const isAdded = await fetchAddCart(eventData?.id as number, 1, eventData?.pricing as number);
+        if (isAdded) {
+            setAddCartText("Added to your cart");
+            setTimeout(() => setAddCartText(null), 3000);
+        }
+        else {
+            setAddCartText("Failed to add. Reloading page...");
+            setTimeout(() => window.location.href = `/event/${id}`, 1000);
+        }
+    }
+
     useEffect(() => {
         if (!id) return;
 
@@ -75,14 +90,29 @@ export default function Event() {
                 console.log(response)
                 if (!response.ok) throw new Error("Failed to fetch event")
                 const data: EventData = (await response.json())
+                console.log("Data:", data);
                 setEventData(data)
+
+
+                // Fetch user info
+                if (data.creator_id) {
+                    const loadUser = async () => {
+                        const userData = await fetchUserInfo(data.creator_id);
+
+                        if (userData && "user" in userData) {
+                            setUser(userData.user);
+
+                        }
+                    }
+                    loadUser();
+                }
 
                 // use mock data instead
                 // setEventData(
                 //     mockEvents.filter((event) => event.id === parseInt(id))[0]
                 // )
 
-                fetchRecommendations()
+
 
             } catch (err) {
                 setError((err as Error).message)
@@ -92,6 +122,7 @@ export default function Event() {
         };
 
         fetchEvent();
+        fetchRecommendations()
     }, [id]);
     console.log("Event " + id, eventData)
     return (
@@ -161,17 +192,41 @@ export default function Event() {
                                     <h2>Ticket Details</h2>
                                     <p>Price: ${eventData.pricing}</p>
                                     <p>Max Participants: {eventData.max_participants}</p>
-                                    <p>Current Participants: {eventData.currentParticipants}</p>
+                                    <p>Current Participants: {eventData.current_participants}</p>
+                                </div>
+
+                                <div className="add-cart-container">
+                                    {addCartText &&
+                                        <h2 className="cart-text">{addCartText}</h2>
+                                    }
+                                    <button
+                                        className="apply-button"
+                                        onClick={handleButtonClick}
+                                        disabled={new Date(eventData.start_date) < new Date()}
+                                    >
+                                        Add to cart
+                                    </button>
                                 </div>
 
                                 <div className="organizer-detail">
-                                    <h2>Organizer</h2>
-                                    <p>{eventData.creator}</p>
-                                    <div className="organizer-icon">
-                                        <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
-                                    </div>
-                                    <p>Posted: {new Date(eventData.created_at).toDateString()}</p>
-                                    <p>Updated: {new Date(eventData.updated_at).toDateString()}</p>
+                                    {user && <>
+                                        <p>Posted: {new Date(eventData.created_at).toDateString()}</p>
+                                        <p>Updated: {new Date(eventData.updated_at).toDateString()}</p>
+                                        <div className="spacer"></div>
+
+
+                                        <h2>Event organizer</h2>
+
+                                        <div className="organizer-icon">
+                                            <p>{user.user_name}</p>
+                                            <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
+                                        </div>
+
+
+                                        <h2>Contact information</h2>
+                                        <p>Email: {user.email}</p>
+                                        <p>Phone: {user.phone}</p>
+                                    </>}
                                 </div>
                             </div>
                         </div>
@@ -179,7 +234,7 @@ export default function Event() {
 
                         <HorizontalEventList
                             title="Related Events"
-                            EventCards={quickPicksData}
+                            EventCards={quickPicksData.filter((event) => event.id != eventData?.id)}
                         />
                     </div>
                 }
@@ -301,6 +356,7 @@ export default function Event() {
 
                 .organizer-icon {
                     display: flex;
+                    flex-direction: column;
                     justify-content: center;
                     align-items: center;
                     padding-right: 1em;
@@ -322,6 +378,41 @@ export default function Event() {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
+                }
+
+                .add-cart-container {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+
+                    margin: 1rem;
+                    font-size: var(--font-size-body-L);
+                }
+
+                .cart-text {
+                    font-size: 1.5rem;
+                }
+
+                .apply-button {
+                    padding: 0.5rem;
+                    width: 15rem;
+                    background-color: var(--color-primary);
+                    color: black;
+                    border: none;
+                    border-radius: 10px;
+                    transition: .1s;
+                }
+
+                .apply-button:hover {
+                    background-color: var(--color-primary-dark);
+                }
+
+                .apply-button:disabled {
+                    background-color: #999999;
+                    cursor: not-allowed;
                 }
 
             `}</style>

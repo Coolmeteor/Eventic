@@ -1,9 +1,5 @@
-import { useState, useEffect } from 'react';
 import DefaultLinkButton from '../DefaultLinkButton';
 import { useRouter } from 'next/router';
-import { User } from '../../utils/profile-api';
-
-const API = 'http://127.0.0.1:5000'
 
 type Props = {
     pageName: string;

@@ -10,11 +10,11 @@ type Props = {
 
 export function UserIcon({
     isLogin,
-}: Props){
+}: Props) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     return (
         <div className="inline-block">
-            <div 
+            <div
                 className="relative"
                 // onMouseEnter={() => setTimeout(() => setIsOpen(true), 500)}
                 onMouseEnter={() => setIsOpen(true)}
@@ -22,23 +22,27 @@ export function UserIcon({
             >
                 {!isLogin ? (
                     <DefaultButton
-                        bgColor={['000000', '000000','000000']}
-                        onClick={() => window.location.href = "/login"}>
+                        bgColor={['000000', '000000', '000000']}
+                        link={true}
+                        href="/login"
+                    >
                         <p>Login</p>
                     </DefaultButton>
                 ) : (
                     <DefaultButton
-                        bgColor={['000000', '000000','000000']}
+                        bgColor={['000000', '000000', '000000']}
+                         link={true}
+                        href="/profile"
                         onClick={() => window.location.href = "/profile"}>
-                        <FontAwesomeIcon 
-                            icon={faUser} 
+                        <FontAwesomeIcon
+                            icon={faUser}
                         />
                     </DefaultButton>
                 )}
 
                 {/* Popup menu */}
                 {isOpen && isLogin && (
-                    <div 
+                    <div
                         className="absolute right-0 mt-0 z-50"
                     >
                         <div className="relative w-40 h-10 overflow-visible z-50">
@@ -55,13 +59,13 @@ export function UserIcon({
                                     Logout
                                 </button>
                             </div>
-                            
+
                         </div>
                     </div>
                 )}
             </div>
         </div>
-            
-        
+
+
     );
 }
