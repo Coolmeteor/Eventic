@@ -1,9 +1,9 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, getByTestId } from '@testing-library/react'
 
 import { EventData, mockEvents } from '@/constants'
 import '@testing-library/jest-dom'
-import EventCard from '../EventCard'
+import { EventCard } from '../EventCard'
 
 
 const mockEvent: EventData = mockEvents[0]
@@ -35,6 +35,7 @@ describe('EventCard data rendering', () => {
         // large is not a prop currently being used
         render(<EventCard large={false} event={mockEvent} />)
 
+        expect(screen.getByText(mockEvent.pricing)).toBeInTheDocument()
         expect(screen.getByText(mockEvent.name)).toBeInTheDocument()
         expect(screen.getByText(mockEvent.description)).toBeInTheDocument()
         expect(screen.getByText(mockEvent.location_string)).toBeInTheDocument()
@@ -45,25 +46,34 @@ describe('EventCard data rendering', () => {
      * Event card background image
      */
     test('Check image and alt text', () => {
-        render(<EventCard large={false} event={mockEvent} />)
-        const image = screen.getByAltText(mockEvent.name) as HTMLImageElement
-        expect(image).toBeInTheDocument()
-        expect(image.src).toBe(mockEvent.media[0])
+        const { container } = render(
+            <EventCard large={false} event={mockEvent} />
+        )
+        // afetr image got changed to background
+        let imageStyle = `background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 0%,rgba(255, 255, 255, 0) 35%, rgba(0, 0, 0, 0.09) 50%, rgba(0, 0, 0, 0.61) 90%, rgba(0, 0, 0, 0.8) 100%),
+                    url(${mockEvent.media[0]});`
+        expect(container.querySelector(".top")).toHaveStyle(imageStyle);
+
+        // before, when image was a janky overlay
+        // const image = screen.getByAltText(mockEvent.name) as HTMLImageElement
+        // expect(image).toBeInTheDocument()
+        // expect(image.src).toBe(mockEvent.media[0])
     })
 
 
     /**
-     * Check if button is correctly rendered if button is specified
+     * Check if button-link is correctly rendered if button is specified
      */
-    test('Render button: Prop IS passed', () => {
+    test('Render button-link: Prop IS passed', () => {
         render(
             <EventCard
                 large={false}
                 event={mockEvent}
-                btn={{ text: "View More", click: jest.fn() }}
+                btn={{ href: `/event/${mockEvent.id}`, text: "View more" }}
             />
         )
-        expect(screen.queryByText("View More")).toBeInTheDocument()
+        expect(screen.queryByText(/view more/i)).toBeInTheDocument()
+        expect(screen.getByText(/view more/i).closest('a')).toHaveAttribute('href', `/event/${mockEvent.id}`)
     })
 
     /**
@@ -79,21 +89,4 @@ describe('EventCard data rendering', () => {
         expect(screen.queryByText("View More")).toBeNull()
     })
 
-    /**
-     * Button click
-     */
-    test('Button click', () => {
-        const handleClick = jest.fn()
-        render(
-            <EventCard
-                large={false}
-                event={mockEvent}
-                btn={{ text: "View More", click: handleClick }}
-            />
-        )
-
-        const button = screen.getByText("View More")
-        fireEvent.click(button)
-        expect(handleClick).toHaveBeenCalled()
-    })
 })
