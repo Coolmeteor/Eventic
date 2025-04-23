@@ -89,7 +89,7 @@ This document summarizes the unit testing practices and coverage in our React ap
 
 #### Error Handling / Edge Cases
 - Very long input lengths and weird characters is supported up to whatever TypeScript string can support
-- 
+
 
 ## Test Coverage
 Write down the test converage percentage from the testing framework. For example:
