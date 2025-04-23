@@ -45,7 +45,7 @@ describe('EventCard data rendering', () => {
     /**
      * Event card background image
      */
-    test('Check image and alt text', () => {
+    test('Check image', () => {
         const { container } = render(
             <EventCard large={false} event={mockEvent} />
         )
