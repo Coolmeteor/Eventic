@@ -118,6 +118,8 @@ Organizers have all the user features, but also additional event management feat
 The "My Content" page serves as a dashboard with the user feeds, as well as a section for event management options.
 ![alt text](image-12.png)
 
+This also also avalible in the organizer profile 
+![alt text](image-21.png)
 
 
 
@@ -158,16 +160,22 @@ The statistics page can be accessed through "Analytics", both in the "My Content
 
 This displays a summary of the event's performance. Organizers can view sales, and weekly and daily statistics as well. This page offers very filters based on time frame.
 
+This allows organizers to visualize trends and performance.
+
 # Ticketing 
 
 Users can view their tickets in the ordered tickets page.
 ![alt text](image-17.png)
 
-This shows all the tickets the user has purchased. When attending events, users will need to show their QR code for event organizers to scan, as this is their ticket. Click on "View ticket" and then we offer a printout of the ticket.
+This shows all the tickets the user has purchased. When attending events, users will need to show their QR code for event organizers to scan, as this is their ticket. Click on "View ticket" and then we offer a printout of the ticket. Upcomming tickets page shows events that will be held within one month.
 
 ![alt text](image-18.png)
+
+Customers do not need to recieve tickets by mail, and this protects customer information in the process.
 
 
 For organizers, they may use the scan functionality to record tickets and grant users access to their event.
 
-![alt text](image-19.png)
+![alt text](image-20.png)
+
+This allows for fast event check-in and ticket validation, and also avoids fake or duplicated tickets from being used.
