@@ -189,6 +189,28 @@ This document summarizes the unit testing practices and coverage in our React ap
 | 2   | Price formatting logic      | Typing formatted price string still sets correct number    | `"2,000.0505"`        | `setData` called with `2000.05`          | PASS  |
 | 3   | formatPrice utility test    | Verifies `formatPrice()` formats various inputs correctly  | `"1,500.5"`           | `"1500.50"`                              | FAILED   |
 
+### Unit: DefaultButton
+
+#### Test Cases
+| No. | Test Case Name        | Description                  | Input                        | Expected Output / Behavior | Status |
+| --- | --------------------- | ---------------------------- | ---------------------------- | -------------------------- | ------ |
+| 1   | Render regular button | Render as a button           | no props                     | Renders correctly          | PASS   |
+| 2   | Test onclick button   | Render as a link             | `link={true}`, `href="/yes"` | Renders correctly          | PASS   |
+| 3   | Test onclick button   | Test onclick function called | `onClick={mockFn}`           | onclick function is called | PASS   |
+
+
+#### Precondition
+- `onClick` and `href` is valid given whatever is supposed to be used
+
+
+#### Postcondition
+- None
+
+
+#### Error Handling / Edge Cases
+- No button content is valid
+- No href/onClick means nothing happens
+
 ### Unit: DefaultInputForm
 
 #### Test Cases
@@ -657,6 +679,30 @@ const mockEventItemProps: EventItemProps = {
 - Retries up to 3 times on missing or invalid data.
 - Handles empty responses without crashing.
 
+
+### Unit: TagEditor
+
+#### Test Cases
+| No. | Test Case Name                        | Description                                               | Input                                                                         | Expected Output / Behavior                | Status |
+| --- | ------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------- | ------ |
+| 1   | Render component                      | Basic rendering                                           | `tags={[]}`                                                                   | Component renders                         | PASS   |
+| 2   | Test inputing tags                    | Adding tags via user input methods enter key and comma    | `user types "2000"`                                                           | `["meow", "miaw", "nya", "myaaa"]`        | PASS   |
+| 3   | Empty and blank tag inputs            | Typing blank tags should be ignored                       | `tags={[]}`, user enters `"{enter}"`       and `"<spacebar>{enter}"`          | `[]`                                      | PASS   |
+| 4   | Test inputing tags given initial tags | Verift that adding tags via user input will add in order  | `tags={["tag1", "tag2", "tag3"]}`, user types `meow,miaw{enter}`              | `"tag1", "tag2", "tag3", "meow", "miaw"]` | PASS   |
+| 5   | Ignoring duplicate tags               | Duplicate tags already in the component should be ignored | `tags={["tag1", "tag2", "tag3"]}`, user types `tag1{enter}` and `meow{enter}` | `"tag1", "tag2", "tag3", "meow"]`         | PASS   |
+| 6   | Remove button                         | Verifies The x button works                               | Click X on                                                                    | `["tag1", "tag3"]`                        | PASS   |
+
+#### Precondition *(if needed)*
+- `setTags` and `tags` prop is provided and functional.
+
+
+#### Postcondition *(if needed)*
+- The tags show up visually
+
+
+#### Error Handling / Edge Cases
+- Empty amd blank tags are ignored
+- Duplicated tags are not added to prevent duplicates
 
 ### Unit: GenerateTicketPDF
 
