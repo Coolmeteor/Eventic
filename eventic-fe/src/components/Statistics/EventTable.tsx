@@ -98,6 +98,7 @@ export default function EventTable({
     }, []);
 
     const handleDurationChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setIsLoading(true);
         setDuration(e.target.value);
 
         
@@ -107,30 +108,31 @@ export default function EventTable({
             setSortedData(sortStatsData(fetchedStatsData.stats_data as EventStats[], sortConfig));
             setCurrentTotal(fetchedStatsData.total_stats as EventStats);
         }
+
+        setIsLoading(false);
     };
 
+    if(isLoading){
+        return <LoadingMessage>Loading event stats</LoadingMessage>;
+    }
 
     if(!currentTotal || !sortedData) {
-        if(isLoading){
-            return <LoadingMessage>Loading event stats</LoadingMessage>;
-        }
-        else {
-            return <LoadingMessage>No data</LoadingMessage>
-        }
+        return <LoadingMessage>No data</LoadingMessage>
     }
 
     return (
         <div className="table-container">
             <div className="duration-container">
-                <label className="duration-label">Change Duration:</label>
+                <label htmlFor="duration-select" className="duration-label">Change Duration:</label>
                 <select
+                    id="duration-select"
                     value={duration}
                     onChange={handleDurationChange}
                     className="select-box"
                 >
                     {
-                        durations.map((item) => (
-                            <option value={item.value}>{item.label}</option>
+                        durations.map((item, index) => (
+                            <option key={index} value={item.value}>{item.label}</option>
                         ))
                     }
                 </select>
@@ -151,7 +153,7 @@ export default function EventTable({
                 <tbody className="table-body">
                     {sortedData.map((data, index) => (
                         index < 10 &&   // Show only 10 events stats
-                        <tr>
+                        <tr key={index}>
                             {labels.map(({ key }) => (
                                 <td 
                                     className={`table-label-${key}`}

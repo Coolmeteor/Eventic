@@ -4,7 +4,7 @@ import DoBChangeFormBox from "@/components/Profile/EditComponents/DoBChangeForm"
 describe("DoBChangeFormBox", () => {
     const mockSubmit = jest.fn();
 
-    it("Renders correctly with a registered date", () => {
+    test("Renders correctly with a registered date", () => {
         render(
             <DoBChangeFormBox
                 currentValue="2000-01-01"
@@ -22,7 +22,7 @@ describe("DoBChangeFormBox", () => {
         expect(screen.getByDisplayValue("2000-01-01")).toBeInTheDocument();
     });
 
-    it("Shows 'Not registered' if no current value is provided", () => {
+    test("Shows 'Not registered' if no current value is provided", () => {
         render(
             <DoBChangeFormBox
                 currentValue=""
@@ -35,7 +35,7 @@ describe("DoBChangeFormBox", () => {
         expect(screen.getByText("Not registered")).toBeInTheDocument();
     });
 
-    it("Calls onSubmit with selected date on form submit", () => {
+    test("Calls onSubmit with selected date on form submit", () => {
         render(
             <DoBChangeFormBox
                 currentValue="2000-01-01"
@@ -53,7 +53,7 @@ describe("DoBChangeFormBox", () => {
         expect(mockSubmit).toHaveBeenCalledWith("2001-12-31");
     });
 
-    it("Displays error message when provided 'Invalid date'", () => {
+    test("Displays error message when provided 'Invalid date'", () => {
         render(
             <DoBChangeFormBox
                 currentValue="2000-01-01"

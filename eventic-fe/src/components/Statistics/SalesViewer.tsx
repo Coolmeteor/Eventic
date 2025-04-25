@@ -43,8 +43,7 @@ export default function SalesViewer({
             setTimeout(() => { window.location.href = "/org/stats"}, 2000);
             return (
                 <LoadingMessage>
-                    <p>Failed to load data</p>
-                    Reloading data
+                    Failed to load data. Reloading data
                 </LoadingMessage>
             )
         }
@@ -54,11 +53,10 @@ export default function SalesViewer({
     return (
         <div className="viewer-container">
             {isLoading ? (
-                <LoadingMessage><p>Loading data</p></LoadingMessage>
+                <LoadingMessage>Loading data</LoadingMessage>
             ) : !totalStats || !statsData ? (
                 <LoadingMessage>
-                    <p>Failed to load data</p>
-                    <p>Reloading data</p>
+                    Failed to load data. Reloading data
                 </LoadingMessage>
             ) : (
                 <>

@@ -4,14 +4,12 @@ import React, { useRef } from 'react';
 
 type Props = {
     children: React.ReactNode;
-    noButton?: Boolean;
     scrollAmount?: number;
 }
 
 
 export function HorizontalScrollContainer({
-    children, 
-    noButton=true,
+    children,
     scrollAmount=450,
 }: Props){
     const scrollRef = useRef<HTMLDivElement>(null);
