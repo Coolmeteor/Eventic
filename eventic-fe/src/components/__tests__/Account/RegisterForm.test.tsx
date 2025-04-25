@@ -3,6 +3,17 @@ import userEvent from '@testing-library/user-event'
 import RegisterForm from '@/components/Account/RegisterForm'
 
 describe('RegisterForm ', () => {
+    // Disable console.log/error since the response from mocked API causes undesired error logs.
+    beforeAll(() => {
+        jest.spyOn(console, 'log').mockImplementation(() => {});
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterAll(() => {
+        (console.log as jest.Mock).mockRestore();
+        (console.error as jest.Mock).mockRestore();
+    });
+
     describe('Render', () => {
         test('All input field exist', () => {
             render(<RegisterForm setIsLogin={jest.fn()} />);
