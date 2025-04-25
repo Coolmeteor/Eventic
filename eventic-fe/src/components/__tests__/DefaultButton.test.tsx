@@ -2,6 +2,22 @@ import React from "react"
 import { render, screen, fireEvent } from "@testing-library/react"
 import DefaultButton from "../DefaultButton"
 
+// we use <style> tags, jest does not support this well. Throws css parse errors, and this is non-fatal error anyways so ignore it
+beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation((msg) => {
+        if (typeof msg === 'string' && msg.includes('Could not parse CSS stylesheet')) {
+            return;
+        }
+        console.log("Ignoring css error");
+        // console.log("Ignoring css error", msg);
+    });
+});
+
+afterAll(() => {
+    jest.restoreAllMocks();
+});
+
+
 describe("DefaultButton tests", () => {
     test("Render regular button", () => {
         render(<DefaultButton>View more</DefaultButton>)
