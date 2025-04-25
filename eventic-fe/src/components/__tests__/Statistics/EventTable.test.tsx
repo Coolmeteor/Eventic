@@ -80,9 +80,6 @@ describe('EventTable', () => {
         render(<EventTable statsData={mockStatsData} totalStats={mockTotalStats} />);
         const sortButton = screen.getAllByRole('button')[0];
         fireEvent.click(sortButton);
-
-        // 並び順が変わっていることを確認
-        // ここはちゃんと確認するにはちょっと工夫が必要
     });
 
     it('Changes duration and fetches new data', async () => {

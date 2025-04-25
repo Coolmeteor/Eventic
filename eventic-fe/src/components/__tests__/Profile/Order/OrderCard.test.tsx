@@ -87,6 +87,4 @@ describe("OrderCard", () => {
             ).toBeInTheDocument()
         );
     });
-
-    // オプション: ボタンのリンクを確認する（window.location.hrefのモックが必要な場合あり）
 });

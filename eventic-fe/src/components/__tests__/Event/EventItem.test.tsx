@@ -49,4 +49,9 @@ describe("EventItem", () => {
 
         expect(window.location.href).toBe("/event/123");
     });
+
+    test("Shows a loading message if thumbnail is empty", () => {
+        render(<EventItem {...mockEventItemProps} thumbnail="" />);
+        expect(screen.getByText("Loading...")).toBeInTheDocument();
+    });
 });

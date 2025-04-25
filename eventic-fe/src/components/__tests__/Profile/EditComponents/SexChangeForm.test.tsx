@@ -7,7 +7,7 @@ describe("SexChangeFormBox", () => {
 
     beforeEach(() => mockSubmit.mockClear());
 
-    it("renders with title and current value", () => {
+    it("Renders with title and current value", () => {
         render(
             <SexChangeFormBox
                 currentValue="Male"
@@ -28,7 +28,7 @@ describe("SexChangeFormBox", () => {
         )).toBeInTheDocument();
     });
 
-    it("shows 'Not registered' if currentValue is invalid", () => {
+    it("Shows 'Not registered' if currentValue is invalid", () => {
         render(
             <SexChangeFormBox
                 currentValue=""
@@ -41,7 +41,7 @@ describe("SexChangeFormBox", () => {
         expect(screen.getByText("Not registered")).toBeInTheDocument();
     });
 
-    it("renders all gender radio options", () => {
+    it("Renders all gender radio options", () => {
         render(
             <SexChangeFormBox
                 currentValue=""
@@ -56,7 +56,7 @@ describe("SexChangeFormBox", () => {
         });
     });
 
-    it("updates selectedGender when an option is selected", () => {
+    it("Updates selectedGender when an option is selected", () => {
         render(
             <SexChangeFormBox
                 currentValue=""
@@ -71,7 +71,7 @@ describe("SexChangeFormBox", () => {
         expect(femaleOption.checked).toBe(true);
     });
 
-    it("calls onSubmit with selected gender", () => {
+    it("Calls onSubmit with selected gender", () => {
         render(
             <SexChangeFormBox
                 currentValue=""
@@ -88,7 +88,7 @@ describe("SexChangeFormBox", () => {
         expect(mockSubmit).toHaveBeenCalledWith("Female");
     });
 
-    it("displays error message", () => {
+    it("Displays error message", () => {
         render(
             <SexChangeFormBox
                 currentValue=""
