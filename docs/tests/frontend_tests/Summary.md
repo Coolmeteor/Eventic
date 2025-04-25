@@ -91,6 +91,45 @@ This document summarizes the unit testing practices and coverage in our React ap
 - Very long input lengths and weird characters is supported up to whatever TypeScript string can support
 
 
+### Unit: HorizontalScroll
+
+#### Test Cases
+| No. | Test Case Name                       | Description                                                    | Input                          | Expected Output / Behavior                   | Status |
+| --- | ------------------------------------ | -------------------------------------------------------------- | ------------------------------ | -------------------------------------------- | ------ |
+| 1   | HorizontalScroll rendering items     | Renders items in list                                          | textWithIcons                  | Renders all items                            | PASS   |
+| 2   | MiniHorizontalScroll rendering items | Renders items in list                                          | tags and textWithIcons         | Renders all items                            | PASS   |
+| 3   | Render if only tags                  | Render MiniHorizontalScroll correctly given  only tags         | tags but textWithIcons is null | Renders tags and only tags                   | PASS   |
+| 4   | Render if only textWithIcons         | Render MiniHorizontalScroll correctly given only textWithIcons | textWithIcons but tags is null | Renders textWithIcons and only textWithIcons | PASS   |
+
+#### Precondition
+- Data being rendered itself is not malformed
+
+
+#### Postcondition *(if needed)*
+- Data is displayed
+
+
+#### Error Handling / Edge Cases
+- No items ends up being blank list
+
+### Unit: MiniCard
+
+#### Test Cases
+| No. | Test Case Name                   | Description                                           | Input                                             | Expected Output / Behavior      | Status |
+| --- | -------------------------------- | ----------------------------------------------------- | ------------------------------------------------- | ------------------------------- | ------ |
+| 1   | Render image only                | Render card correctly given image only                | image={mockEvent.media[0]}, icon = undefined      | Renders with image          | PASS   |
+| 2   | Render icon only                 | Render card correctly given icon only                 | image = undefined, icon={faParachuteBox}          | Renders with icon   | PASS   |
+| 3   | Render given both icon and image | Render card correctly, image takes priority over icon | image={mockEvent.media[0]}, icon={faParachuteBox} | Renders with image | PASS   |
+
+#### Precondition
+- Image and/or icon data is valid
+
+#### Postcondition
+- None
+
+#### Error Handling / Edge Cases
+- No graphic is rendered when both image and icon is not provided (expected behaviour). Same with text
+
 ## Test Coverage
 Write down the test converage percentage from the testing framework. For example:
 ```markdown
