@@ -3,7 +3,8 @@
  */
 import { API } from "@/constants";
 
-function getAccessCSRFToken(){
+// Export for testing purpose
+export function getAccessCSRFToken(){
     const cookies = document.cookie.split("; ");
     for (const cookie of cookies){
         const [name, value] = cookie.split("=");
@@ -16,7 +17,8 @@ function getAccessCSRFToken(){
     return "";  // If there is not CSRF token in Cookies
 }
 
-function getRefreshCSRFToken(){
+// Export for testing purpose
+export function getRefreshCSRFToken(){
     const cookies = document.cookie.split("; ");
     for (const cookie of cookies){
         const [name, value] = cookie.split("=");

@@ -28,6 +28,7 @@
     "html5-qrcode": "^2.3.8",
     "next": "^15.1.6",
     "next-auth": "^4.24.11",
+    "node-fetch": "^3.3.2",
     "pdfmake": "^0.2.18",
     "postcss": "^8.5.1",
     "quill": "^2.0.3",
