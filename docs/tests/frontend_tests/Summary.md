@@ -966,6 +966,7 @@ const mockEventItemProps: EventItemProps = {
 ### Unit: Integration
 
 #### Integration Test Cases
+- All integration test cases listed above were manually executed and verified without automation.
 
 | No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
 |-----|----------------|-------------|-------|----------------------------|--------|
