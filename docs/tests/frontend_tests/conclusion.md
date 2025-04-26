@@ -1,19 +1,13 @@
 ## Test Coverage
-Write down the test converage percentage from the testing framework. For example:
+This section shows the test coverate for the front-end testing.
 ```markdown
 Unit Test Coverage (from Jest):
-- Statements: 93%
-- Branches: 87%
-- Functions: 95%
-- Lines: 93%
-```
-
-## Known Issues
-Describe not tested/not fixed issues. For example:
-```markdown
-- Toast messages occasionally overlap on small screens
-- Delay in error rendering due to debounce (to be fixed)
+- Statements: 87.36%
+- Branches: 78.04%
+- Functions: 80.39%
+- Lines: 88.93%
 ```
 
 ## Authors
-Names whose worked on the frontend testing.
+- Shoei Yamamoto (sy21uu@brocku.ca, 7334444)
+- Michael Zhou (mz21pp@brocku.ca, 7265762)

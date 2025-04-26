@@ -6,7 +6,7 @@ This document summarizes the unit testing practices and coverage in our React ap
 
 ## Objective
 
-- Verify that each component behaves as expected under typical and edge-case scenarios.
+- Verify that each component behaves as expected under typical and some edge-case scenarios.
 - Ensure that any changes in logic do not unintentionally break the UI.
 - Improve maintainability by documenting test structure clearly.
 
@@ -15,4 +15,4 @@ This document summarizes the unit testing practices and coverage in our React ap
 - Frontend Framework: React
 - Language: TypeScript
 - Testing Framework: Jest, @testing-library/react
-- Date: ******************************************
+- Date: 04/25/2025
