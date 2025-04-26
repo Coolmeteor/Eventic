@@ -758,6 +758,254 @@ const mockEventItemProps: EventItemProps = {
 - Additional tests may include corrupted image data, network errors, or no ticket ID.
 
 
+### Unit: auth-api
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1  | Get access CSRF token | Reads `csrf_access_token` from cookies | `document.cookie` has access token | Returns access token | PASS |
+| 2  | Get refresh CSRF token | Reads `csrf_refresh_token` from cookies | `document.cookie` has refresh token | Returns refresh token | PASS |
+| 3  | Convert response with JSON content | Converts `application/json` response | Fake response with JSON content | Returns parsed JSON object | PASS |
+| 4  | Convert response with non-JSON content | Converts `text/plain` response | Fake response with plain text | Returns raw text | PASS |
+| 5  | Logout redirects to login page | Successfully calls logout API and redirects | Mock fetch returns success | `window.location.href` is `/login` | PASS |
+| 6  | Authentication succeeds with access token | Access token is valid and authenticated successfully | Mock fetch returns success on access check | Returns `true` | PASS |
+| 7  | Authentication succeeds after refresh | Access token fails, refresh succeeds | First fetch fails, second fetch succeeds | Returns `true` | PASS |
+| 8  | Authentication fails completely | Both access token and refresh token fail | Both fetch attempts fail | Returns `false` | PASS |
+| 9  | Refresh token success | Refresh token API call succeeds | Mock fetch returns success | Returns response with `ok: true` | PASS |
+| 10 | Refresh token failure | Refresh token API call fails | Mock fetch returns failure | Returns `undefined` | PASS |
+
+#### Precondition
+- `global.fetch` is mocked.
+- `window.location.href` is overridden in the testing environment.
+
+#### Postcondition
+- Correct behavior for token management and authentication flow is confirmed.
+
+#### Error Handling / Edge Cases
+- Handles missing or invalid cookies.
+- Handles access token expiration and retries with refresh token.
+- Handles complete authentication failure gracefully.
+
+
+### Unit: event
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1  | Extract event item data | Extracts essential fields from event object | Sample `Event` object | Returns simplified event item | PASS |
+| 2  | fetchTicketEvent success | Successfully fetches event data | Mock fetch resolves ok | Returns event object | PASS |
+| 3  | fetchTicketEvent failure | Fails to fetch event data | Mock fetch resolves not ok | Returns `undefined` | PASS |
+| 4  | fetchAddCart success | Successfully adds item to cart | Mock fetch resolves ok | Returns `true` | PASS |
+| 5  | fetchAddCart failure | Fails to add item to cart | Mock fetch resolves not ok | Returns `false` | PASS |
+| 6  | fetchDeleteCart success | Successfully deletes cart | Mock fetch resolves ok | Returns `true` | PASS |
+| 7  | fetchDeleteCart failure | Fails to delete cart | Mock fetch resolves not ok | Returns `false` | PASS |
+| 8  | fetchCartItems success | Successfully fetches cart items | Mock fetch resolves ok | Returns cart items array | PASS |
+| 9  | fetchCartItems failure | Fails to fetch cart items | Mock fetch resolves not ok | Returns `undefined` | PASS |
+| 10 | fetchCartPurchase success | Successfully completes cart purchase | Mock fetch resolves ok | Returns `true` | PASS |
+| 11 | fetchCartPurchase failure | Fails to complete cart purchase | Mock fetch resolves not ok | Returns `false` | PASS |
+
+#### Precondition
+- `global.fetch` and `convertResponse` are mocked.
+- All network operations are simulated inside unit tests.
+
+#### Postcondition
+- Correct extraction of event data is validated.
+- Correct handling of add-to-cart, delete-cart, cart fetch, and purchase flows is verified.
+
+#### Error Handling / Edge Cases
+- Handles API failures by returning appropriate fallback values (`false`, `undefined`).
+- Ensures API response structure is respected.
+
+
+### Unit: helper
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1  | Convert blob to Base64 string | Successfully fetches a blob and converts it | Mocked blob fetch and FileReader response | Returns base64-encoded string | PASS |
+
+#### Precondition
+- `global.fetch` is mocked to return a blob.
+- `global.FileReader` is mocked to simulate reading the blob as a base64 data URL.
+
+#### Postcondition
+- `blobToBase64` returns a valid base64 string from the provided URL.
+
+#### Error Handling / Edge Cases
+- FileReader's `onloadend` is correctly triggered.
+- Fetch call is verified to have been made with the correct URL.
+- Handles successful fetch and base64 conversion gracefully.
+
+
+### Unit: profile-api
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1 | isValidGender returns true for valid values | "Male", "Female", "Other" | Valid gender strings | true | PASS |
+| 2 | isValidGender returns false for invalid values | "Unknown" | false | PASS |
+| 3 | fetchProfile returns user when access token valid | Mock fetch 200 OK | Returns user data | PASS |
+| 4 | fetchProfile refreshes token if 401 and succeeds | Mock fetch 401 then 200 | Returns user data after refresh | PASS |
+| 5 | fetchProfile redirects if refresh fails | Mock fetch 401, refresh fail | Redirect to `/login` | PASS |
+| 6 | fetchUserInfo succeeds with valid response | Mock fetch 200 OK | Returns user data | PASS |
+| 7 | fetchUserInfo returns undefined on error | Mock fetch 400 Bad | Returns undefined | PASS |
+| 8 | changeRequest succeeds on first attempt | Mock fetch 200 OK | Calls resetText and sets success | PASS |
+| 9 | changeRequest refreshes token and succeeds | Mock fetch 401 then 200 | Calls resetText after refresh | PASS |
+| 10 | changeRequest redirects on refresh fail | Mock fetch 401, refresh fail | Redirect to `/login` | PASS |
+| 11 | fetchOrders succeeds directly | Mock fetch 200 OK | Returns orders data | PASS |
+| 12 | fetchOrders refreshes token and succeeds | Mock fetch 401 then 200 | Returns orders data | PASS |
+| 13 | fetchOrders redirects if refresh fails | Mock fetch 401, refresh fail | Redirect to `/login` | PASS |
+| 14 | fetchUpcomingOrders succeeds directly | Mock fetch 200 OK | Returns upcoming orders data | PASS |
+| 15 | fetchUpcomingOrders refreshes token and succeeds | Mock fetch 401 then 200 | Returns upcoming orders data | PASS |
+| 16 | fetchUpcomingOrders redirects if refresh fails | Mock fetch 401, refresh fail | Redirect to `/login` | PASS |
+
+#### Precondition
+- `global.fetch` is mocked for HTTP requests.
+- `refreshToken` and `convertResponse` are mocked from `auth-api`.
+- `window.location.href` is writable and controlled in tests.
+
+#### Postcondition
+- Data is returned or redirection happens appropriately.
+- Token refresh logic is verified.
+- Error handling ensures fallback to `/login` if authentication fails.
+
+#### Error Handling / Edge Cases
+- 401 Unauthorized triggers refresh logic.
+- Refresh failure causes forced logout.
+- convertResponse correctly processes both JSON and plain text responses.
+
+
+### Unit: statistics
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1 | sortStatsData name ascending | Sorts events by name in ascending order | Events with names "B Event", "A Event" | Sorted order: "A Event", "B Event" | PASS |
+| 2 | sortStatsData sales descending | Sorts events by sales in descending order | Events with sales 1000, 2000 | Sorted order: 2000 → 1000 | PASS |
+| 3 | FetchEventStats returns all stats | Fetch stats when duration is "all" | Mock fetch OK | Returns stats data | PASS |
+| 4 | FetchEventStats returns duration stats | Fetch stats when duration is "threeMonths" | Mock fetch OK | Returns duration stats | PASS |
+| 5 | FetchEventStats returns undefined on failure | Fetch fails | Mock fetch not OK | Returns undefined | PASS |
+| 6 | FetchChart returns data on success | Fetch sales chart data | Mock fetch OK | Returns chart data array | PASS |
+| 7 | FetchChart returns empty array on failure | Fetch fails | Mock fetch not OK | Returns empty array | PASS |
+| 8 | FetchDailyChart returns data on success | Fetch daily chart data | Mock fetch OK | Returns chart data array | PASS |
+| 9 | FetchDailyChart returns undefined on failure | Fetch fails | Mock fetch not OK | Returns undefined | PASS |
+| 10 | FetchWeeklyChart returns data on success | Fetch weekly chart data | Mock fetch OK | Returns chart data array | PASS |
+| 11 | FetchWeeklyChart returns undefined on failure | Fetch fails | Mock fetch not OK | Returns undefined | PASS |
+| 12 | FetchOrgEvents returns all events | Fetch "all" events for organizer | Mock fetch OK | Returns events list | PASS |
+| 13 | FetchOrgEvents returns upcoming events | Fetch "upcoming" events for organizer | Mock fetch OK | Returns upcoming events list | PASS |
+| 14 | FetchOrgEvents returns previous events | Fetch "previous" events for organizer | Mock fetch OK | Returns previous events list | PASS |
+| 15 | FetchOrgEvents returns undefined on failure | Fetch fails | Mock fetch not OK | Returns undefined | PASS |
+
+#### Precondition
+- `global.fetch` is mocked for HTTP requests.
+- `convertResponse` is mocked from `auth-api`.
+- Sample event data is provided where needed for sorting tests.
+
+#### Postcondition
+- Data is sorted correctly or returned based on fetch success.
+- Undefined or empty array is returned when fetch fails.
+
+#### Error Handling / Edge Cases
+- Fallback behavior (undefined or empty array) is tested for failed API calls.
+- Sorting direction ("asc", "desc") correctness is verified.
+
+
+### Unit: ticket_purchases
+
+#### Test Cases for Utility Functionst
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1 | AuthorizeTicket success case | Returns true when fetch is successful and ok | Ticket ID = 123, fetch ok = true | Returns true | PASS |
+| 2 | AuthorizeTicket failure case | Returns false when fetch is not ok | Ticket ID = 456, fetch ok = false | Returns false | PASS |
+| 3 | AuthorizeTicket fetch error case | Returns false when fetch throws an error | Ticket ID = 789, fetch throws error | Returns false | PASS |
+
+#### Precondition
+- `global.fetch` is mocked for HTTP requests.
+- `jest.clearAllMocks()` is called before each test to reset fetch behavior.
+
+#### Postcondition
+- Ticket authorization succeeds or fails appropriately based on API response.
+
+#### Error Handling / Edge Cases
+- Proper handling is verified when:
+- Fetch response is not OK.
+- Fetch operation itself fails (e.g., network error).
+
+
+### Unit: utils
+
+#### Test Cases for Utility Functions
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1 | Return correct icon for matching category | Returns icon matching input category exactly | "Music" | Icon with `iconName: "music"` | PASS |
+| 2 | Case insensitive matching | Returns correct icon even if input case differs | "art" | Icon with `iconName: "paint-brush"` | PASS |
+| 3 | Return default icon if no match | Returns default icon when no category matches | "Unknown Category" | Icon with `iconName: "question-circle"` | PASS |
+
+#### Precondition
+- `eventCategoriesWithIcons` mock is provided:
+  - "Music" → "music" icon
+  - "Art" → "paint-brush" icon
+  - Default → "question-circle" icon
+
+#### Postcondition
+- Correct icon object is returned based on category name, case-insensitive.
+
+#### Error Handling / Edge Cases
+- If no category matches, the default icon (`question-circle`) is safely returned.
+
+
+## Integration Tests
+
+### Unit: Integration
+
+#### Integration Test Cases
+
+| No. | Test Case Name | Description | Input | Expected Output / Behavior | Status |
+|-----|----------------|-------------|-------|----------------------------|--------|
+| 1 | Home → Event Detail Navigation | Clicking event card on Home navigates to event detail page | Click event card | Moved to `/event/[id]` page | PASS |
+| 2 | Login Success | Enter correct credentials and login | Correct email/password | Redirected to Home page | PASS |
+| 3 | Login Failure | Enter wrong credentials and attempt login | Wrong email/password | Error message shown, stays on login page | PASS |
+| 4 | Move to Create User Form | Click "Create One" on login page | Click "Create One" link | User registration form displayed | PASS |
+| 5 | Move to Organizer Registration | In user registration form, click "Move to organizer registration" | Click link | Redirected to `/org/register` page | PASS |
+| 6 | Profile Page for Customer | Customer account profile shows only "Your Account" quick links | Logged-in as Customer | Only "Your Account" links shown | PASS |
+| 7 | Profile Page for Organizer | Organizer account profile shows "Your Account" and "Event Management" quick links | Logged-in as Organizer | Both "Your Account" and "Event Management" links shown | PASS |
+| 8 | Organizer Event List (/org/events) | Shows list of events linked to organizer | Access `/org/events` | Organizer's events listed | PASS |
+| 9 | Upcoming Events (/org/upcoming) | Shows events within 1 month from today | Access `/org/upcoming` | Only future events within 1 month shown | PASS |
+| 10 | Past Events (/org/previous) | Shows past events | Access `/org/previous` | Only past events shown | PASS |
+| 11 | Organizer Statistics (/org/stats) | Shows charts and tables, changeable by duration/sort | Access `/org/stats` and interact | Chart and table update correctly | PASS |
+| 12 | Ticket Scanner (/org/scan) | Select upcoming event and open camera | Access `/org/scan` | Upcoming events selectable, camera opens | PASS |
+| 13 | Customer Order List (/customer/orders) | Displays purchased ticket list | Access `/customer/orders` | List of purchased tickets shown | PASS |
+| 14 | Customer Upcoming Events (/customer/upcoming) | Shows tickets for events happening soon | Access `/customer/upcoming` | Upcoming event tickets listed | PASS |
+| 15 | Event List (/event) | Shows public event list with filters and sorting | Access `/event` | Public events displayed, filtering/sorting works | PASS |
+| 16 | Event Search (/event) | Search by keyword and show matching events | Input search word | Matched events shown | PASS |
+| 17 | Event Detail Page (/event/[id]) | Displays event details by id | Access `/event/[id]` | Correct event data displayed | PASS |
+| 18 | Logout Popup | Hover person icon → Show popup → Logout | Hover icon, click logout | Logged out successfully | PASS |
+
+#### Precondition
+- Users and organizers are already registered in the system.
+- Organizer has created events.
+- Tickets are purchased by the customer account.
+
+#### Postcondition
+- User is correctly logged in/logged out.
+- Event-related pages reflect expected data based on time and user role.
+- Sorting, searching, and filters are functional.
+
+#### Error Handling / Edge Cases
+- Incorrect login shows appropriate error without redirect.
+- No events available: Pages show fallback UI (e.g., "No events found").
+- Organizer with no upcoming or past events: Displays empty list gracefully.
+- Logout always resets session and redirects to login.
+
+
+
 ## Test Coverage
 Write down the test converage percentage from the testing framework. For example:
 ```markdown
