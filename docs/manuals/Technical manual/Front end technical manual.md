@@ -255,7 +255,27 @@ Per this example, the checkout page would be `http://<host>/checkout`, the event
 
 
 ## Authentication
+Eventic front-end implements a secure authentication system based on HTTP-only cookies send from the server. This ensures that sensitive tokens are not accessible from JavaScript, minimizing risks.
 
+### Authentication Flow
+- Upon successful login/register, the backend set CSRF tokens(`csrf_access_token`, `csrf_refresh_token`) inside HTTP-only cookies.
+- These tokens are automatically sent with every request to the API server using `credentials: "include"` option in the `fetch` requests.
+```tsx
+fetch("/api/endpointA", {
+    method: "GET",
+    credentials: "include", // Send cookies with the request
+})
+```
+- `csrf_access_token` is used for normal authentication.
+- If an API request returns 401 unauthorized response, the frontend client automatically tries to refresh the access token by using the `csrf_refresh_token` when entering a page.
+- If refresh fails, the user is logged out and redirected to the login page.
+
+### Token Handling
+Tokens are never stored in LocalStorage or SessionStorage.
+The frontend relies entirely on cookies managed by the browser for security.
+- Access token is short-lived.
+- Refresh token is longer-lived and used to refresh the access token
+The system uses a CSRF protection, and all important requests include proper CSRF validation on the server side.
 
 
 
