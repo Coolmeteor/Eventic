@@ -93,35 +93,35 @@ export default function Checkout() {
                 // setEventData(data)
 
 
-                // const data = await fetchCartItems();
-                // if (data && "cart_events" in data && "quantities" in data) {
-                //     const qnties = data.quantities;
-                //     const events = data.cart_events as EventData[];
-                //     let fetchedEventData: { qnty: number, event: EventData }[] = [];
-                //     events.forEach((event, index) => {
-                //         const quantity = qnties[index];
-                //         fetchedEventData.push({
-                //             qnty: quantity,
-                //             event: event,
-                //         });
-                //     });
+                const data = await fetchCartItems();
+                if (data && "cart_events" in data && "quantities" in data) {
+                    const qnties = data.quantities;
+                    const events = data.cart_events as EventData[];
+                    let fetchedEventData: { qnty: number, event: EventData }[] = [];
+                    events.forEach((event, index) => {
+                        const quantity = qnties[index];
+                        fetchedEventData.push({
+                            qnty: quantity,
+                            event: event,
+                        });
+                    });
 
-                //     setEventData(fetchedEventData);
-                // }
+                    setEventData(fetchedEventData);
+                }
 
                 // use mock data instead
                 // deduplicate, and sum same events for quantity
-                let result: { qnty: number, event: EventData }[] = []
-                mockEvents.forEach((event) => {
-                    if (result.find((e) => e.event.id === event.id)) {
-                        result.find((e) => e.event.id === event.id)!.qnty++
-                        return
-                    } else {
-                        result.push({ qnty: 1, event: event })
-                    }
-                })
+                // let result: { qnty: number, event: EventData }[] = []
+                // mockEvents.forEach((event) => {
+                //     if (result.find((e) => e.event.id === event.id)) {
+                //         result.find((e) => e.event.id === event.id)!.qnty++
+                //         return
+                //     } else {
+                //         result.push({ qnty: 1, event: event })
+                //     }
+                // })
 
-                setEventData(result)
+                // setEventData(result)
 
             } catch (err) {
                 setError((err as Error).message)
