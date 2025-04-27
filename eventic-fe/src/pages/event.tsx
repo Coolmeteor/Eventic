@@ -24,7 +24,7 @@ const defaultSearchParams: SearchParams = {
     ascending: true,
     category: "",
     tags: [],
-    sortType: "",
+    sortType: "name",
     priceMin: undefined,
     priceMax: undefined
 }
@@ -43,7 +43,7 @@ export default function Event() {
      * This also sends the search parameters for database queries
      */
     async function searchRequest() {
-        const fetchCount = 10
+        const fetchCount = 20
         setLoading(true)
         let isSearch = JSON.stringify(searchParams) != JSON.stringify(defaultSearchParams)
         let fetchUrl = `${API}/event/recommendation/${fetchCount}`
