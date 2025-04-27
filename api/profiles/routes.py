@@ -80,29 +80,6 @@ def get_profile():
     else:
         return jsonify({"error": "User not found"}), 404
 
-
-@profile_bp.route("/userinfo/<int:user_id>", methods=["GET"])
-def get_userinfo(user_id):    
-    try:
-        print(user_id)
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                cursor.execute("SELECT * FROM users WHERE id = " + str(user_id))
-
-                user = cursor.fetchone()
-
-    except Exception as e:
-        print(e)
-        return jsonify({"error": f' Error: {str(e)}'}), 500
-    
-    if user:
-        return jsonify({
-            "message": "User info returned",
-            "user": user
-            }), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
-
 # Change the user_name
 @profile_bp.route("/change-username", methods=["PATCH"])
 def change_name():
