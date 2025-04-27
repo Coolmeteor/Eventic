@@ -53,7 +53,7 @@ describe('GalleryImage Component', () => {
 
     test('Remove button works if enabled', () => {
         const mockRemove = jest.fn()
-        render(<GalleryImage src={imageData[0]} removable onRemove={mockRemove} />)
+        render(<GalleryImage src={imageData[0]} removable={true} onRemove={mockRemove} />)
 
         const removeButton = screen.getByRole('button', { name: 'X' })
         expect(removeButton).toBeInTheDocument()
@@ -64,19 +64,10 @@ describe('GalleryImage Component', () => {
 })
 
 
-const data = {
-    files: [...imageData],
-    types: ["Files"],
-    getData: () => "",
-    setData: () => { },
-    clearData: () => { },
-
-}
 
 
 
-
-describe("MediaUploadBox", () => {
+describe("MediaUploadBox component", () => {
     let images: string[] = []
     let setImages = jest.fn((newImages) => {
         images = newImages
@@ -105,7 +96,7 @@ describe("MediaUploadBox", () => {
         expect(dropZone.className).not.toContain("bg-blue-100")
     })
 
-    test("Images are exported when inputted", async () => {
+    test("Images are exported when inputted through drag and drop", async () => {
         render(<MediaUploadBox images={images} setImages={setImages} />)
 
         const dropZone = screen.getByLabelText(/drag & drop/i).parentElement!
@@ -119,7 +110,7 @@ describe("MediaUploadBox", () => {
 
     })
 
-    test("Uploads images through file input", async () => {
+    test("Images are exported when inputted through file upload dialog", async () => {
         render(<MediaUploadBox images={images} setImages={setImages} />)
 
         // add this if have time
