@@ -10,13 +10,11 @@ import { getEventIcon } from "@/utils/utils";
 import { HorizontalEventList } from "@/components/ScrollerLists/HoritonalEventList";
 import { extractEventCardData } from "@/utils/format";
 import { EventItemProps, fetchAddCart } from "@/utils/event";
-import { fetchProfile, fetchUserInfo, User } from "@/utils/profile-api";
 
 export default function Event() {
     const router = useRouter();
     const { id } = router.query
 
-    const [user, setUser] = useState<User>()
 
     const [eventData, setEventData] = useState<EventData | null>(null)
     const [quickPicksData, setQuickPicksData] = useState<EventItemProps[]>([])
@@ -56,7 +54,7 @@ export default function Event() {
 
     const handleButtonClick = async () => {
         const isAdded = await fetchAddCart(eventData?.id as number, 1, eventData?.pricing as number);
-        if (isAdded) {
+        if (isAdded){
             setAddCartText("Added to your cart");
             setTimeout(() => setAddCartText(null), 3000);
         }
@@ -93,26 +91,12 @@ export default function Event() {
                 console.log("Data:", data);
                 setEventData(data)
 
-
-                // Fetch user info
-                if (data.creator_id) {
-                    const loadUser = async () => {
-                        const userData = await fetchUserInfo(data.creator_id);
-
-                        if (userData && "user" in userData) {
-                            setUser(userData.user);
-
-                        }
-                    }
-                    loadUser();
-                }
-
                 // use mock data instead
                 // setEventData(
                 //     mockEvents.filter((event) => event.id === parseInt(id))[0]
                 // )
 
-
+                fetchRecommendations()
 
             } catch (err) {
                 setError((err as Error).message)
@@ -122,7 +106,6 @@ export default function Event() {
         };
 
         fetchEvent();
-        fetchRecommendations()
     }, [id]);
     console.log("Event " + id, eventData)
     return (
@@ -197,9 +180,9 @@ export default function Event() {
 
                                 <div className="add-cart-container">
                                     {addCartText &&
-                                        <h2 className="cart-text">{addCartText}</h2>
+                                    <h2 className="cart-text">{addCartText}</h2>
                                     }
-                                    <button
+                                    <button 
                                         className="apply-button"
                                         onClick={handleButtonClick}
                                         disabled={new Date(eventData.start_date) < new Date()}
@@ -209,24 +192,13 @@ export default function Event() {
                                 </div>
 
                                 <div className="organizer-detail">
-                                    {user && <>
-                                        <p>Posted: {new Date(eventData.created_at).toDateString()}</p>
-                                        <p>Updated: {new Date(eventData.updated_at).toDateString()}</p>
-                                        <div className="spacer"></div>
-
-
-                                        <h2>Event organizer</h2>
-
-                                        <div className="organizer-icon">
-                                            <p>{user.user_name}</p>
-                                            <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
-                                        </div>
-
-
-                                        <h2>Contact information</h2>
-                                        <p>Email: {user.email}</p>
-                                        <p>Phone: {user.phone}</p>
-                                    </>}
+                                    <h2>Organizer</h2>
+                                    <p>{eventData.creator}</p>
+                                    <div className="organizer-icon">
+                                        <FontAwesomeIcon icon={faSquarePersonConfined} fontSize={"170px"} />
+                                    </div>
+                                    <p>Posted: {new Date(eventData.created_at).toDateString()}</p>
+                                    <p>Updated: {new Date(eventData.updated_at).toDateString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -234,7 +206,7 @@ export default function Event() {
 
                         <HorizontalEventList
                             title="Related Events"
-                            EventCards={quickPicksData.filter((event) => event.id != eventData?.id)}
+                            EventCards={quickPicksData}
                         />
                     </div>
                 }
@@ -356,7 +328,6 @@ export default function Event() {
 
                 .organizer-icon {
                     display: flex;
-                    flex-direction: column;
                     justify-content: center;
                     align-items: center;
                     padding-right: 1em;
