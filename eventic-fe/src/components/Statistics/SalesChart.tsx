@@ -82,19 +82,18 @@ export default function SalesLineChart({
 
         loadData();
     }, []);
-
-    if (chartData.length <= 0){
-        if (isLoading){
-            <LoadingMessage>Loading chart</LoadingMessage>
-        }
-        else {
-
-        }
-    }
-
-    useMemo(() => {
+    
+    useEffect(() => {
         setLabelInterval(Math.max(Math.ceil((chartData.length / 20) - 1), 0));
     }, [chartData]);
+
+    if (isLoading){
+        return <LoadingMessage>Loading chart</LoadingMessage>
+    }
+
+    if (chartData.length <= 0){
+        return <div className='container'>No data available.</div>;
+    }
 
     return (
         <>
@@ -181,29 +180,32 @@ export default function SalesLineChart({
                         <label className="settings-label">Chart Settings</label>
                         <div className="box-container">
                             <div className="setting">
-                                <label className="set-label">Duration</label>
+                                <label htmlFor="duration-select" className="set-label">Duration</label>
                                 <select
+                                    id="duration-select"
+                                    name="duration"
                                     value={duration}
                                     onChange={handleDurationChange}
                                     className="select-box"
                                 >
                                     {
-                                        durations.map((item) => (
-                                            <option value={item.value}>{item.label}</option>
+                                        durations.map((item, index) => (
+                                            <option key={index} value={item.value}>{item.label}</option>
                                         ))
                                     }
                                 </select>
                             </div>
                             <div className="setting">
-                                <label className="set-label">Interval</label>
+                                <label htmlFor="interval-select" className="set-label">Interval</label>
                                 <select
+                                    id="interval-select"
                                     value={interval}
                                     onChange={handleIntervalChange}
                                     className="select-box"
                                 >
                                     {
-                                        intervals.map((item) => (
-                                            <option value={item.value}>{item.label}</option>
+                                        intervals.map((item, index) => (
+                                            <option key={index} value={item.value}>{item.label}</option>
                                         ))
                                     }
                                 </select>

@@ -8,10 +8,11 @@ const customJestConfig = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     testEnvironment: 'jsdom',
     moduleNameMapper: {
-    '\\.(css|scss|sass)$': 'identity-obj-proxy',
+        '\\.(css|scss|sass)$': 'identity-obj-proxy',
+        "^@/(.*)$": "<rootDir>/src/$1",
     },
     transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+        '^.+\\.(ts|tsx)$': 'ts-jest',
     },
     testMatch: [
         '**/__tests__/**/*.[jt]s?(x)',

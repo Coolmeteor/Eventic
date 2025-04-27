@@ -66,15 +66,16 @@ export default function DailyChart({
             <div className='container'>
                 <h2 className='chart-label'>Daily</h2>
                 <div className="sort-container">
-                    <label className="sort-label">Select data by:</label>
+                    <label htmlFor="sort-select" className="sort-label">Select data by:</label>
                     <select
+                        id="sort-select"
                         value={sortType}
                         onChange={handleSortTypeChange}
                         className="select-box"
                     >
                         {
-                            sortTypes.map((item) => (
-                                <option value={item.value}>{item.label}</option>
+                            sortTypes.map((item, index) => (
+                                <option key={index} value={item.value}>{item.label}</option>
                             ))
                         }
                     </select>

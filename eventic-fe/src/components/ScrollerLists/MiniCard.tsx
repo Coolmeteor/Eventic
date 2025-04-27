@@ -11,7 +11,7 @@ export function MiniCard({ icon = undefined, image = undefined, text }: Props) {
     return (
         <>
             <div className="mini-card">
-                {icon && <div className="mini-card-icon">
+                {(icon && image == undefined) && <div className="mini-card-icon">
                     <FontAwesomeIcon icon={icon} fontSize={"3em"} />
                 </div>}
                 {image && <img src={image} alt={text} className="mini-card-icon" />}

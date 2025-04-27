@@ -88,8 +88,12 @@ export default function SecurityChangeFormBox({
                 <h2>{children}</h2>
                 <form onSubmit={(e) => {
                     e.preventDefault();
-                    onSubmit(e.currentTarget.value.value, e.currentTarget.password.value);
+                    const form = e.currentTarget;
+                    const value = (form.elements.namedItem("value") as HTMLInputElement).value;
+                    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
+                    onSubmit(value, password);
+                    
                     setInputValue("");
                     setPassInput("");
                     setInputErrorText("");
@@ -101,6 +105,7 @@ export default function SecurityChangeFormBox({
                         onChange={handleChange} 
                         onInvalid={onInvalid}
                         id="value" 
+                        name="value"
                         type={type}
                         inputMode={inputMode}
                         placeholder={`New ${title}`}
@@ -112,6 +117,7 @@ export default function SecurityChangeFormBox({
                         value={passInput} 
                         onChange={(e) =>setPassInput(e.target.value)} 
                         id="password" 
+                        name="password"
                         type="password" 
                         placeholder={`Password`}
                     />

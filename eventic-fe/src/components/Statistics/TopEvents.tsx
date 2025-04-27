@@ -51,16 +51,16 @@ export default function TopEvents({
                     className="select-box"
                 >
                     {
-                        durations.map((item) => (
-                            <option value={item.value}>{item.label}</option>
+                        durations.map((item, index) => (
+                            <option key={index} value={item.value}>{item.label}</option>
                         ))
                     }
                 </select>
             </div>
             <ul className="list">
                 {topEvents.map((e, i) => (
-                    <div className="event-info">
-                        <li key={e.name} className={`list-${i}`}>
+                    <div key={e.name} className="event-info">
+                        <li className={`list-${i}`}>
                             {i + 1}. <a className="event-name">{e.name}</a> Sales: {formatCurrency(e.sales)}
                         </li>
                         <button 
