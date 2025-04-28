@@ -1,21 +1,34 @@
-# Summary
-This document outlines the unit tests for the database schema of the Event Management System. The tests validate the core components of the database, including constraints, triggers.
+# Backend Test Documentation
 
-# Test Coverage:
-- Schema Constraints: Ensured that data integrity rules are enforced through CHECK constraints (e.g., preventing negative pricing), UNIQUE constraints (e.g., preventing duplicate emails), and other custom rules such as the correct date order for events.
+## Database
+## Overview
+This document describes how we validate our PostgreSQL schema, triggers, and helper functions.  
+We use plain‐SQL test scripts executed via the `psql` CLI to ensure each constraint, trigger, and function behaves as expected.
 
-# Execution:
-- The tests were executed using plain SQL scripts, with psql used to interact with the PostgreSQL test database.
+## Objective
+- **Unit Tests:** Verify individual schema elements (CHECKs, UNIQUEs, triggers, functions) in isolation.  
+- **Seed Data Tests:** Confirm our seed scripts produce the expected volume and shape of data for front-end charts.
 
-- Test results were monitored to ensure that all schema constraints and triggers behaved as expected.
+## Environment
+- **Database:** PostgreSQL 13+  
+- **CLI:** `psql` (version ≥ 13)  
+- **Test Runner:**  
+  - **Option 1 (plain SQL):** Run `psql --file=…/*.test.sql` and inspect PASS/FAIL in the test-docs  
+  - **Option 2 (pgTAP):** Install [pgTAP](https://pgtap.org/) and run `pg_prove` over your `.sql` test files  
 
-# Expected Outcomes:
-- Constraints correctly reject invalid data (e.g., negative pricing, duplicate emails).
+## Test Coverage
+- Constraints: Ensured that database constraints such as CHECK, UNIQUE, and foreign keys are properly enforced.
 
-- Triggers correctly update the updated_at field and log changes in the audit_log table.
+- Triggers: Verified that triggers like updated_at updates function correctly during insert, update, and delete operations.
 
-- Functions return correct data, such as event statistics within a given date range.
 
-# Status:
-- All tests are expected to pass when executed against a correctly configured test database. If any test fails, the schema or triggers should be revised to meet the expected behavior.
+## Known Issues
+
+- **Constraint Violations**: The `tickets` table constraint to prevent negative pricing is working, but there are scenarios where invalid data might still be attempted for insertion.
+- **Trigger Failures**: The trigger on the `updated_at` column does not always fire on updates due to a logic error in the trigger function, particularly in the case of multiple updates within the same transaction.
+- **Data Type Mismatches**: There are occasional issues with inserting data that doesn’t match the expected precision for numeric fields.
+- **SQL Syntax Errors**: Some older test cases have been found to have syntax errors, particularly with missing semicolons in multi-line SQL statements.
+
+## Authors
+ZhanPing Zhou(zz19mg@brocku.ca 6854830)
 
