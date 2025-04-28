@@ -1,18 +1,17 @@
-# Frontend Test Documentation
+# Backend Test Documentation
 
+## Database
 ## Overview
-
-This document summarizes the unit testing practices and coverage in our React application project. All tests are written using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/), aiming to ensure UI component correctness, stability, and user interaction reliability.
+This document describes how we validate our PostgreSQL schema, triggers, and helper functions.  
+We use plain‐SQL test scripts executed via the `psql` CLI to ensure each constraint, trigger, and function behaves as expected.
 
 ## Objective
-
-- Verify that each component behaves as expected under typical and edge-case scenarios.
-- Ensure that any changes in logic do not unintentionally break the UI.
-- Improve maintainability by documenting test structure clearly.
+- **Unit Tests:** Verify individual schema elements (CHECKs, UNIQUEs, triggers, functions) in isolation.  
+- **Seed Data Tests:** Confirm our seed scripts produce the expected volume and shape of data for front-end charts.
 
 ## Environment
-
-- Frontend Framework: React
-- Language: TypeScript
-- Testing Framework: Jest, @testing-library/react
-- Date: ******************************************
+- **Database:** PostgreSQL 13+  
+- **CLI:** `psql` (version ≥ 13)  
+- **Test Runner:**  
+  - **Option 1 (plain SQL):** Run `psql --file=…/*.test.sql` and inspect PASS/FAIL in the test-docs  
+  - **Option 2 (pgTAP):** Install [pgTAP](https://pgtap.org/) and run `pg_prove` over your `.sql` test files  

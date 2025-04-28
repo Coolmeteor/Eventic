@@ -1,39 +1,21 @@
-# Frontend Test Documentation
+# Summary
+This document outlines the unit tests for the database schema of the Event Management System. The tests validate the core components of the database, including constraints, triggers.
 
-## Overview
+# Test Coverage:
+- Schema Constraints: Ensured that data integrity rules are enforced through CHECK constraints (e.g., preventing negative pricing), UNIQUE constraints (e.g., preventing duplicate emails), and other custom rules such as the correct date order for events.
 
-This document summarizes the unit testing practices and coverage in our React application project. All tests are written using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/), aiming to ensure UI component correctness, stability, and user interaction reliability.
+# Execution:
+- The tests were executed using plain SQL scripts, with psql used to interact with the PostgreSQL test database.
 
-## Objective
+- Test results were monitored to ensure that all schema constraints and triggers behaved as expected.
 
-- Verify that each component behaves as expected under typical and edge-case scenarios.
-- Ensure that any changes in logic do not unintentionally break the UI.
-- Improve maintainability by documenting test structure clearly.
+# Expected Outcomes:
+- Constraints correctly reject invalid data (e.g., negative pricing, duplicate emails).
 
-## Environment
+- Triggers correctly update the updated_at field and log changes in the audit_log table.
 
-- Frontend Framework: React
-- Language: TypeScript
-- Testing Framework: Jest, @testing-library/react
-- Date: ******************************************
+- Functions return correct data, such as event statistics within a given date range.
 
-## Test Coverage
-Write down the test converage percentage from the testing framework. For example:
-```markdown
-Unit Test Coverage (from Jest):
-- Statements: 93%
-- Branches: 87%
-- Functions: 95%
-- Lines: 93%
-```
-
-## Known Issues
-Describe not tested/not fixed issues. For example:
-```markdown
-- Toast messages occasionally overlap on small screens
-- Delay in error rendering due to debounce (to be fixed)
-```
-
-## Authors
-Names whose worked on the frontend testing.
+# Status:
+- All tests are expected to pass when executed against a correctly configured test database. If any test fails, the schema or triggers should be revised to meet the expected behavior.
 
